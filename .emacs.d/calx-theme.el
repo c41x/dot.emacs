@@ -73,11 +73,17 @@
 ; add new face to match C/C++ operators and numbers
 (defvar font-lock-operator-face 'font-lock-operator-face)
 (defvar font-lock-number-face 'font-lock-number-face)
+(defvar font-lock-over-80-face 'font-lock-over-80-face)
 
 (defface font-lock-operator-face
   '((((class color)) :foreground "#99bde6")
     (t :inverse-video t))
   "Face to match operators (custom)." :group 'basic-faces)
+
+(defface font-lock-over-80-face
+  '((((class color)) :foreground "LightSkyBlue")
+    (t :inverse-video t))
+  "Face to match 80+ lines custom)." :group 'basic-faces)
 
 (defface font-lock-number-face
   '((((class color)) :foreground "red")
@@ -88,4 +94,5 @@
  '(flymake-errline ((((class color)) (:background "#772200"))))
  '(flymake-warnline ((((class color)) (:underline "#aaff33"))))
  '(font-lock-number-face ((t (:foreground "#dd5522"))));66aa33
- '(font-lock-operator-face ((t (:foreground "#99bde6")))))
+ '(font-lock-operator-face ((t (:foreground "#99bde6"))))
+ '(font-lock-over-80-face ((t (:foreground "#ff2211")))))
