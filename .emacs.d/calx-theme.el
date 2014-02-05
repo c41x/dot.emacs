@@ -1,0 +1,91 @@
+(deftheme calx
+  "Created 2012-10-13.")
+
+;(background-cl "#000000")
+;(foreground-cl "#b2af99")
+;(comment "#515850")
+;(keyword "#649cd8")
+;(number "#eb5ce0")
+;(operator "#99bde6")
+;(string-fore "#dc7e28")
+;(highlight-back "#333333")
+;(highlight-fore "#ffffff")
+;(frame-color "#00ff00")
+;(modeline-color "#649cd8")
+;(modeline-fore-color "#000000")
+;(modeline-color-incactive "#222222")
+
+; hints:
+; to find out what face (and other info) is under cursor, jest press C-u C-x =
+
+(custom-theme-set-faces
+ 'calx
+ '(default ((t (:inherit nil :background "#000000" :foreground "#b2af99" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "outline" :family "Liberation Mono"))))
+ '(cursor ((t (:background "white"))))
+ '(fixed-pitch ((t (:family "Monospace"))))
+ '(variable-pitch ((t (:family "Sans Serif"))))
+ '(escape-glyph ((t (:foreground "#dc7e28"))))
+ '(minibuffer-prompt ((t (:foreground "#dc7e28"))))
+ '(highlight ((t (:foreground "#ffffff" :underline t))))
+ '(region ((t (:background "#333333"))))
+ '(shadow ((((class color grayscale) (min-colors 88) (background light)) (:foreground "grey50")) (((class color grayscale) (min-colors 88) (background dark)) (:foreground "grey70")) (((class color) (min-colors 8) (background light)) (:foreground "green")) (((class color) (min-colors 8) (background dark)) (:foreground "yellow"))))
+ '(secondary-selection ((t (:foreground "#f6f3e8" :background "#333366"))))
+ '(trailing-whitespace ((((class color) (background light)) (:background "red1")) (((class color) (background dark)) (:background "red1")) (t (:inverse-video t))))
+ '(font-lock-builtin-face ((t (:foreground "#649cd8"))))
+ '(font-lock-comment-delimiter-face ((default (:inherit (font-lock-comment-face)))))
+ '(font-lock-comment-face ((t (:foreground "#515850"))))
+ '(font-lock-constant-face ((t (:foreground "#649cd8"))))
+ '(font-lock-doc-face ((t (:inherit (font-lock-string-face)))))
+ '(font-lock-function-name-face ((t (:foreground "#b2af99"))))
+ '(font-lock-keyword-face ((t (:foreground "#649cd8"))))
+ '(font-lock-negation-char-face ((t nil)))
+ '(font-lock-preprocessor-face ((t (:foreground "#ebe05c"))))
+ '(font-lock-regexp-grouping-backslash ((t (:inherit (bold)))))
+ '(font-lock-regexp-grouping-construct ((t (:inherit (bold)))))
+ '(font-lock-string-face ((t (:foreground "#66aa33"))));dc7e28
+ '(font-lock-type-face ((t (:foreground "#649cd8"))))
+ '(font-lock-variable-name-face ((t (:foreground "#b2af99"))))
+ '(font-lock-warning-face ((t (:foreground "#ccaa8f" :inherit (error)))))
+ '(show-paren-match-face ((t (:foreground "yellow" :background "black"))))
+ '(button ((t (:foreground "#f6f3e8" :background "#333333" :inherit (link)))))
+ '(link ((t (:underline t :foreground "#8ac6f2"))))
+ '(link-visited ((t (:underline t :foreground "#e5786d" :inherit (link)))))
+ '(fringe ((t (:background "#121212" :foreground "#39ae1c"))))
+ '(linum ((t (:background "#121212" :foreground "#343434"))))
+ '(header-line ((t (:box nil :foreground "#e7f6da" :background "#303030" :inherit (mode-line)))))
+ '(tooltip ((t (:foreground "systeminfotext" :background "systeminfowindow" :inherit (variable-pitch)))))
+ '(mode-line ((t (:box (:line-width -1 :color nil :style released-button) :foreground "#dddddd" :background "#097e00"))))
+ '(mode-line-buffer-id ((t (:weight normal))))
+ '(mode-line-emphasis ((t (:weight normal))))
+ '(mode-line-highlight ((((class color) (min-colors 88)) (:box (:line-width 2 :color "#ffffff" :style released-button))) (t (:inherit (highlight)))))
+ '(mode-line-inactive ((t (:weight light :box (:line-width -1 :color "grey40" :style nil) :foreground "#857b6f" :background "#444444" :inherit (mode-line)))))
+ '(isearch ((t (:foreground "#857b6f" :background "#343434"))))
+ '(isearch-fail ((((class color) (min-colors 88) (background light)) (:background "RosyBrown1")) (((class color) (min-colors 88) (background dark)) (:background "red4")) (((class color) (min-colors 16)) (:background "red")) (((class color) (min-colors 8)) (:background "red")) (((class color grayscale)) (:foreground "grey")) (t (:inverse-video t))))
+ '(lazy-highlight ((t (:foreground "#a0a8b0" :background "#384048"))))
+ '(match ((((class color) (min-colors 88) (background light)) (:background "yellow1")) (((class color) (min-colors 88) (background dark)) (:background "RoyalBlue3")) (((class color) (min-colors 8) (background light)) (:foreground "black" :background "yellow")) (((class color) (min-colors 8) (background dark)) (:foreground "white" :background "blue")) (((type tty) (class mono)) (:inverse-video t)) (t (:background "gray"))))
+ '(next-error ((t (:inherit (region)))))
+ '(flymake-errline-)
+ '(query-replace ((t (:inherit (isearch))))))
+
+(provide-theme 'calx)
+
+; custom theming
+; add new face to match C/C++ operators and numbers
+(defvar font-lock-operator-face 'font-lock-operator-face)
+(defvar font-lock-number-face 'font-lock-number-face)
+
+(defface font-lock-operator-face
+  '((((class color)) :foreground "#99bde6")
+    (t :inverse-video t))
+  "Face to match operators (custom)." :group 'basic-faces)
+
+(defface font-lock-number-face
+  '((((class color)) :foreground "red")
+    (t :inverse-video t))
+  "Face to match numbers (custom)." :group 'basic-faces)
+
+(custom-set-faces
+ '(flymake-errline ((((class color)) (:background "#772200"))))
+ '(flymake-warnline ((((class color)) (:underline "#aaff33"))))
+ '(font-lock-number-face ((t (:foreground "#dd5522"))));66aa33
+ '(font-lock-operator-face ((t (:foreground "#99bde6")))))
