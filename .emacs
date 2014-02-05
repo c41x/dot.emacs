@@ -42,9 +42,6 @@
 (setq-default make-backup-files nil)
 (setq-default auto-save-default nil)
 
-; default make command: | or just change filename from mingw-make32 to make on windows 'cause these are 2 different exe-s...
-;(setq-default compile-command "mingw32-make")
-
 ; keystrokes
 (global-unset-key (kbd "<C-z>")) ; disable Ctrl+z hide
 (global-set-key (kbd "<C-tab>") 'other-window) ; ctrl+tab to switch panels
@@ -63,8 +60,6 @@
 
 ; remember saved buffers and screens
 (desktop-save-mode 1)
-;(require 'workgroups)
-;(workgroups-mode 1)
 
 ; popup (needed for autocomplete)
 (add-to-list 'load-path "~/.emacs.d")
@@ -78,25 +73,8 @@
 ; just bind cua-rotate-rectangle to other keybind | TODO: check if is in rectangle mode
 (global-set-key (kbd "C-M-r") 'cua-rotate-rectangle)
 
-; set window size & position (1920x1200)
-;(if (window-system)
-;    (progn
-;      (set-frame-size (selected-frame) 250 90)
-;      (set-frame-position (selected-frame) 60 10)))
-
 ; iswitchb mode for tabs
 (iswitchb-mode t)
-
-; gtalk
-;(add-to-list 'load-path "~/.emacs.d/emacs-jabber-0.8.0")
-;(require 'jabber)
-;(setq jabber-account-list '(
-;                            ("jakubduracz@gmail.com"
-;                            ;;   (:password . nil) or (:password . "your-pass")
-;                              (:network-server . "talk.google.com")
-;                              (:port . 443)
-;                              (:connection-type . ssl))
-;                            ))
 
 ; yasnippet
 (add-to-list 'load-path "~/.emacs.d/yasnippet")
@@ -107,25 +85,25 @@
 (setq-default yas/trigger-key (kbd "C-;"))
 
 ; autocomplete
-;(add-to-list 'load-path "~/.emacs.d/autocomplete")
-;(require 'auto-complete-config)
-;(add-to-list 'ac-dictionary-directories "~/.emacs.d/autocomplete/dict")
-;(ac-config-default)
+(add-to-list 'load-path "~/.emacs.d/autocomplete")
+(require 'auto-complete-config)
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/autocomplete/dict")
+(ac-config-default)
 
 ; auto-complete
-;(setq-default auto-complete-mode t)
-;(global-auto-complete-mode t)
+(setq-default auto-complete-mode t)
+(global-auto-complete-mode t)
 
 ; C/C++ autocomplete hooks
-;(defun ac-ccc-mode-setup ()
-;  (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
-; 					 ;ac-source-filename ; just press / and directory completion appears
-; 					 ac-source-files-in-current-dir ; from files in current directory
-; 					 ;ac-source-semantic ; symantic autocomplete for C/C++
-; 					 ac-source-words-in-all-buffer ; all stuff from buffers
-; 					 ac-source-yasnippet)))
-; 
-;(ac-flyspell-workaround) ; lag hack
+(defun ac-ccc-mode-setup ()
+  (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
+ 					 ;ac-source-filename ; just press / and directory completion appears
+ 					 ac-source-files-in-current-dir ; from files in current directory
+ 					 ;ac-source-semantic ; symantic autocomplete for C/C++
+ 					 ac-source-words-in-all-buffer ; all stuff from buffers
+ 					 ac-source-yasnippet)))
+ 
+(ac-flyspell-workaround) ; lag hack
 
 (add-hook 'c-mode 'ac-ccc-mode-setup)
 (add-hook 'c++-mode 'ac-ccc-mode-setup)
@@ -167,19 +145,6 @@
 (font-lock-add-keywords 'c-mode number-rex)
 (font-lock-add-keywords 'c++-mode number-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\([0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
-
-; C++ compiling keybindings (TODO: write cmake extension)
-;(global-set-key (kbd "<f7>") '(lambda () (interactive) (compile "make all"))) ; just build default target (all:)
-;(global-set-key (kbd "<f6>") '(lambda () (interactive) (compile "make run"))) ; make "run:" target
-;(global-set-key (kbd "<f5>") 'gdb) ; debug me
-;(global-set-key (kbd "<f9>") 'gdb-toggle-breakpoint) ; toggle breakpoint
-;(global-set-key (kbd "<f10>") 'gud-next) ; next statement
-
-;(global-set-key (kbd "<f3>") '(lambda () (interactive) (shell-command "cd d:/repo/multimania/data/scripts & d:/repo/multimania/data/scripts/sync_shared_vita.py")))
-;(global-set-key (kbd "<f4>") '(lambda () (interactive) (shell-command "cd d:/repo/shakespears/data/scripts & d:/repo/shakespears/data/scripts/prepare_pc_vita.py")))
-(global-set-key (kbd "<f5>") '(lambda () (interactive) (shell-command "cd d:/repo/shakespears/data/scripts & d:/repo/shakespears/data/scripts/prepare_pc_vita.py")))
-(global-set-key (kbd "<f6>") '(lambda () (interactive) (shell-command "cd d:/repo/shakespears/data/scripts & d:/repo/shakespears/data/scripts/prepare_pc_ps3.py")))
-(global-set-key (kbd "<f7>") '(lambda () (interactive) (shell-command "cd d:/repo/shakespears/data/scripts & d:/repo/shakespears/data/scripts/prepare_ps3.py")))
 
 ; C++ coding style (indenting)
 (setq c-offsets-alist '((member-init-intro . ++)))
@@ -245,16 +210,6 @@
 (global-set-key (kbd "C-c +") (lambda () (interactive) (change-closest-number 1)))
 (global-set-key (kbd "C-c -") (lambda () (interactive) (change-closest-number -1)))
 
-;
-(defun process-shit ()
-  (interactive)
-  (replace-string "4096" "2048")
-  (replace-string "2048" "1024")
-  (replace-string "1024" "512")
-  (replace-string "512" "256")
-  (replace-string "256" "128")
-)
-
 ; ace jump mode
 (require 'ace-jump-mode)
 (define-key global-map (kbd "S-SPC") 'ace-jump-mode)
@@ -297,11 +252,6 @@
 ; pretty lambda
 (require 'pretty-lambdada)
 (pretty-lambda-for-modes)
-
-; powerline
-;(add-to-list 'load-path "~/.emacs.d/powerline")
-;(require 'powerline)
-;(powerline-default-theme)
 
 ; swapping windows
 (defun swap-windows ()
