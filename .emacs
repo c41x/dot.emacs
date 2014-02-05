@@ -3,14 +3,16 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
+ '(ansi-color-names-vector
+   ["#212526" "#ff4b4b" "#b4fa70" "#fce94f"
+	"#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
  '(cua-mode t nil (cua-base))
  '(global-linum-mode t)
  '(query-replace-show-replacement t)
  '(show-paren-mode t)
  '(tool-bar-mode nil))
 		    
-;--------------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
 ; hide unused GUI's
 (tool-bar-mode -1) ;; hide toolbar (icons)
 (tooltip-mode -1) ;; hide tooltips
@@ -280,7 +282,7 @@
   (interactive)
   (highlight-lines-matching-regexp ".\\{81\\}" 'font-lock-over-80-face))
 
-;--------------------------------------------------------------------------------------------------
+;-------------------------------------------------------------------------------
 ; additional help ;
 ; to refresh settings just run M-x (eval-buffer)
 (custom-set-faces
