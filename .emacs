@@ -274,6 +274,12 @@
 
 (global-set-key (kbd "C-x C-k") 'kill-close-window)
 
+; highlight 80+ lines
+(defun highlight-80+ ()
+  "Highlights lines that have 80+ characters"
+  (interactive)
+  (highlight-lines-matching-regexp ".\\{81\\}" 'font-lock-over-80-face))
+
 ;--------------------------------------------------------------------------------------------------
 ; additional help ;
 ; to refresh settings just run M-x (eval-buffer)
