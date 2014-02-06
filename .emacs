@@ -3,9 +3,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector
-   ["#212526" "#ff4b4b" "#b4fa70" "#fce94f"
-	"#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
+ '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
  '(cua-mode t nil (cua-base))
  '(global-linum-mode t)
  '(query-replace-show-replacement t)
@@ -294,5 +292,6 @@
  '(diff-removed ((t (:foreground "orange red"))))
  '(dired-directory ((t (:foreground "#eeaa11"))))
  '(mode-line ((t (:background "#097e00" :foreground "#dddddd" :box nil))))
- '(mode-line-highlight ((t (:box (:line-width 2 :color "#ffffff"))))))
+ '(mode-line-highlight ((t nil)))
+ '(mode-line-inactive ((t (:inherit mode-line :background "#444444" :foreground "#857b6f" :box nil :weight light)))))
 
