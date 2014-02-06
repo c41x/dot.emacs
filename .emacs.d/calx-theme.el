@@ -1,5 +1,5 @@
 (deftheme calx
-  "Created 2012-10-13.")
+  "Created 2012-10-13. Last update 2014-02-06.")
 
 ;(background-cl "#000000")
 ;(foreground-cl "#b2af99")
