@@ -11,6 +11,11 @@
  '(tool-bar-mode nil))
 		    
 ;-------------------------------------------------------------------------------
+; TODO: package management
+
+;-------------------------------------------------------------------------------
+(server-start)
+
 ; hide unused GUI's
 (tool-bar-mode -1) ;; hide toolbar (icons)
 (tooltip-mode -1) ;; hide tooltips
