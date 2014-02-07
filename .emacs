@@ -9,9 +9,6 @@
  '(query-replace-show-replacement t)
  '(show-paren-mode t)
  '(tool-bar-mode nil))
-		    
-;-------------------------------------------------------------------------------
-; TODO: package management
 
 ;-------------------------------------------------------------------------------
 (server-start)
