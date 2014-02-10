@@ -140,9 +140,9 @@
 ; C/C++ autocomplete hooks
 (defun ac-ccc-mode-setup ()
   (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
- 					 ;ac-source-filename ; just press / and directory completion appears
+ 					 ac-source-filename ; just press / and directory completion appears
  					 ac-source-files-in-current-dir ; from files in current directory
- 					 ;ac-source-semantic ; symantic autocomplete for C/C++
+ 					 ac-source-semantic ; symantic autocomplete for C/C++
  					 ac-source-words-in-all-buffer ; all stuff from buffers
  					 ac-source-yasnippet)))
  
@@ -150,6 +150,10 @@
 
 (add-hook 'c-mode 'ac-ccc-mode-setup)
 (add-hook 'c++-mode 'ac-ccc-mode-setup)
+
+; control + space = autocomplete
+(global-unset-key (kbd "C-SPC"))
+(global-set-key (kbd "C-SPC") '(lambda () (interactive) (auto-complete)))
 
 ; cursor type - horizontal bar '_'
 (setq-default cursor-type 'hbar)
