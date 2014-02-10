@@ -10,7 +10,7 @@
 ::::::::::::::::::::::::::::::::::::::::::::::::::
 @echo off
 :: Emacs binaries...
-set binpath=d:\emacs\bin
+set binpath=d:\emacs-24.3\bin
 :: If no arg is given set filename to c:\
 if "%~1"=="" (
   set filename=c:\
