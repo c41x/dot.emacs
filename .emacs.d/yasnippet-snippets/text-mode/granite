@@ -1,0 +1,13 @@
+# name: (granite header)
+# key: granite
+# --
+/*
+ * granite engine 1.0 | 2006-`(format-time-string "%Y")` | Jakub Duracz | jakubduracz@gmail.com | http://jakubduracz.com 
+ * file: $1
+ * created: `(format-time-string "%d-%m-%Y")`
+ * 
+ * description: $2
+ * 
+ * changelog:
+ * - ${3:`(format-time-string "%d-%m-%Y:")` file created}$0
+ */

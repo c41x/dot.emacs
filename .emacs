@@ -11,6 +11,45 @@
  '(tool-bar-mode nil))
 
 ;-------------------------------------------------------------------------------
+(require 'cl-lib)
+(require 'cl)
+(require 'package)
+
+; package management
+(package-initialize)
+(setq package-archives
+	  '(("marmalade" . "http://marmalade-repo.org/packages/")
+		("melpa" . "http://melpa.milkbox.net/packages/")))
+
+(defvar required-packages
+  '(yasnippet
+	auto-complete
+	expand-region
+	multiple-cursors
+	ace-jump-mode
+	glsl-mode
+	cmake-mode
+	pretty-lambdada
+	autopair
+	csharp-mode
+	js2-mode
+	lua-mode
+	popup))
+
+(defun has-package-to-install ()
+  (loop for p in required-packages
+		when (not (package-installed-p p)) do (return t)
+		finally (return nil)))
+
+(when (has-package-to-install)
+  (message "get latest versions of packages...")
+  (package-refresh-contents)
+  (message "done.")
+  (dolist (p required-packages)
+	(when (not (package-installed-p p))
+	  (package-install p))))
+
+;-------------------------------------------------------------------------------
 (server-start)
 
 ; hide unused GUI's
@@ -61,13 +100,9 @@
 (global-set-key (kbd "C-M-v") 'yank-pop)
 
 ; remember saved buffers and screens
-(desktop-save-mode 1)
-
-; popup (needed for autocomplete)
-(add-to-list 'load-path "~/.emacs.d")
+;(desktop-save-mode 1)
 
 ; automatic brackets {}()[]""'' pairing
-(add-to-list 'load-path "~/autopair")
 (require 'autopair)
 (autopair-global-mode)
 
@@ -79,17 +114,15 @@
 (iswitchb-mode t)
 
 ; yasnippet
-(add-to-list 'load-path "~/.emacs.d/yasnippet")
 (require 'yasnippet)
 (yas--initialize)
-(yas-load-directory "~/.emacs.d/yasnippet/snippets")
+(yas-load-directory "~/.emacs.d/snippets")
 (yas-global-mode 1)
 (setq-default yas/trigger-key (kbd "C-;"))
 
 ; autocomplete
-(add-to-list 'load-path "~/.emacs.d/autocomplete")
 (require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories "~/.emacs.d/autocomplete/dict")
+(add-to-list 'ac-dictionary-directories "~/.emacs.d/autocomplete-dict")
 (ac-config-default)
 
 ; auto-complete
@@ -127,7 +160,6 @@
 (global-set-key (kbd "M-<down>") '(lambda () (interactive) (smooth-scroll 1 8 0.1)))
 
 ; cmake-mode
-(setq load-path (cons (expand-file-name "~/.emacs.d") load-path))
 (require 'cmake-mode)
 (setq auto-mode-alist
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
@@ -187,18 +219,18 @@
 (add-hook 'c-initialization-hook 'my-make-CR-do-indent)
 
 ; tree-mode
-(add-to-list 'load-path "~/.emacs.d/tree")
-(require 'imenu-tree)
-(require 'tags-tree)
-(require 'tree-mode)
-(eval-after-load "tree-widget"
-  '(if (boundp 'tree-widget-themes-load-path)
-       (add-to-list 'tree-widget-themes-load-path "~/.emacs.d/tree/tree-widget/imenu/")))
-(autoload 'imenu-tree "imenu-tree" "Imenu tree" t)
-(autoload 'tags-tree "tags-tree" "TAGS tree" t)
-
-; dirtree
-(require 'dirtree)
+;(add-to-list 'load-path "~/.emacs.d/tree")
+;(require 'imenu-tree)
+;(require 'tags-tree)
+;(require 'tree-mode)
+;(eval-after-load "tree-widget"
+;  '(if (boundp 'tree-widget-themes-load-path)
+;       (add-to-list 'tree-widget-themes-load-path "~/.emacs.d/tree/tree-widget/imenu/")))
+;(autoload 'imenu-tree "imenu-tree" "Imenu tree" t)
+;(autoload 'tags-tree "tags-tree" "TAGS tree" t)
+; 
+;; dirtree
+;(require 'dirtree)
 
 ; increment closest number
 (defun change-closest-number (increase-by)
@@ -216,15 +248,9 @@
 (require 'ace-jump-mode)
 (define-key global-map (kbd "S-SPC") 'ace-jump-mode)
 
-(setq package-archives '(("ELPA" . "http://tromey.com/elpa/") 
-						 ("gnu"  . "http://elpa.gnu.org/packages/")
-						 ("melpa". "http://melpa.milkbox.net/packages/")
-						 ("SC"   . "http://joseito.republika.pl/sunrise-commander/")))
-
 (flyspell-mode 0)
 
 ; multiple cursors
-(add-to-list 'load-path "~/.emacs.d/multiple-cursors")
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
@@ -232,7 +258,6 @@
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
 ; expand region
-(add-to-list 'load-path "~/.emacs.d/expand-region")
 (require 'expand-region)
 (global-unset-key (kbd "C-w"))
 (global-set-key (kbd "C-w") 'er/expand-region)
