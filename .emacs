@@ -11,11 +11,12 @@
  '(tool-bar-mode nil))
 
 ;-------------------------------------------------------------------------------
+; package management
+
 (require 'cl-lib)
 (require 'cl)
 (require 'package)
 
-; package management
 (package-initialize)
 (setq package-archives
 	  '(("marmalade" . "http://marmalade-repo.org/packages/")
@@ -50,6 +51,8 @@
 	  (package-install p))))
 
 ;-------------------------------------------------------------------------------
+; general
+
 (server-start)
 
 ; disable startup screen
