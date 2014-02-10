@@ -33,7 +33,7 @@
 	autopair
 	csharp-mode
 	js2-mode
-	lua-mode
+	lua-mode	
 	popup))
 
 (defun has-package-to-install ()
@@ -51,6 +51,9 @@
 
 ;-------------------------------------------------------------------------------
 (server-start)
+
+; disable startup screen
+(setq inhibit-startup-message t)
 
 ; hide unused GUI's
 (tool-bar-mode -1) ;; hide toolbar (icons)
@@ -101,6 +104,11 @@
 
 ; remember saved buffers and screens
 ;(desktop-save-mode 1)
+
+; open config file
+(defun cfg ()
+  (interactive)
+  (find-file "~/.emacs"))
 
 ; automatic brackets {}()[]""'' pairing
 (require 'autopair)
@@ -214,9 +222,7 @@
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
-(defun my-make-CR-do-indent ()
-  (define-key c-mode-base-map "\C-m" 'c-context-line-break))
-(add-hook 'c-initialization-hook 'my-make-CR-do-indent)
+(electric-indent-mode t)
 
 ; tree-mode
 ;(add-to-list 'load-path "~/.emacs.d/tree")
@@ -263,6 +269,7 @@
 (global-set-key (kbd "C-w") 'er/expand-region)
 
 ; CG mode
+(add-to-list 'load-path "~/.emacs.d/my-packages/")
 (require 'cg-mode)
 (add-to-list 'auto-mode-alist '("\\.fx\\'" . cg-mode))
 (add-to-list 'auto-mode-alist '("\\.cgfx\\'" . cg-mode))
