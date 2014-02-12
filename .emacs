@@ -8,6 +8,7 @@
  '(global-linum-mode t)
  '(query-replace-show-replacement t)
  '(show-paren-mode t)
+ '(sml/active-background-color "green4")
  '(tool-bar-mode nil))
 
 ;-------------------------------------------------------------------------------
@@ -49,16 +50,14 @@
   (dolist (p required-packages)
 	(when (not (package-installed-p p))
 	  (package-install p))))
+		    
+;--------------------------------------------------------------------------------------------------
+; hide unused GUI's
 
-;-------------------------------------------------------------------------------
-; general
+; no start screen
+(setq inhibit-startup-screen 1)
 
 (server-start)
-
-; disable startup screen
-(setq inhibit-startup-message t)
-
-; hide unused GUI's
 (tool-bar-mode -1) ;; hide toolbar (icons)
 (tooltip-mode -1) ;; hide tooltips
 
@@ -77,17 +76,15 @@
 ; switches off word wrap
 (setq-default truncate-lines 0)
 
-; ido mode
-(setq-default ido-mode t)
-(ido-mode t)
-;(ido-enable-flex-matching t)
-
 ; tell emacs to open .h files in C++ mode (c-mode by default)
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
 ; no auto-save-backups, thanks
 (setq-default make-backup-files nil)
 (setq-default auto-save-default nil)
+
+; default make command: | or just change filename from mingw-make32 to make on windows 'cause these are 2 different exe-s...
+(setq-default compile-command "mingw32-make")
 
 ; keystrokes
 (global-unset-key (kbd "<C-z>")) ; disable Ctrl+z hide
@@ -98,24 +95,19 @@
 (global-set-key (kbd "C-c C-<left>") (lambda () (interactive) (enlarge-window-horizontally -2)))
 (cua-mode 1) ; cua-mode (Ctrl+C,V,X,Z)
 (setq x-select-enable-clipboard t) ; allows to copy/paste text between emacs and other apps
-;(global-set-key (kbd "C-u C-c") 'uncomment-region)
-;(global-set-key (kbd "C-c C-m") 'comment-region)
 
 ; yank-pop - more CUA - friendly
 (global-unset-key (kbd "M-y"))
 (global-set-key (kbd "C-M-v") 'yank-pop)
 
-; remember saved buffers and screens
-;(desktop-save-mode 1)
+; automatic brackets {}()[]""'' pairing
+(require 'autopair)
+(autopair-global-mode)
 
 ; open config file
 (defun cfg ()
   (interactive)
   (find-file "~/.emacs"))
-
-; automatic brackets {}()[]""'' pairing
-(require 'autopair)
-(autopair-global-mode)
 
 ; fix to conflict between cua rectangle mode and autopair (autopair overrides enter key (cua-rotate-rectangle))
 ; just bind cua-rotate-rectangle to other keybind | TODO: check if is in rectangle mode
@@ -131,6 +123,10 @@
 (yas-global-mode 1)
 (setq-default yas/trigger-key (kbd "C-;"))
 
+; ido mode
+(require 'ido)
+(ido-mode t)
+
 ; autocomplete
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/autocomplete-dict")
@@ -145,12 +141,11 @@
   (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
  					 ac-source-filename ; just press / and directory completion appears
  					 ac-source-files-in-current-dir ; from files in current directory
- 					 ac-source-semantic ; symantic autocomplete for C/C++
+ 					 ;ac-source-semantic ; symantic autocomplete for C/C++
  					 ac-source-words-in-all-buffer ; all stuff from buffers
  					 ac-source-yasnippet)))
  
 (ac-flyspell-workaround) ; lag hack
-
 (add-hook 'c-mode 'ac-ccc-mode-setup)
 (add-hook 'c++-mode 'ac-ccc-mode-setup)
 
@@ -175,6 +170,7 @@
 (global-set-key (kbd "M-<down>") '(lambda () (interactive) (smooth-scroll 1 8 0.1)))
 
 ; cmake-mode
+;(setq load-path (cons (expand-file-name "~/.emacs.d") load-path))
 (require 'cmake-mode)
 (setq auto-mode-alist
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
@@ -184,40 +180,58 @@
 (setq-default font-lock-maximum-decoration 2)
 
 ; highlighting operators
+; "\\([][|!.+=&/%*,<>(){};:^~-?]+\\)"
 (defvar operator-rex '(("\\([][|!.+=&/%*,<>(){};:^~\\-?]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'c-mode operator-rex)
 (font-lock-add-keywords 'c++-mode operator-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
  
 ; highlighting numbers
+;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
 (defvar number-rex '(("\\<\\(\\([0-9.]+[lufLU]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'c-mode number-rex)
 (font-lock-add-keywords 'c++-mode number-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\([0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 
+; C++ compiling keybindings (CMake)
+(global-set-key (kbd "<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-debug)))))
+(global-set-key (kbd "S-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-release)))))
+(global-set-key (kbd "C-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-debug))))) ; compile full project
+(global-set-key (kbd "C-S-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-release))))) ; compile full project
+(global-set-key (kbd "<f6>") '(lambda () (interactive) (compile (format "%s" (find-inproject-executable-debug)))))
+(global-set-key (kbd "S-<f6>") '(lambda () (interactive) (compile (format "%s" (find-inproject-executable-release)))))
+(global-set-key (kbd "<f5>") '(lambda () (interactive) (gdb (format "gdb -i=mi %s" (find-inproject-executable-debug)))))
+(global-set-key (kbd "<f9>") 'gdb-toggle-breakpoint) ; toggle breakpoint
+(global-set-key (kbd "<f10>") 'gud-next) ; next statement
+
 ; C++ coding style (indenting)
 (setq c-offsets-alist '((member-init-intro . ++)))
 
 ; Create my personal style.
-(setq-default indent-tabs-mode t) ; no shitty spaces
-(setq-default tab-width 4)
+(setq indent-tabs-mode t) ; no shitty spaces
 
 (defconst my-c-style
-  '((c-tab-always-indent	 . t)
-	(c-comment-only-line-offset . 4)
-	(c-hanging-braces-alist	 . ((substatement-open after) (brace-list-open)))
-	(c-hanging-colons-alist	 . ((member-init-intro before) (inher-intro) (case-label after) (label after) (access-label after)))
-	(c-cleanup-list		 . (scope-operator
-							empty-defun-braces
-							defun-close-semi))
-	(c-offsets-alist		 . ((arglist-close . c-lineup-arglist)
-								(substatement-open . 0)
-								(case-label . 4)
-								(block-open . 0)
-								(inclass . 4)
-								(innamespace . 0)
-								(knr-argdecl-intro . -)))
-	(c-echo-syntactic-information-p . t))
+ '((c-tab-always-indent	 . t)
+   (c-comment-only-line-offset . 4)
+   (c-hanging-braces-alist	 . ((substatement-open after)
+				    (brace-list-open)))
+   (c-hanging-colons-alist	 . ((member-init-intro before)
+				    (inher-intro)
+				    (case-label after)
+				    (label after)
+				    (access-label after)))
+   (c-cleanup-list		 . (scope-operator
+				    empty-defun-braces
+				    defun-close-semi))
+   (c-offsets-alist		 . ((arglist-close . c-lineup-arglist)
+				    (substatement-open . 0)
+				    (case-label . 4)
+				    (block-open . 0)
+				    (inclass . 4)
+				    (innamespace . 0)
+				    (comment-intro . 0)
+				    (knr-argdecl-intro . -)))
+   (c-echo-syntactic-information-p . t))
  "calx programming style")
 
 (c-add-style "CALX" my-c-style)
@@ -229,21 +243,12 @@
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
+; auto indenting current line when pressing <enter>
 (electric-indent-mode t)
 
-; tree-mode
-;(add-to-list 'load-path "~/.emacs.d/tree")
-;(require 'imenu-tree)
-;(require 'tags-tree)
-;(require 'tree-mode)
-;(eval-after-load "tree-widget"
-;  '(if (boundp 'tree-widget-themes-load-path)
-;       (add-to-list 'tree-widget-themes-load-path "~/.emacs.d/tree/tree-widget/imenu/")))
-;(autoload 'imenu-tree "imenu-tree" "Imenu tree" t)
-;(autoload 'tags-tree "tags-tree" "TAGS tree" t)
-; 
-;; dirtree
-;(require 'dirtree)
+; ace-jump mode for quick jumping around
+(require 'ace-jump-mode)
+(define-key global-map (kbd "S-SPC") 'ace-jump-mode)
 
 ; increment closest number
 (defun change-closest-number (increase-by)
@@ -256,10 +261,6 @@
 
 (global-set-key (kbd "C-c +") (lambda () (interactive) (change-closest-number 1)))
 (global-set-key (kbd "C-c -") (lambda () (interactive) (change-closest-number -1)))
-
-; ace jump mode
-(require 'ace-jump-mode)
-(define-key global-map (kbd "S-SPC") 'ace-jump-mode)
 
 (flyspell-mode 0)
 
@@ -284,11 +285,6 @@
 (font-lock-add-keywords 'cg-mode number-rex) ; highlight numbers
 (defvar preprocessor-rex '(("\\#[A-Za-z]+" . font-lock-preprocessor-face)))
 (font-lock-add-keywords 'cg-mode preprocessor-rex) ; highlight operators
-
-; recompile . files
-(defun recompile-dots ()
-  (interactive)
-  (byte-recompile-directory "~/" 0))
 
 ; pretty lambda
 (require 'pretty-lambdada)
@@ -321,18 +317,83 @@
   (interactive)
   (highlight-lines-matching-regexp ".\\{81\\}" 'font-lock-over-80-face))
 
-;-------------------------------------------------------------------------------
+;--------------------------------------------------------------------------------------------------
+; CMake project utils
+(defun upward-check-file (filename startdir)
+  "Moves up in directory structure and checks if desired file is there"
+  (let ((dirname (expand-file-name startdir))
+	(not-found nil)
+	(top nil)
+	(max-level 5)
+	(prv-dirname nil))
+
+    (while (not (or not-found top (= max-level 0)))
+      (setq max-level (- max-level 1))
+      (if (string= (expand-file-name dirname) "/")
+	  (setq top t))
+      (if (file-exists-p (expand-file-name filename dirname))
+	  (progn
+	    (setq prv-dirname dirname)
+	    (setq dirname (expand-file-name ".." dirname)))
+	(setq not-found t)))
+
+    prv-dirname))
+
+(defun find-project-directory-base (project-dir)
+  "Returns CMake project root directory or nil"
+  (interactive)
+  (let ((file (upward-check-file "CMakeLists.txt" ".")))
+    (if file (concat (file-name-as-directory file) project-dir) nil)))
+
+(defun find-inproject-directory-base (project-dir tail)
+  "returns corresponding directory in CMake project directory structure"
+  (let ((project-root (upward-check-file "CMakeLists.txt" "."))
+	(full-path (expand-file-name ".")))
+    (if project-root
+	(concat project-root project-dir (substring full-path (length project-root)) tail)
+      nil)))
+
+(defun find-inproject-executable-base (project-dir)
+  "returns path to executable in CMake directory structure"
+  (let ((inproject-dir (find-inproject-directory-base project-dir "")))
+    (concat inproject-dir "/" (file-name-nondirectory inproject-dir))))
+
+(defun find-executable-name ()
+  "returns executable name"
+  (file-name-nondirectory (expand-file-name ".")))
+
+(defun find-project-directory-debug ()
+  (find-project-directory-base "project/debug"))
+(defun find-project-directory-release ()
+  (find-project-directory-base "project/release"))
+
+(defun find-project-directory ()
+  (find-project-directory-base ""))
+(defun find-inproject-directory-release ()
+  (find-inproject-directory-base "/project/release" "/"))
+(defun find-inproject-directory-debug ()
+  (find-inproject-directory-base "/project/debug" "/"))
+
+(defun find-inproject-executable-debug ()
+  (find-inproject-executable-base "/project/debug"))
+(defun find-inproject-executable-release ()
+  (find-inproject-executable-base "/project/release"))
+
+;--------------------------------------------------------------------------------------------------
 ; additional help ;
 ; to refresh settings just run M-x (eval-buffer)
+
+(put 'downcase-region 'disabled nil)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(diff-added ((t (:foreground "forest green"))))
- '(diff-removed ((t (:foreground "orange red"))))
+ '(compilation-error ((t (:foreground "orange red" :underline nil))))
+ '(compilation-info ((t (:foreground "light slate blue"))))
+ '(compilation-warning ((t (:foreground "green yellow" :underline nil))))
+ '(diff-added ((t (:background "dark green"))))
+ '(diff-removed ((t (:background "firebrick4"))))
  '(dired-directory ((t (:foreground "#eeaa11"))))
- '(mode-line ((t (:background "#097e00" :foreground "#dddddd" :box nil))))
- '(mode-line-highlight ((t nil)))
- '(mode-line-inactive ((t (:inherit mode-line :background "#444444" :foreground "#857b6f" :box nil :weight light)))))
-
+ '(sml/filename ((t (:inherit sml/global :foreground "lemon chiffon"))))
+ '(warning ((t (:foreground "DarkOrange")))))
