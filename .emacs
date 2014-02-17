@@ -20,36 +20,36 @@
 
 (package-initialize)
 (setq package-archives
-	  '(("marmalade" . "http://marmalade-repo.org/packages/")
-		("melpa" . "http://melpa.milkbox.net/packages/")))
+      '(("marmalade" . "http://marmalade-repo.org/packages/")
+	("melpa" . "http://melpa.milkbox.net/packages/")))
 
 (defvar required-packages
   '(yasnippet
-	auto-complete
-	expand-region
-	multiple-cursors
-	ace-jump-mode
-	glsl-mode
-	cmake-mode
-	pretty-lambdada
-	autopair
-	csharp-mode
-	js2-mode
-	lua-mode	
-	popup))
+    auto-complete
+    expand-region
+    multiple-cursors
+    ace-jump-mode
+    glsl-mode
+    cmake-mode
+    pretty-lambdada
+    autopair
+    csharp-mode
+    js2-mode
+    lua-mode	
+    popup))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
-		when (not (package-installed-p p)) do (return t)
-		finally (return nil)))
+	when (not (package-installed-p p)) do (return t)
+	finally (return nil)))
 
 (when (has-package-to-install)
   (message "get latest versions of packages...")
   (package-refresh-contents)
   (message "done.")
   (dolist (p required-packages)
-	(when (not (package-installed-p p))
-	  (package-install p))))
+    (when (not (package-installed-p p))
+      (package-install p))))
 		    
 ;--------------------------------------------------------------------------------------------------
 ; hide unused GUI's
@@ -135,6 +135,21 @@
 ; auto-complete
 (setq-default auto-complete-mode t)
 (global-auto-complete-mode t)
+
+; documentation tip
+(defun popup-doc ()
+  (interactive)
+  (let* ((position (point))
+	 (string-under-cursor (buffer-substring-no-properties
+			       (progn (skip-syntax-backward "w_") (point))
+			       (progn (skip-syntax-forward "w_") (point)))))
+    (if (ac-symbol-documentation (intern string-under-cursor))
+	(progn
+	  (goto-char position)
+	  (popup-tip (ac-symbol-documentation (intern string-under-cursor))))
+      (message (format "symbol documentation not found: \"%s\"" (intern string-under-cursor))))))
+
+(global-set-key (kbd "C-?") 'popup-doc)
 
 ; C/C++ autocomplete hooks
 (defun ac-ccc-mode-setup ()
@@ -281,6 +296,8 @@
 (require 'cg-mode)
 (add-to-list 'auto-mode-alist '("\\.fx\\'" . cg-mode))
 (add-to-list 'auto-mode-alist '("\\.cgfx\\'" . cg-mode))
+(add-to-list 'auto-mode-alist '("\\.shader\\'" . cg-mode))
+(add-to-list 'auto-mode-alist '("\\.cginc\\'" . cg-mode))
 (font-lock-add-keywords 'cg-mode operator-rex) ; highlight operators
 (font-lock-add-keywords 'cg-mode number-rex) ; highlight numbers
 (defvar preprocessor-rex '(("\\#[A-Za-z]+" . font-lock-preprocessor-face)))
@@ -316,6 +333,9 @@
   "Highlights lines that have 80+ characters"
   (interactive)
   (highlight-lines-matching-regexp ".\\{81\\}" 'font-lock-over-80-face))
+
+; file name in title bar
+(setq frame-title-format "emacs | %b")
 
 ;--------------------------------------------------------------------------------------------------
 ; CMake project utils
