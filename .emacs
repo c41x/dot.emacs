@@ -199,6 +199,7 @@
 (defvar operator-rex '(("\\([][|!.+=&/%*,<>(){};:^~\\-?]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'c-mode operator-rex)
 (font-lock-add-keywords 'c++-mode operator-rex)
+(font-lock-add-keywords 'js-mode operator-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
  
 ; highlighting numbers
@@ -206,6 +207,7 @@
 (defvar number-rex '(("\\<\\(\\([0-9.]+[lufLU]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'c-mode number-rex)
 (font-lock-add-keywords 'c++-mode number-rex)
+(font-lock-add-keywords 'js-mode number-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\([0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 
 ; C++ compiling keybindings (CMake)
