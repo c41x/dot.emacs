@@ -35,7 +35,9 @@
     autopair
     csharp-mode
     js2-mode
-    lua-mode	
+    lua-mode
+    helm
+    helm-swoop
     popup))
 
 (defun has-package-to-install ()
@@ -183,6 +185,14 @@
 (global-set-key (kbd "C-M-<down>") '(lambda () (interactive) (smooth-scroll 3 7 0.1)))
 (global-set-key (kbd "M-<up>") '(lambda () (interactive) (smooth-scroll -1 8 0.1)))
 (global-set-key (kbd "M-<down>") '(lambda () (interactive) (smooth-scroll 1 8 0.1)))
+
+; helm
+(require 'helm-config)
+(helm-mode t)
+(set 'helm-idle-delay 0.0)
+(set 'helm-input-idle-delay 0.0)
+(global-set-key (kbd "C-,") '(lambda ()(interactive) (helm-for-files)))
+(global-set-key (kbd "C-.") '(lambda ()(interactive) (helm-swoop)))
 
 ; cmake-mode
 ;(setq load-path (cons (expand-file-name "~/.emacs.d") load-path))
