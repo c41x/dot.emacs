@@ -52,6 +52,8 @@
   (dolist (p required-packages)
     (when (not (package-installed-p p))
       (package-install p))))
+
+;; TODO: uninstall unused packages
 		    
 ;--------------------------------------------------------------------------------------------------
 ; hide unused GUI's
@@ -166,9 +168,15 @@
 (add-hook 'c-mode 'ac-ccc-mode-setup)
 (add-hook 'c++-mode 'ac-ccc-mode-setup)
 
-; control + space = autocomplete
+; control + space = autocomplete (and enable AC mode if not enabled)
 (global-unset-key (kbd "C-SPC"))
-(global-set-key (kbd "C-SPC") '(lambda () (interactive) (auto-complete)))
+(global-set-key (kbd "C-SPC")
+		'(lambda ()
+		   (interactive)
+		   (unless auto-complete-mode
+		     (message "enabling auto-complete-mode")
+		     (auto-complete-mode t))
+		   (auto-complete)))
 
 ; cursor type - horizontal bar '_'
 (setq-default cursor-type 'hbar)
