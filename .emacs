@@ -5,9 +5,11 @@
  ;; If there is more than one, they won't work right.
  '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
  '(cua-mode t nil (cua-base))
+ '(custom-safe-themes (quote ("12d9cd1e2bdcaf8f18c6e9bb56336f7a62c39ed034f8eb5d17ef66ec4fef03de" default)))
  '(global-linum-mode t)
  '(query-replace-show-replacement t)
  '(show-paren-mode t)
+ '(show-paren-style (quote expression))
  '(sml/active-background-color "green4")
  '(tool-bar-mode nil))
 
@@ -73,6 +75,8 @@
 
 ; highlight matching braces
 (show-paren-mode t)
+(setq show-paren-style 'expression)
+(add-hook 'after-init-hook '(lambda ()(set-face-foreground 'show-paren-match nil))) ; keeps syntax color as foreground
 
 ; show line numbers
 (global-linum-mode t)
@@ -215,10 +219,13 @@
 ; highlighting operators
 ; "\\([][|!.+=&/%*,<>(){};:^~-?]+\\)"
 (defvar operator-rex '(("\\([][|!.+=&/%*,<>(){};:^~\\-?]\\)" . font-lock-operator-face)))
+(defvar operator-rex-xml '(("\\(<>/=\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'c-mode operator-rex)
 (font-lock-add-keywords 'c++-mode operator-rex)
 (font-lock-add-keywords 'js-mode operator-rex)
+(font-lock-add-keywords 'csharp-mode operator-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
+(font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
  
 ; highlighting numbers
 ;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
@@ -226,6 +233,7 @@
 (font-lock-add-keywords 'c-mode number-rex)
 (font-lock-add-keywords 'c++-mode number-rex)
 (font-lock-add-keywords 'js-mode number-rex)
+(font-lock-add-keywords 'csharp-mode number-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\([0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 
 ; C++ compiling keybindings (CMake)
@@ -299,6 +307,9 @@
 
 (flyspell-mode 0)
 
+;; shows current function name in modeline
+(which-function-mode)
+
 ; multiple cursors
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
@@ -317,6 +328,7 @@
 (add-to-list 'auto-mode-alist '("\\.fx\\'" . cg-mode))
 (add-to-list 'auto-mode-alist '("\\.cgfx\\'" . cg-mode))
 (add-to-list 'auto-mode-alist '("\\.shader\\'" . cg-mode))
+(add-to-list 'auto-mode-alist '("\\.compute\\'" . cg-mode))
 (add-to-list 'auto-mode-alist '("\\.cginc\\'" . cg-mode))
 (font-lock-add-keywords 'cg-mode operator-rex) ; highlight operators
 (font-lock-add-keywords 'cg-mode number-rex) ; highlight numbers
@@ -327,7 +339,7 @@
 (require 'pretty-lambdada)
 (pretty-lambda-for-modes)
 
-; swapping windows
+; swapping windows / buffers
 (defun swap-windows ()
   "Swaps buffers in selected-window with next-window"
   (interactive)
@@ -338,6 +350,20 @@
 		   (that-buffer (window-buffer that)))
 	  (set-window-buffer this that-buffer)
 	  (set-window-buffer that this-buffer))))
+
+(defun move-window-away ()
+  "Moves buffer to \"other\""
+  (interactive)
+  (unless (one-window-p)
+    (let* ((that (next-window))
+	   (this (selected-window))
+	   (this-buffer (window-buffer this))
+	   (prv-buffer (other-buffer)))
+      (set-window-buffer this prv-buffer)
+      (set-window-buffer that this-buffer))))
+
+(global-set-key (kbd "C-; s") 'swap-windows)
+(global-set-key (kbd "C-; a") 'move-window-away)
 
 ; kill-close
 (defun kill-close-window ()
@@ -356,6 +382,10 @@
 
 ; file name in title bar
 (setq frame-title-format "emacs | %b")
+
+;; delete useless trailing spaces
+(add-hook 'before-save-hook 'whitespace-cleanup)
+(add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
 
 ;--------------------------------------------------------------------------------------------------
 ; CMake project utils
@@ -440,5 +470,9 @@
  '(mode-line-emphasis ((t nil)))
  '(mode-line-highlight ((t nil)))
  '(mode-line-inactive ((t (:inherit mode-line :background "#444444" :foreground "#857b6f" :box nil))))
+ '(show-paren-match ((t (:background "#112233"))))
+ '(show-paren-match-face ((t (:background "#112233"))) t)
+ '(show-paren-mismatch ((t (:background "#aa2211"))))
+ '(show-paren-mismatch-face ((t (:background "#aa2211"))) t)
  '(sml/filename ((t (:inherit sml/global :foreground "lemon chiffon"))))
  '(warning ((t (:foreground "DarkOrange")))))
