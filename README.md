@@ -1,4 +1,4 @@
 dot.emacs
 =========
 
-Emacs configuration files
+My Emacs configuration files for Windows
