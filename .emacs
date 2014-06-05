@@ -205,6 +205,7 @@
 (set 'helm-input-idle-delay 0.0)
 (global-set-key (kbd "C-,") '(lambda ()(interactive) (helm-for-files)))
 (global-set-key (kbd "C-.") '(lambda ()(interactive) (helm-swoop)))
+(global-set-key (kbd "C-x C-f") 'find-file)
 
 ; cmake-mode
 ;(setq load-path (cons (expand-file-name "~/.emacs.d") load-path))
