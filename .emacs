@@ -22,25 +22,25 @@
 
 (package-initialize)
 (setq package-archives
-      '(("marmalade" . "http://marmalade-repo.org/packages/")
+	  '(("marmalade" . "http://marmalade-repo.org/packages/")
 	("melpa" . "http://melpa.milkbox.net/packages/")))
 
 (defvar required-packages
   '(yasnippet
-    auto-complete
-    expand-region
-    multiple-cursors
-    ace-jump-mode
-    glsl-mode
-    cmake-mode
-    pretty-lambdada
-    autopair
-    csharp-mode
-    js2-mode
-    lua-mode
-    helm
-    helm-swoop
-    popup))
+	auto-complete
+	expand-region
+	multiple-cursors
+	ace-jump-mode
+	glsl-mode
+	cmake-mode
+	pretty-lambdada
+	autopair
+	csharp-mode
+	js2-mode
+	lua-mode
+	helm
+	helm-swoop
+	popup))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -52,11 +52,11 @@
   (package-refresh-contents)
   (message "done.")
   (dolist (p required-packages)
-    (when (not (package-installed-p p))
-      (package-install p))))
+	(when (not (package-installed-p p))
+	  (package-install p))))
 
 ;; TODO: uninstall unused packages
-		    
+
 ;--------------------------------------------------------------------------------------------------
 ; hide unused GUI's
 
@@ -149,25 +149,25 @@
   (interactive)
   (let* ((position (point))
 	 (string-under-cursor (buffer-substring-no-properties
-			       (progn (skip-syntax-backward "w_") (point))
-			       (progn (skip-syntax-forward "w_") (point)))))
-    (if (ac-symbol-documentation (intern string-under-cursor))
+				   (progn (skip-syntax-backward "w_") (point))
+				   (progn (skip-syntax-forward "w_") (point)))))
+	(if (ac-symbol-documentation (intern string-under-cursor))
 	(progn
 	  (goto-char position)
 	  (popup-tip (ac-symbol-documentation (intern string-under-cursor))))
-      (message (format "symbol documentation not found: \"%s\"" (intern string-under-cursor))))))
+	  (message (format "symbol documentation not found: \"%s\"" (intern string-under-cursor))))))
 
 (global-set-key (kbd "C-?") 'popup-doc)
 
 ; C/C++ autocomplete hooks
 (defun ac-ccc-mode-setup ()
   (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
- 					 ac-source-filename ; just press / and directory completion appears
- 					 ac-source-files-in-current-dir ; from files in current directory
- 					 ;ac-source-semantic ; symantic autocomplete for C/C++
- 					 ac-source-words-in-all-buffer ; all stuff from buffers
- 					 ac-source-yasnippet)))
- 
+					 ac-source-filename ; just press / and directory completion appears
+					 ac-source-files-in-current-dir ; from files in current directory
+					 ;ac-source-semantic ; symantic autocomplete for C/C++
+					 ac-source-words-in-all-buffer ; all stuff from buffers
+					 ac-source-yasnippet)))
+
 (ac-flyspell-workaround) ; lag hack
 (add-hook 'c-mode 'ac-ccc-mode-setup)
 (add-hook 'c++-mode 'ac-ccc-mode-setup)
@@ -178,8 +178,8 @@
 		'(lambda ()
 		   (interactive)
 		   (unless auto-complete-mode
-		     (message "enabling auto-complete-mode")
-		     (auto-complete-mode t))
+			 (message "enabling auto-complete-mode")
+			 (auto-complete-mode t))
 		   (auto-complete)))
 
 ; cursor type - horizontal bar '_'
@@ -188,9 +188,9 @@
 ; simple smooth scrolling (sit-for is some kind of Sleep)
 ; time is not accurate because lag may occur while scrolling... so tweak it experimenally
 (defun smooth-scroll (lines number-of-iterations time)
-    (let ((sit-for-time (/ (float time) (float number-of-iterations))))
+	(let ((sit-for-time (/ (float time) (float number-of-iterations))))
 	(loop for i from 1 to number-of-iterations do (progn
-        (scroll-up lines)
+		(scroll-up lines)
 		(sit-for sit-for-time)))))
 
 (global-set-key (kbd "C-M-<up>") '(lambda () (interactive) (smooth-scroll -3 7 0.1)))
@@ -210,7 +210,7 @@
 ;(setq load-path (cons (expand-file-name "~/.emacs.d") load-path))
 (require 'cmake-mode)
 (setq auto-mode-alist
-      (append '(("CMakeLists\\.txt\\'" . cmake-mode)
+	  (append '(("CMakeLists\\.txt\\'" . cmake-mode)
 		("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
 
 ; font lock decoration level: 1-3 | 2 is enough, 3 is too slow on WinXP
@@ -226,7 +226,7 @@
 (font-lock-add-keywords 'csharp-mode operator-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
- 
+
 ; highlighting numbers
 ;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
 (defvar number-rex '(("\\<\\(\\([0-9.]+[lufLU]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
@@ -257,23 +257,23 @@
  '((c-tab-always-indent	 . t)
    (c-comment-only-line-offset . 4)
    (c-hanging-braces-alist	 . ((substatement-open after)
-				    (brace-list-open)))
+					(brace-list-open)))
    (c-hanging-colons-alist	 . ((member-init-intro before)
-				    (inher-intro)
-				    (case-label after)
-				    (label after)
-				    (access-label after)))
+					(inher-intro)
+					(case-label after)
+					(label after)
+					(access-label after)))
    (c-cleanup-list		 . (scope-operator
-				    empty-defun-braces
-				    defun-close-semi))
+					empty-defun-braces
+					defun-close-semi))
    (c-offsets-alist		 . ((arglist-close . c-lineup-arglist)
-				    (substatement-open . 0)
-				    (case-label . 4)
-				    (block-open . 0)
-				    (inclass . 4)
-				    (innamespace . 0)
-				    (comment-intro . 0)
-				    (knr-argdecl-intro . -)))
+					(substatement-open . 0)
+					(case-label . 4)
+					(block-open . 0)
+					(inclass . 4)
+					(innamespace . 0)
+					(comment-intro . 0)
+					(knr-argdecl-intro . -)))
    (c-echo-syntactic-information-p . t))
  "calx programming style")
 
@@ -349,18 +349,20 @@
 		   (this-buffer (window-buffer this))
 		   (that-buffer (window-buffer that)))
 	  (set-window-buffer this that-buffer)
-	  (set-window-buffer that this-buffer))))
+	  (set-window-buffer that this-buffer)
+	  (other-window 1))))
 
 (defun move-window-away ()
   "Moves buffer to \"other\""
   (interactive)
   (unless (one-window-p)
-    (let* ((that (next-window))
+	(let* ((that (next-window))
 	   (this (selected-window))
 	   (this-buffer (window-buffer this))
 	   (prv-buffer (other-buffer)))
-      (set-window-buffer this prv-buffer)
-      (set-window-buffer that this-buffer))))
+	  (set-window-buffer this prv-buffer)
+	  (set-window-buffer that this-buffer)
+	  (other-window 1))))
 
 (global-set-key (kbd "C-; s") 'swap-windows)
 (global-set-key (kbd "C-; a") 'move-window-away)
@@ -384,8 +386,8 @@
 (setq frame-title-format "emacs | %b")
 
 ;; delete useless trailing spaces
-(add-hook 'before-save-hook 'whitespace-cleanup)
-(add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
+;;(add-hook 'before-save-hook 'whitespace-cleanup)
+;;(add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
 
 ;--------------------------------------------------------------------------------------------------
 ; CMake project utils
@@ -397,36 +399,36 @@
 	(max-level 5)
 	(prv-dirname nil))
 
-    (while (not (or not-found top (= max-level 0)))
-      (setq max-level (- max-level 1))
-      (if (string= (expand-file-name dirname) "/")
+	(while (not (or not-found top (= max-level 0)))
+	  (setq max-level (- max-level 1))
+	  (if (string= (expand-file-name dirname) "/")
 	  (setq top t))
-      (if (file-exists-p (expand-file-name filename dirname))
+	  (if (file-exists-p (expand-file-name filename dirname))
 	  (progn
-	    (setq prv-dirname dirname)
-	    (setq dirname (expand-file-name ".." dirname)))
+		(setq prv-dirname dirname)
+		(setq dirname (expand-file-name ".." dirname)))
 	(setq not-found t)))
 
-    prv-dirname))
+	prv-dirname))
 
 (defun find-project-directory-base (project-dir)
   "Returns CMake project root directory or nil"
   (interactive)
   (let ((file (upward-check-file "CMakeLists.txt" ".")))
-    (if file (concat (file-name-as-directory file) project-dir) nil)))
+	(if file (concat (file-name-as-directory file) project-dir) nil)))
 
 (defun find-inproject-directory-base (project-dir tail)
   "returns corresponding directory in CMake project directory structure"
   (let ((project-root (upward-check-file "CMakeLists.txt" "."))
 	(full-path (expand-file-name ".")))
-    (if project-root
+	(if project-root
 	(concat project-root project-dir (substring full-path (length project-root)) tail)
-      nil)))
+	  nil)))
 
 (defun find-inproject-executable-base (project-dir)
   "returns path to executable in CMake directory structure"
   (let ((inproject-dir (find-inproject-directory-base project-dir "")))
-    (concat inproject-dir "/" (file-name-nondirectory inproject-dir))))
+	(concat inproject-dir "/" (file-name-nondirectory inproject-dir))))
 
 (defun find-executable-name ()
   "returns executable name"
