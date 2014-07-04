@@ -6,7 +6,7 @@
  '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
  '(cua-mode t nil (cua-base))
  '(custom-safe-themes (quote ("12d9cd1e2bdcaf8f18c6e9bb56336f7a62c39ed034f8eb5d17ef66ec4fef03de" default)))
- '(global-linum-mode t)
+ '(mode-line-format (quote ("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification "   " mode-line-position (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces "%-")))
  '(query-replace-show-replacement t)
  '(show-paren-mode t)
  '(show-paren-style (quote expression))
@@ -27,20 +27,21 @@
 
 (defvar required-packages
   '(yasnippet
-	auto-complete
-	expand-region
-	multiple-cursors
-	ace-jump-mode
-	glsl-mode
-	cmake-mode
-	pretty-lambdada
-	autopair
-	csharp-mode
-	js2-mode
-	lua-mode
-	helm
-	helm-swoop
-	popup))
+    auto-complete
+    expand-region
+    multiple-cursors
+    ace-jump-mode
+    glsl-mode
+    cmake-mode
+    pretty-lambdada
+    autopair
+    csharp-mode
+    js2-mode
+    lua-mode
+    helm
+    helm-swoop
+    smex
+    popup))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -131,9 +132,11 @@
 (yas-global-mode 1)
 (setq-default yas/trigger-key (kbd "C-;"))
 
-; ido mode
+; ido mode / smex for M-x
 (require 'ido)
 (ido-mode t)
+(smex-initialize)
+(global-set-key (kbd "M-x") 'smex)
 
 ; autocomplete
 (require 'auto-complete-config)
@@ -198,14 +201,13 @@
 (global-set-key (kbd "M-<up>") '(lambda () (interactive) (smooth-scroll -1 8 0.1)))
 (global-set-key (kbd "M-<down>") '(lambda () (interactive) (smooth-scroll 1 8 0.1)))
 
-; helm
+;; helm
 (require 'helm-config)
-(helm-mode t)
 (set 'helm-idle-delay 0.0)
 (set 'helm-input-idle-delay 0.0)
-(global-set-key (kbd "C-,") '(lambda ()(interactive) (helm-for-files)))
-(global-set-key (kbd "C-.") '(lambda ()(interactive) (helm-swoop)))
-(global-set-key (kbd "C-x C-f") 'find-file)
+(global-set-key (kbd "C-,") 'helm-for-files)
+(global-set-key (kbd "C-.") 'helm-swoop)
+(global-set-key (kbd "C-x r b") 'helm-bookmarks)
 
 ; cmake-mode
 ;(setq load-path (cons (expand-file-name "~/.emacs.d") load-path))
@@ -309,7 +311,7 @@
 (flyspell-mode 0)
 
 ;; shows current function name in modeline
-(which-function-mode)
+;; (which-function-mode)
 
 ; multiple cursors
 (require 'multiple-cursors)
@@ -457,6 +459,27 @@
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
 
+;; google services integration (uses google command line tools - googlecl)
+(defun googlecl (command)
+  "calls google command - line tool with given arguments"
+  (interactive "sGoogle Command Line | Arguments: ")
+  (message (format "google %s" command))
+  (shell-command (format "google %s" command)))
+
+(defun google-calendar-add (descr)
+  "adds event to calendar"
+  (interactive "sDescription: ")
+  (googlecl (format "calendar add \"%s\"" descr)))
+
+(defun google-calendar-today ()
+  "lists today's tasks"
+  (interactive)
+  (googlecl "calendar today"))
+
+
+(global-set-key (kbd "C-' a") 'google-calendar-add)
+(global-set-key (kbd "C-' t") 'google-calendar-today)
+
 ;--------------------------------------------------------------------------------------------------
 ; additional help ;
 ; to refresh settings just run M-x (eval-buffer)
@@ -473,14 +496,15 @@
  '(diff-added ((t (:background "dark green"))))
  '(diff-removed ((t (:background "firebrick4"))))
  '(dired-directory ((t (:foreground "#eeaa11"))))
- '(mode-line ((t (:background "#097e00" :foreground "#dddddd" :box nil))))
+ '(fringe ((t (:background "black" :foreground "#39ae1c"))))
+ '(linum ((t (:background "black" :foreground "#343434"))))
+ '(mode-line ((t (:background "#161616" :foreground "#ff3300" :box nil))))
  '(mode-line-buffer-id ((t nil)))
  '(mode-line-emphasis ((t nil)))
  '(mode-line-highlight ((t nil)))
- '(mode-line-inactive ((t (:inherit mode-line :background "#444444" :foreground "#857b6f" :box nil))))
+ '(mode-line-inactive ((t (:inherit mode-line :background "#161616" :foreground "#857b6f" :box nil :weight light))))
  '(show-paren-match ((t (:background "#112233"))))
- '(show-paren-match-face ((t (:background "#112233"))) t)
  '(show-paren-mismatch ((t (:background "#aa2211"))))
- '(show-paren-mismatch-face ((t (:background "#aa2211"))) t)
  '(sml/filename ((t (:inherit sml/global :foreground "lemon chiffon"))))
- '(warning ((t (:foreground "DarkOrange")))))
+ '(warning ((t (:foreground "DarkOrange"))))
+ '(which-func ((t (:foreground "moccasin")))))
