@@ -74,6 +74,7 @@
 (defvar font-lock-operator-face 'font-lock-operator-face)
 (defvar font-lock-number-face 'font-lock-number-face)
 (defvar font-lock-over-80-face 'font-lock-over-80-face)
+(defvar font-lock-page-break-face 'font-lock-page-break-face)
 
 (defface font-lock-operator-face
   '((((class color)) :foreground "#99bde6")
@@ -89,6 +90,11 @@
   '((((class color)) :foreground "red")
     (t :inverse-video t))
   "Face to match numbers (custom)." :group 'basic-faces)
+
+(defface font-lock-page-break-face
+  '((((class color)) :background "MediumPurple3" :foreground "gray3")
+    (t :inverse-video t))
+  "Face to match page breaks (custom)." :group 'basic-faces)
 
 (custom-set-faces
  '(flymake-errline ((((class color)) (:background "#772200"))))

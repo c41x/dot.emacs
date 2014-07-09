@@ -379,11 +379,25 @@
 
 (global-set-key (kbd "C-x C-k") 'kill-close-window)
 
-; highlight 80+ lines
+;; highlight 80+ lines
 (defun highlight-80+ ()
   "Highlights lines that have 80+ characters"
   (interactive)
   (highlight-lines-matching-regexp ".\\{81\\}" 'font-lock-over-80-face))
+
+;; highlight "page breaks" and apply in modes specified below
+(defun highlight-page-breaks ()
+  (interactive)
+  (highlight-lines-matching-regexp ".?//-." 'font-lock-page-break-face))
+
+(add-hook 'after-change-major-mode-hook
+	  (lambda ()
+	    (if (or
+		 (eq major-mode 'c-mode)
+		 (eq major-mode 'c++-mode)
+		 (eq major-mode 'js-mode)
+		 (eq major-mode 'cs-mode))
+		(highlight-page-breaks))))
 
 ; file name in title bar
 (setq frame-title-format "emacs | %b")
