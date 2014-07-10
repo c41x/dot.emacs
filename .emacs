@@ -399,6 +399,34 @@
 		 (eq major-mode 'cs-mode))
 		(highlight-page-breaks))))
 
+(defvar page-break-wrap-search nil)
+(defun page-break-navigate (dir)
+  (if (eq dir 1)
+      (next-line)
+    (previous-line))
+  (unless (re-search-forward ".?//-." nil t dir)
+    (if page-break-wrap-search
+	(progn
+	  (setq page-break-wrap-search nil)
+	  (if (eq dir 1)
+	      (beginning-of-buffer)
+	    (end-of-buffer))
+	  (page-break-navigate dir))
+      (progn
+	(setq page-break-wrap-search t)
+	(message "Search reached end of document, press button to wrap search")))))
+
+(defun next-page-break ()
+  (interactive)
+  (page-break-navigate 1))
+
+(defun prev-page-break ()
+  (interactive)
+  (page-break-navigate -1))
+
+(global-set-key (kbd "M-]") 'next-page-break)
+(global-set-key (kbd "M-[") 'prev-page-break)
+
 ; file name in title bar
 (setq frame-title-format "emacs | %b")
 

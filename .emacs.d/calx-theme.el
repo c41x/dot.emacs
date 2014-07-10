@@ -92,7 +92,7 @@
   "Face to match numbers (custom)." :group 'basic-faces)
 
 (defface font-lock-page-break-face
-  '((((class color)) :background "MediumPurple3" :foreground "gray3")
+  '((((class color)) :background "MediumPurple3" :foreground "black")
     (t :inverse-video t))
   "Face to match page breaks (custom)." :group 'basic-faces)
 
