@@ -393,6 +393,7 @@
 (add-hook 'after-change-major-mode-hook
 	  (lambda ()
 	    (if (or
+		 (eq major-mode 'cg-mode)
 		 (eq major-mode 'c-mode)
 		 (eq major-mode 'c++-mode)
 		 (eq major-mode 'js-mode)
@@ -427,7 +428,10 @@
 (global-set-key (kbd "M-]") 'next-page-break)
 (global-set-key (kbd "M-[") 'prev-page-break)
 
-; file name in title bar
+;; list page-breaks in helm-swoop
+(global-set-key (kbd "C-; x") '(lambda ()(interactive)(helm-swoop :$query ".?//-.")))
+
+;; file name in title bar
 (setq frame-title-format "emacs | %b")
 
 ;; delete useless trailing spaces
