@@ -518,7 +518,7 @@
 (defun google-calendar-add (descr)
   "adds event to calendar"
   (interactive "sDescription: ")
-  (googlecl (format "calendar add \"%s\"" descr)))
+  (googlecl (format "calendar add \"%s\" --reminder 1m" descr)))
 
 (defun google-calendar-today ()
   "lists today's tasks"
