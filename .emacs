@@ -438,6 +438,9 @@
 ;;(add-hook 'before-save-hook 'whitespace-cleanup)
 ;;(add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
 
+;; no beeps
+(setq visible-bell t)
+
 ;--------------------------------------------------------------------------------------------------
 ; CMake project utils
 (defun upward-check-file (filename startdir)
