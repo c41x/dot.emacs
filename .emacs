@@ -385,10 +385,18 @@
   (interactive)
   (highlight-lines-matching-regexp ".\\{81\\}" 'font-lock-over-80-face))
 
-;; highlight "page breaks" and apply in modes specified below
+;; highlight "page breaks" / TODOs and apply in modes specified below
+(defconst re-page-break ".?//-.")
+(defconst re-todo ".?TODO\\:.")
+(defconst re-page-break-or-todo "\\(.?//-.\\)\\|\\(.?TODO\\:.\\)")
+
 (defun highlight-page-breaks ()
   (interactive)
-  (highlight-lines-matching-regexp ".?//-." 'font-lock-page-break-face))
+  (highlight-lines-matching-regexp re-page-break 'font-lock-page-break-face))
+
+(defun highlight-todos ()
+  (interactive)
+  (highlight-lines-matching-regexp re-todo 'font-lock-todo-face))
 
 (add-hook 'after-change-major-mode-hook
 	  (lambda ()
@@ -398,14 +406,16 @@
 		 (eq major-mode 'c++-mode)
 		 (eq major-mode 'js-mode)
 		 (eq major-mode 'cs-mode))
-		(highlight-page-breaks))))
+		(progn (highlight-page-breaks)
+		       (highlight-todos)))))
 
 (defvar page-break-wrap-search nil)
 (defun page-break-navigate (dir)
   (if (eq dir 1)
       (next-line)
     (previous-line))
-  (unless (re-search-forward ".?//-." nil t dir)
+  (unless (re-search-forward re-page-break-or-todo nil t dir)
+    (message "label not found!")
     (if page-break-wrap-search
 	(progn
 	  (setq page-break-wrap-search nil)

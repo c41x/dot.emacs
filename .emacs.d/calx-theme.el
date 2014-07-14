@@ -75,6 +75,7 @@
 (defvar font-lock-number-face 'font-lock-number-face)
 (defvar font-lock-over-80-face 'font-lock-over-80-face)
 (defvar font-lock-page-break-face 'font-lock-page-break-face)
+(defvar font-lock-todo-face 'font-lock-todo-face)
 
 (defface font-lock-operator-face
   '((((class color)) :foreground "#99bde6")
@@ -93,6 +94,11 @@
 
 (defface font-lock-page-break-face
   '((((class color)) :background "MediumPurple3" :foreground "black")
+    (t :inverse-video t))
+  "Face to match page breaks (custom)." :group 'basic-faces)
+
+(defface font-lock-todo-face
+  '((((class color)) :background "goldenrod" :foreground "black")
     (t :inverse-video t))
   "Face to match page breaks (custom)." :group 'basic-faces)
 
