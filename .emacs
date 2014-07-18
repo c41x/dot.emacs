@@ -449,7 +449,7 @@
 ;;(add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
 
 ;; no beeps
-(setq visible-bell t)
+;; (setq visible-bell t)
 
 ;--------------------------------------------------------------------------------------------------
 ; CMake project utils
