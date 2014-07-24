@@ -405,7 +405,8 @@
 		 (eq major-mode 'c-mode)
 		 (eq major-mode 'c++-mode)
 		 (eq major-mode 'js-mode)
-		 (eq major-mode 'cs-mode))
+		 (eq major-mode 'cs-mode)
+		 (eq major-mode 'csharp-mode))
 		(progn (highlight-page-breaks)
 		       (highlight-todos)))))
 
