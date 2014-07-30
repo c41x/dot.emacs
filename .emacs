@@ -583,6 +583,8 @@
  '(mode-line-emphasis ((t nil)))
  '(mode-line-highlight ((t nil)))
  '(mode-line-inactive ((t (:inherit mode-line :background "#161616" :foreground "#857b6f" :box nil :weight light))))
+ '(popup-face ((t (:background "AntiqueWhite3" :foreground "black"))))
+ '(popup-menu-selection-face ((t (:background "chartreuse4" :foreground "white"))))
  '(show-paren-match ((t (:background "#112233"))))
  '(show-paren-mismatch ((t (:background "#aa2211"))))
  '(sml/filename ((t (:inherit sml/global :foreground "lemon chiffon"))))
