@@ -439,8 +439,8 @@
 (global-set-key (kbd "M-]") 'next-page-break)
 (global-set-key (kbd "M-[") 'prev-page-break)
 
-;; list page-breaks in helm-swoop
-(global-set-key (kbd "C-; x") '(lambda ()(interactive)(helm-swoop :$query ".?//-.")))
+;; list page-breaks in helm-swoop TODO:
+;; (global-set-key (kbd "C-; x") '(lambda ()(interactive)(helm-swoop :$query ".?//-.")))
 
 ;; file name in title bar
 (setq frame-title-format "emacs | %b")
