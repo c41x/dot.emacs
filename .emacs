@@ -452,12 +452,23 @@
 	(setq num (+ num 1))))
     (nreverse ret)))
 
+(defun get-buffer-tags-cursor (tags-list)
+  ;; search tags list untill point position is smaller than element
+  (let ((i 0)
+	(el tags-list))
+    (while (< (cdr (car el)) (point))
+      (setq i (+ 1 i))
+      (setq el (cdr el)))
+    i))
+
 (defun popupize-item (element)
   (popup-make-item (car element) :value (cdr element)))
 
 (defun page-breaks-popup ()
   (interactive)
-  (goto-char (popup-menu* (mapcar 'popupize-item (get-buffer-tags)))))
+  (let ((buffer-tags (get-buffer-tags)))
+    (goto-char (popup-menu* (mapcar 'popupize-item buffer-tags)
+			    :cursor (get-buffer-tags-cursor buffer-tags)))))
 
 (global-set-key (kbd "C-; x") 'page-breaks-popup)
 
