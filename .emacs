@@ -439,8 +439,28 @@
 (global-set-key (kbd "M-]") 'next-page-break)
 (global-set-key (kbd "M-[") 'prev-page-break)
 
-;; list page-breaks in helm-swoop TODO:
-;; (global-set-key (kbd "C-; x") '(lambda ()(interactive)(helm-swoop :$query ".?//-.")))
+;; list page-breaks in popup.el
+(defconst re-page-break-popup ".?//- ?\\(.*\\)")
+(defun get-buffer-tags ()
+  (let ((ret nil)
+	(num 1))
+    (save-excursion
+      (beginning-of-buffer)
+      (while (re-search-forward re-page-break-popup nil t 1)
+	(add-to-list 'ret (cons (concat " " (number-to-string num) ") " (match-string-no-properties 1))
+				(match-beginning 1)))
+	(setq num (+ num 1))))
+    (nreverse ret)))
+
+(defun popupize-item (element)
+  (popup-make-item (car element) :value (cdr element)))
+
+(defun page-breaks-popup ()
+  (interactive)
+  (goto-char (popup-menu* (mapcar 'popupize-item (get-buffer-tags)))))
+
+(global-set-key (kbd "C-; x") 'page-breaks-popup)
+
 
 ;; file name in title bar
 (setq frame-title-format "emacs | %b")
