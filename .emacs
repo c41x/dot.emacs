@@ -493,8 +493,10 @@
 (defun page-breaks-popup ()
   (interactive)
   (let ((buffer-tags (get-buffer-tags)))
-    (goto-char (popup-menu* (mapcar 'popupize-item buffer-tags)
-			    :cursor (get-buffer-tags-cursor buffer-tags)))))
+    (if buffer-tags
+	(goto-char (popup-menu* (mapcar 'popupize-item buffer-tags)
+				:cursor (get-buffer-tags-cursor buffer-tags)))
+      (message "no page breaks found"))))
 
 (global-set-key (kbd "C-; x") 'page-breaks-popup)
 
