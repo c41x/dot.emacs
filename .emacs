@@ -336,6 +336,9 @@
 (require 'pretty-lambdada)
 (pretty-lambda-for-modes)
 
+;; delete trailing whitespace on save
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
 ;; swapping windows / buffers
 (defun swap-windows ()
   "Swaps buffers in selected-window with next-window"
