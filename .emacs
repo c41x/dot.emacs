@@ -13,8 +13,8 @@
  '(sml/active-background-color "green4")
  '(tool-bar-mode nil))
 
-;-------------------------------------------------------------------------------
-; package management
+;; --------------------------------------------------------------------------------------------------
+;; package management
 
 (require 'cl-lib)
 (require 'cl)
@@ -56,46 +56,41 @@
 	(when (not (package-installed-p p))
 	  (package-install p))))
 
-;; TODO: uninstall unused packages
+;; --------------------------------------------------------------------------------------------------
 
-;--------------------------------------------------------------------------------------------------
-; hide unused GUI's
-
-; no start screen
+;; no start screen
 (setq inhibit-startup-screen 1)
 
 (server-start)
 (tool-bar-mode -1) ;; hide toolbar (icons)
 (tooltip-mode -1) ;; hide tooltips
+(scroll-bar-mode 0) ;; disable system scrollbars
 
-; theme
+;; theme
 (load-theme 'calx t)
 
-; disable system scrollbars
-(scroll-bar-mode 0)
-
-; highlight matching braces
+;; highlight matching braces
 (show-paren-mode t)
 (setq show-paren-style 'expression)
 (add-hook 'after-init-hook '(lambda ()(set-face-foreground 'show-paren-match nil))) ; keeps syntax color as foreground
 
-; show line numbers
+;; show line numbers
 (global-linum-mode t)
 
-; switches off word wrap
+;; switches off word wrap
 (setq-default truncate-lines 0)
 
-; tell emacs to open .h files in C++ mode (c-mode by default)
+;; tell emacs to open .h files in C++ mode (c-mode by default)
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
-; no auto-save-backups, thanks
+;; no auto-save-backups, thanks
 (setq-default make-backup-files nil)
 (setq-default auto-save-default nil)
 
-; default make command: | or just change filename from mingw-make32 to make on windows 'cause these are 2 different exe-s...
+;; default make command: | or just change filename from mingw-make32 to make on windows 'cause these are 2 different exe-s...
 (setq-default compile-command "mingw32-make")
 
-; keystrokes
+;; keystrokes
 (global-unset-key (kbd "<C-z>")) ; disable Ctrl+z hide
 (global-set-key (kbd "<C-tab>") 'other-window) ; ctrl+tab to switch panels
 (global-set-key (kbd "C-c C-<up>") (lambda () (interactive) (enlarge-window 2)))
@@ -105,96 +100,97 @@
 (cua-mode 1) ; cua-mode (Ctrl+C,V,X,Z)
 (setq x-select-enable-clipboard t) ; allows to copy/paste text between emacs and other apps
 
-; yank-pop - more CUA - friendly
+;; yank-pop - more CUA - friendly
 (global-unset-key (kbd "M-y"))
 (global-set-key (kbd "C-M-v") 'yank-pop)
 
-; automatic brackets {}()[]""'' pairing
+;; automatic brackets {}()[]""'' pairing
 (require 'autopair)
 (autopair-global-mode)
 
-; open config file
+;; open config file
 (defun cfg ()
   (interactive)
   (find-file "~/.emacs"))
 
-; fix to conflict between cua rectangle mode and autopair (autopair overrides enter key (cua-rotate-rectangle))
-; just bind cua-rotate-rectangle to other keybind | TODO: check if is in rectangle mode
+;; fix to conflict between cua rectangle mode and autopair (autopair overrides enter key (cua-rotate-rectangle))
+;; just bind cua-rotate-rectangle to other keybind | TODO: check if is in rectangle mode
 (global-set-key (kbd "C-M-r") 'cua-rotate-rectangle)
 
-; iswitchb mode for tabs
+;; iswitchb mode for tabs
 (iswitchb-mode t)
 
-; yasnippet
+;; file name in title bar
+(setq frame-title-format "emacs | %b")
+
+;; yasnippet
 (require 'yasnippet)
 (yas--initialize)
 (yas-load-directory "~/.emacs.d/snippets")
 (yas-global-mode 1)
 (setq-default yas/trigger-key (kbd "C-;"))
 
-; ido mode / smex for M-x
+;; ido mode / smex for M-x
 (require 'ido)
 (ido-mode t)
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
 
-; autocomplete
+;; autocomplete
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/autocomplete-dict")
 (ac-config-default)
-
-; auto-complete
 (setq-default auto-complete-mode t)
 (global-auto-complete-mode t)
 
-; documentation tip
+;; documentation tip
 (defun popup-doc ()
   (interactive)
   (let* ((position (point))
 	 (string-under-cursor (buffer-substring-no-properties
-				   (progn (skip-syntax-backward "w_") (point))
-				   (progn (skip-syntax-forward "w_") (point)))))
-	(if (ac-symbol-documentation (intern string-under-cursor))
+			       (progn (skip-syntax-backward "w_") (point))
+			       (progn (skip-syntax-forward "w_") (point)))))
+    (if (ac-symbol-documentation (intern string-under-cursor))
 	(progn
 	  (goto-char position)
 	  (popup-tip (ac-symbol-documentation (intern string-under-cursor))))
-	  (message (format "symbol documentation not found: \"%s\"" (intern string-under-cursor))))))
+      (message (format "symbol documentation not found: \"%s\"" (intern string-under-cursor))))))
 
 (global-set-key (kbd "C-?") 'popup-doc)
 
-; C/C++ autocomplete hooks
+;; C/C++ autocomplete hooks
 (defun ac-ccc-mode-setup ()
   (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
-					 ac-source-filename ; just press / and directory completion appears
-					 ac-source-files-in-current-dir ; from files in current directory
-					 ;ac-source-semantic ; symantic autocomplete for C/C++
-					 ac-source-words-in-all-buffer ; all stuff from buffers
-					 ac-source-yasnippet)))
+		     ac-source-filename ; just press / and directory completion appears
+		     ac-source-files-in-current-dir ; from files in current directory
+		     ;;ac-source-semantic ; symantic autocomplete for C/C++
+		     ac-source-words-in-all-buffer ; all stuff from buffers
+		     ac-source-yasnippet)))
 
 (ac-flyspell-workaround) ; lag hack
 (add-hook 'c-mode 'ac-ccc-mode-setup)
 (add-hook 'c++-mode 'ac-ccc-mode-setup)
 
-; control + space = autocomplete (and enable AC mode if not enabled)
+;; control + space = autocomplete (and enable AC mode if not enabled)
 (global-unset-key (kbd "C-SPC"))
 (global-set-key (kbd "C-SPC")
 		'(lambda ()
 		   (interactive)
 		   (unless auto-complete-mode
-			 (message "enabling auto-complete-mode")
-			 (auto-complete-mode t))
+		     (message "enabling auto-complete-mode")
+		     (auto-complete-mode t))
 		   (auto-complete)))
 
-; cursor type - horizontal bar '_'
+;; cursor type - horizontal bar '_'
 (setq-default cursor-type 'hbar)
 
-; simple smooth scrolling (sit-for is some kind of Sleep)
-; time is not accurate because lag may occur while scrolling... so tweak it experimenally
+;; simple smooth scrolling (sit-for is some kind of Sleep)
+;; time is not accurate because lag may occur while scrolling... so tweak it experimenally
 (defun smooth-scroll (lines number-of-iterations time)
-	(let ((sit-for-time (/ (float time) (float number-of-iterations))))
-	(loop for i from 1 to number-of-iterations do (progn
-		(scroll-up lines)
-		(sit-for sit-for-time)))))
+  (let ((sit-for-time (/ (float time) (float number-of-iterations))))
+    (loop for i from 1 to number-of-iterations do (progn
+						    (scroll-up lines)
+						    (sit-for sit-for-time)))))
 
 (global-set-key (kbd "C-M-<up>") '(lambda () (interactive) (smooth-scroll -3 7 0.1)))
 (global-set-key (kbd "C-M-<down>") '(lambda () (interactive) (smooth-scroll 3 7 0.1)))
@@ -209,18 +205,17 @@
 (global-set-key (kbd "C-.") 'helm-swoop)
 (global-set-key (kbd "C-x r b") 'helm-bookmarks)
 
-; cmake-mode
-;(setq load-path (cons (expand-file-name "~/.emacs.d") load-path))
+;; cmake-mode
 (require 'cmake-mode)
 (setq auto-mode-alist
 	  (append '(("CMakeLists\\.txt\\'" . cmake-mode)
 		("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
 
-; font lock decoration level: 1-3 | 2 is enough, 3 is too slow on WinXP
+;; font lock decoration level: 1-3 | 2 is enough, 3 is too slow
 (setq-default font-lock-maximum-decoration 2)
 
-; highlighting operators
-; "\\([][|!.+=&/%*,<>(){};:^~-?]+\\)"
+;; highlighting operators
+;; "\\([][|!.+=&/%*,<>(){};:^~-?]+\\)"
 (defvar operator-rex '(("\\([][|!.+=&/%*,<>(){};:^~\\-?]\\)" . font-lock-operator-face)))
 (defvar operator-rex-xml '(("\\(<>/=\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'c-mode operator-rex)
@@ -230,8 +225,8 @@
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
 
-; highlighting numbers
-;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
+;; highlighting numbers
+;;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
 (defvar number-rex '(("\\<\\(\\([0-9.]+[lufLU]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'c-mode number-rex)
 (font-lock-add-keywords 'c++-mode number-rex)
@@ -239,7 +234,7 @@
 (font-lock-add-keywords 'csharp-mode number-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\([0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 
-; C++ compiling keybindings (CMake)
+;; C++ compiling keybindings (CMake)
 (global-set-key (kbd "<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-debug)))))
 (global-set-key (kbd "S-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-release)))))
 (global-set-key (kbd "C-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-debug))))) ; compile full project
@@ -250,82 +245,81 @@
 (global-set-key (kbd "<f9>") 'gdb-toggle-breakpoint) ; toggle breakpoint
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
 
-; C++ coding style (indenting)
+;; C++ coding style (indenting)
 (setq c-offsets-alist '((member-init-intro . ++)))
-
-; Create my personal style.
 (setq indent-tabs-mode t) ; no shitty spaces
 
 (defconst my-c-style
- '((c-tab-always-indent	 . t)
-   (c-comment-only-line-offset . 4)
-   (c-hanging-braces-alist	 . ((substatement-open after)
-					(brace-list-open)))
-   (c-hanging-colons-alist	 . ((member-init-intro before)
-					(inher-intro)
-					(case-label after)
-					(label after)
-					(access-label after)))
-   (c-cleanup-list		 . (scope-operator
-					empty-defun-braces
-					defun-close-semi))
-   (c-offsets-alist		 . ((arglist-close . c-lineup-arglist)
-					(substatement-open . 0)
-					(case-label . 4)
-					(block-open . 0)
-					(inclass . 4)
-					(innamespace . 0)
-					(comment-intro . 0)
-					(knr-argdecl-intro . -)))
-   (c-echo-syntactic-information-p . t))
- "calx programming style")
+  '((c-tab-always-indent . t)
+    (c-comment-only-line-offset . 4)
+    (c-hanging-braces-alist . ((substatement-open after)
+			       (brace-list-open)))
+    (c-hanging-colons-alist . ((member-init-intro before)
+			       (inher-intro)
+			       (case-label after)
+			       (label after)
+			       (access-label after)))
+    (c-cleanup-list . (scope-operator
+		       empty-defun-braces
+		       defun-close-semi))
+    (c-offsets-alist . ((arglist-close . c-lineup-arglist)
+			(substatement-open . 0)
+			(case-label . 4)
+			(block-open . 0)
+			(inclass . 4)
+			(innamespace . 0)
+			(comment-intro . 0)
+			(knr-argdecl-intro . -)))
+    (c-echo-syntactic-information-p . t))
+  "calx programming style")
 
 (c-add-style "CALX" my-c-style)
 
 (defun my-c-mode-common-hook ()
- (c-set-style "CALX")
- (setq indent-tabs-mode t) ; no shitty spaces
- (setq tab-width 4))
+  (c-set-style "CALX")
+  (setq indent-tabs-mode t)
+  (setq tab-width 4))
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
-; auto indenting current line when pressing <enter>
+;; auto indenting current line when pressing <enter>
 (electric-indent-mode t)
 
-; ace-jump mode for quick jumping around
+;; ace-jump mode for quick jumping around
 (require 'ace-jump-mode)
 (define-key global-map (kbd "S-SPC") 'ace-jump-mode)
 
-; increment closest number
+;; increment closest number
 (defun change-closest-number (increase-by)
   (interactive)
   (if (re-search-backward "[0-9]+" -200 t 1) ; no forward searching
-	  (progn
-		(message "changing: %s->%d" (match-string 0) (+ increase-by (string-to-int (match-string 0))))
-		(replace-match (number-to-string (+ increase-by (string-to-number (match-string 0))))))
-	(error "No number found at this point")))
+      (progn
+	(message "changing: %s->%d" (match-string 0) (+ increase-by (string-to-int (match-string 0))))
+	(replace-match (number-to-string (+ increase-by (string-to-number (match-string 0))))))
+    (error "No number found at this point")))
 
 (global-set-key (kbd "C-c +") (lambda () (interactive) (change-closest-number 1)))
 (global-set-key (kbd "C-c -") (lambda () (interactive) (change-closest-number -1)))
 
+;; speedup AC
 (flyspell-mode 0)
 
 ;; shows current function name in modeline
 ;; (which-function-mode)
 
-; multiple cursors
+;; multiple cursors
 (require 'multiple-cursors)
 (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
 (global-set-key (kbd "C->") 'mc/mark-next-like-this)
 (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
 (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
 
-; expand region
+;; expand region
 (require 'expand-region)
 (global-unset-key (kbd "C-w"))
 (global-set-key (kbd "C-w") 'er/expand-region)
 
-; CG mode
+;; CG/HLSL mode
 (add-to-list 'load-path "~/.emacs.d/my-packages/")
 (require 'cg-mode)
 (add-to-list 'auto-mode-alist '("\\.fx\\'" . cg-mode))
@@ -338,39 +332,39 @@
 (defvar preprocessor-rex '(("\\#[A-Za-z]+" . font-lock-preprocessor-face)))
 (font-lock-add-keywords 'cg-mode preprocessor-rex) ; highlight operators
 
-; pretty lambda
+;; pretty lambda
 (require 'pretty-lambdada)
 (pretty-lambda-for-modes)
 
-; swapping windows / buffers
+;; swapping windows / buffers
 (defun swap-windows ()
   "Swaps buffers in selected-window with next-window"
   (interactive)
   (unless (one-window-p)
-	(let* ((this (selected-window))
-		   (that (next-window))
-		   (this-buffer (window-buffer this))
-		   (that-buffer (window-buffer that)))
-	  (set-window-buffer this that-buffer)
-	  (set-window-buffer that this-buffer)
-	  (other-window 1))))
+    (let* ((this (selected-window))
+	   (that (next-window))
+	   (this-buffer (window-buffer this))
+	   (that-buffer (window-buffer that)))
+      (set-window-buffer this that-buffer)
+      (set-window-buffer that this-buffer)
+      (other-window 1))))
 
 (defun move-window-away ()
   "Moves buffer to \"other\""
   (interactive)
   (unless (one-window-p)
-	(let* ((that (next-window))
+    (let* ((that (next-window))
 	   (this (selected-window))
 	   (this-buffer (window-buffer this))
 	   (prv-buffer (other-buffer)))
-	  (set-window-buffer this prv-buffer)
-	  (set-window-buffer that this-buffer)
-	  (other-window 1))))
+      (set-window-buffer this prv-buffer)
+      (set-window-buffer that this-buffer)
+      (other-window 1))))
 
 (global-set-key (kbd "C-; s") 'swap-windows)
 (global-set-key (kbd "C-; a") 'move-window-away)
 
-; kill-close
+;; kill-close
 (defun kill-close-window ()
   "Kills buffer and then closes window"
   (interactive)
@@ -384,6 +378,35 @@
   "Highlights lines that have 80+ characters"
   (interactive)
   (highlight-lines-matching-regexp ".\\{81\\}" 'font-lock-over-80-face))
+
+;; neotree
+(add-to-list 'load-path "~/.emacs.d/neotree")
+(require 'neotree)
+(global-set-key [f8] 'neotree-toggle)
+
+;; google services integration (uses google command line tools - googlecl)
+(defun googlecl (command)
+  "calls google command - line tool with given arguments"
+  (interactive "sGoogle Command Line | Arguments: ")
+  (message (format "google %s" command))
+  (shell-command (format "google %s" command)))
+
+(defun google-calendar-add (descr)
+  "adds event to calendar"
+  (interactive "sDescription: ")
+  (googlecl (format "calendar add \"%s\" --reminder 1m" descr)))
+
+(defun google-calendar-today ()
+  "lists today's tasks"
+  (interactive)
+  (googlecl "calendar today"))
+
+
+(global-set-key (kbd "C-' a") 'google-calendar-add)
+(global-set-key (kbd "C-' t") 'google-calendar-today)
+
+;; --------------------------------------------------------------------------------------------------
+;; page breaks / tags utility
 
 ;; highlight "page breaks" / TODOs and apply in modes specified below
 (defconst re-page-break ".?//-.")
@@ -472,19 +495,9 @@
 
 (global-set-key (kbd "C-; x") 'page-breaks-popup)
 
+;; --------------------------------------------------------------------------------------------------
+;; CMake project utils
 
-;; file name in title bar
-(setq frame-title-format "emacs | %b")
-
-;; delete useless trailing spaces
-;;(add-hook 'before-save-hook 'whitespace-cleanup)
-;;(add-hook 'before-save-hook (lambda() (delete-trailing-whitespace)))
-
-;; no beeps
-;; (setq visible-bell t)
-
-;--------------------------------------------------------------------------------------------------
-; CMake project utils
 (defun upward-check-file (filename startdir)
   "Moves up in directory structure and checks if desired file is there"
   (let ((dirname (expand-file-name startdir))
@@ -493,36 +506,36 @@
 	(max-level 5)
 	(prv-dirname nil))
 
-	(while (not (or not-found top (= max-level 0)))
-	  (setq max-level (- max-level 1))
-	  (if (string= (expand-file-name dirname) "/")
+    (while (not (or not-found top (= max-level 0)))
+      (setq max-level (- max-level 1))
+      (if (string= (expand-file-name dirname) "/")
 	  (setq top t))
-	  (if (file-exists-p (expand-file-name filename dirname))
+      (if (file-exists-p (expand-file-name filename dirname))
 	  (progn
-		(setq prv-dirname dirname)
-		(setq dirname (expand-file-name ".." dirname)))
+	    (setq prv-dirname dirname)
+	    (setq dirname (expand-file-name ".." dirname)))
 	(setq not-found t)))
 
-	prv-dirname))
+    prv-dirname))
 
 (defun find-project-directory-base (project-dir)
   "Returns CMake project root directory or nil"
   (interactive)
   (let ((file (upward-check-file "CMakeLists.txt" ".")))
-	(if file (concat (file-name-as-directory file) project-dir) nil)))
+    (if file (concat (file-name-as-directory file) project-dir) nil)))
 
 (defun find-inproject-directory-base (project-dir tail)
   "returns corresponding directory in CMake project directory structure"
   (let ((project-root (upward-check-file "CMakeLists.txt" "."))
 	(full-path (expand-file-name ".")))
-	(if project-root
+    (if project-root
 	(concat project-root project-dir (substring full-path (length project-root)) tail)
-	  nil)))
+      nil)))
 
 (defun find-inproject-executable-base (project-dir)
   "returns path to executable in CMake directory structure"
   (let ((inproject-dir (find-inproject-directory-base project-dir "")))
-	(concat inproject-dir "/" (file-name-nondirectory inproject-dir))))
+    (concat inproject-dir "/" (file-name-nondirectory inproject-dir))))
 
 (defun find-executable-name ()
   "returns executable name"
@@ -545,35 +558,9 @@
 (defun find-inproject-executable-release ()
   (find-inproject-executable-base "/project/release"))
 
-;; neotree
-(add-to-list 'load-path "~/.emacs.d/neotree")
-(require 'neotree)
-(global-set-key [f8] 'neotree-toggle)
-
-;; google services integration (uses google command line tools - googlecl)
-(defun googlecl (command)
-  "calls google command - line tool with given arguments"
-  (interactive "sGoogle Command Line | Arguments: ")
-  (message (format "google %s" command))
-  (shell-command (format "google %s" command)))
-
-(defun google-calendar-add (descr)
-  "adds event to calendar"
-  (interactive "sDescription: ")
-  (googlecl (format "calendar add \"%s\" --reminder 1m" descr)))
-
-(defun google-calendar-today ()
-  "lists today's tasks"
-  (interactive)
-  (googlecl "calendar today"))
-
-
-(global-set-key (kbd "C-' a") 'google-calendar-add)
-(global-set-key (kbd "C-' t") 'google-calendar-today)
-
-;--------------------------------------------------------------------------------------------------
-; additional help ;
-; to refresh settings just run M-x (eval-buffer)
+;; --------------------------------------------------------------------------------------------------
+;; additional help ;
+;; to refresh settings just run M-x (eval-buffer)
 
 (put 'downcase-region 'disabled nil)
 (custom-set-faces
