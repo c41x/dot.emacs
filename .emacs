@@ -71,8 +71,9 @@
 
 ;; highlight matching braces
 (show-paren-mode t)
-(setq show-paren-style 'expression)
-(add-hook 'after-init-hook '(lambda ()(set-face-foreground 'show-paren-match nil))) ; keeps syntax color as foreground
+(setq show-paren-style 'parenthesis)
+;; (setq show-paren-style 'expression)
+;; (add-hook 'after-init-hook '(lambda ()(set-face-foreground 'show-paren-match nil))) ; keeps syntax color as foreground
 
 ;; show line numbers
 (global-linum-mode t)
