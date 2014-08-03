@@ -35,7 +35,8 @@
 	autopair
 	csharp-mode
 	js2-mode
-	lua-mode	
+	ac-js2
+	lua-mode
 	popup))
 
 (defun has-package-to-install ()
@@ -139,15 +140,15 @@
 ; C/C++ autocomplete hooks
 (defun ac-ccc-mode-setup ()
   (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
- 					 ac-source-filename ; just press / and directory completion appears
- 					 ac-source-files-in-current-dir ; from files in current directory
- 					 ;ac-source-semantic ; symantic autocomplete for C/C++
- 					 ac-source-words-in-all-buffer ; all stuff from buffers
- 					 ac-source-yasnippet)))
+					 ac-source-filename ; just press / and directory completion appears
+					 ac-source-files-in-current-dir ; from files in current directory
+					 ;ac-source-semantic ; symantic autocomplete for C/C++
+					 ac-source-words-in-all-buffer ; all stuff from buffers
+					 ac-source-yasnippet)))
  
 (ac-flyspell-workaround) ; lag hack
-(add-hook 'c-mode 'ac-ccc-mode-setup)
-(add-hook 'c++-mode 'ac-ccc-mode-setup)
+;(add-hook 'c-mode 'ac-ccc-mode-setup)
+;(add-hook 'c++-mode 'ac-ccc-mode-setup)
 
 ; control + space = autocomplete
 (global-unset-key (kbd "C-SPC"))
@@ -155,6 +156,15 @@
 
 ; cursor type - horizontal bar '_'
 (setq-default cursor-type 'hbar)
+
+; javascript setup
+(defun js2-mode-setup ()
+  (ac-js2-mode)
+  (setq ac-js2-evaluate-calls t)
+  (add-to-list 'semantic-default-submodes 'global-semantic-idle-summary-mode)
+  (add-to-list 'semantic-default-submodes 'global-semantic-idle-completions-mode)
+  (semantic-mode 1))
+(add-hook 'js2-mode 'js2-mode-setup)
 
 ; simple smooth scrolling (sit-for is some kind of Sleep)
 ; time is not accurate because lag may occur while scrolling... so tweak it experimenally
