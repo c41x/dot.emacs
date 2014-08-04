@@ -483,7 +483,8 @@
   ;; search tags list untill point position is smaller than element
   (let ((i 0)
 	(el tags-list))
-    (while (< (cdr (car el)) (point))
+    (while (and (< (+ i 1) (length tags-list))
+		(< (cdr (car el)) (point)))
       (setq i (+ 1 i))
       (setq el (cdr el)))
     i))
