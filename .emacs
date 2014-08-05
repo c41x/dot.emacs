@@ -1,18 +1,3 @@
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
- '(cua-mode t nil (cua-base))
- '(custom-safe-themes (quote ("12d9cd1e2bdcaf8f18c6e9bb56336f7a62c39ed034f8eb5d17ef66ec4fef03de" default)))
- '(mode-line-format (quote ("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification "   " mode-line-position (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces "%-")))
- '(query-replace-show-replacement t)
- '(show-paren-mode t)
- '(show-paren-style (quote expression))
- '(sml/active-background-color "green4")
- '(tool-bar-mode nil))
-
 ;; --------------------------------------------------------------------------------------------------
 ;; package management
 
@@ -566,8 +551,21 @@
   (find-inproject-executable-base "/project/release"))
 
 ;; --------------------------------------------------------------------------------------------------
+;; settings made by customize
 ;; additional help ;
 ;; to refresh settings just run M-x (eval-buffer)
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
+ '(cua-mode t nil (cua-base))
+ '(custom-safe-themes (quote ("12d9cd1e2bdcaf8f18c6e9bb56336f7a62c39ed034f8eb5d17ef66ec4fef03de" default)))
+ '(mode-line-format (quote ("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification "   " mode-line-position (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces "%-")))
+ '(query-replace-show-replacement t)
+ '(sml/active-background-color "green4"))
 
 (put 'downcase-region 'disabled nil)
 (custom-set-faces
@@ -590,7 +588,7 @@
  '(mode-line-inactive ((t (:inherit mode-line :background "#161616" :foreground "#857b6f" :box nil :weight light))))
  '(popup-face ((t (:background "AntiqueWhite3" :foreground "black"))))
  '(popup-menu-selection-face ((t (:background "chartreuse4" :foreground "white"))))
- '(show-paren-match ((t (:background "#112233"))))
+ '(show-paren-match ((t (:background "#44aaee" :foreground "#000000"))))
  '(show-paren-mismatch ((t (:background "#aa2211"))))
  '(sml/filename ((t (:inherit sml/global :foreground "lemon chiffon"))))
  '(warning ((t (:foreground "DarkOrange"))))
