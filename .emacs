@@ -221,6 +221,13 @@
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\([0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 
 ;; C++ compiling keybindings (CMake)
+;; keybinds:
+;; F5 - run & debug
+;; F6 - run
+;; F7 - compile
+;; Modifiers:
+;; Shift - Release version
+;; Control - Recompile project
 (global-set-key (kbd "<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-debug)))))
 (global-set-key (kbd "S-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-release)))))
 (global-set-key (kbd "C-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-debug))))) ; compile full project
