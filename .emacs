@@ -275,6 +275,9 @@
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
+;; csharp-mode inserts {} braces automatically (this totally breaks autopair)
+(add-hook 'csharp-mode-hook (lambda () (local-set-key (kbd "{") 'c-electric-brace)))
+
 ;; auto indenting current line when pressing <enter>
 (electric-indent-mode t)
 
@@ -575,28 +578,3 @@
  '(sml/active-background-color "green4"))
 
 (put 'downcase-region 'disabled nil)
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(compilation-error ((t (:foreground "orange red" :underline nil))))
- '(compilation-info ((t (:foreground "light slate blue"))))
- '(compilation-warning ((t (:foreground "green yellow" :underline nil))))
- '(diff-added ((t (:background "dark green"))))
- '(diff-removed ((t (:background "firebrick4"))))
- '(dired-directory ((t (:foreground "#eeaa11"))))
- '(fringe ((t (:background "black" :foreground "#39ae1c"))))
- '(linum ((t (:background "black" :foreground "#343434"))))
- '(mode-line ((t (:background "#161616" :foreground "#ff3300" :box nil))))
- '(mode-line-buffer-id ((t nil)))
- '(mode-line-emphasis ((t nil)))
- '(mode-line-highlight ((t nil)))
- '(mode-line-inactive ((t (:inherit mode-line :background "#161616" :foreground "#857b6f" :box nil :weight light))))
- '(popup-face ((t (:background "AntiqueWhite3" :foreground "black"))))
- '(popup-menu-selection-face ((t (:background "chartreuse4" :foreground "white"))))
- '(show-paren-match ((t (:background "#44aaee" :foreground "#000000"))))
- '(show-paren-mismatch ((t (:background "#aa2211"))))
- '(sml/filename ((t (:inherit sml/global :foreground "lemon chiffon"))))
- '(warning ((t (:foreground "DarkOrange"))))
- '(which-func ((t (:foreground "moccasin")))))
