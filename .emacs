@@ -564,15 +564,56 @@
 ;; CEH - C Edit Helper
 
 ;; helpers
-(defun ceh--fwd-expression ()
-  ;; TODO: add string skipping
-  (skip-chars-forward "A-Za-z0-9_-")
-  (if (eq (char-after) ?\()
-      (re-search-forward "[)]" nil t 1) ;; function
-    (re-search-forward "[),; ]" nil t 1))) ;; expression
+(defun ceh--search-forward-skip-nested (opening-char closing-char)
+  (let ((nest-level 0))
+    (while
+	(progn
+	  (if (re-search-forward (format "[%c%c]" opening-char closing-char) nil t 1)
+	      (cond ((eq (char-before) opening-char)
+		     (setq nest-level (+ nest-level 1))) ;; down
+		    ((eq (char-before) closing-char)
+		     (setq nest-level (- nest-level 1)))) ;; up
+	    (setq nest-level 0)) ;; quit
+	  (> nest-level 0)))))
 
+(defun ceh--search-backward-skip-nested (opening-char closing-char)
+  (let ((nest-level 0))
+    (while
+	(progn
+	  (if (re-search-backward (format "[%c%c]" opening-char closing-char) nil t 1)
+	      (cond ((eq (char-after) closing-char)
+		     (setq nest-level (+ nest-level 1)))
+		    ((eq (char-after) opening-char)
+		     (setq nest-level (- nest-level 1))))
+	    (setq nest-level 0))
+	  (> nest-level 0)))))
+
+(defconst ceh--operators "- */\+|&^%!,<>=")
+(defconst ceh--id "A-Za-z0-9_\\-\\.\\>\\<")
 (defun ceh--fwd-operators ()
-  (skip-chars-forward "- */\+|&^%!,"))
+  (skip-chars-forward ceh--operators))
+(defun ceh--bck-operators ()
+  (skip-chars-backward ceh--operators))
+(defun ceh--fwd-id ()
+  (skip-chars-forward ceh--id))
+(defun ceh--bck-id ()
+  (skip-chars-backward ceh--id))
+
+;; TODO: add string skipping
+(defun ceh--fwd-expression ()
+  (ceh--fwd-id)
+  (cond ((eq (char-after) ?\()
+	 (ceh--search-forward-skip-nested ?\( ?\))) ;; function
+	(t
+	 (re-search-forward "[),; ]" nil t 1)))) ;; expression
+
+(defun ceh--bck-expression ()
+  (cond ((eq (char-before) ?\))
+	 (ceh--search-backward-skip-nested ?\( ?\))
+	 (ceh--bck-id))
+	(t
+	 (re-search-backward "[(,; ]" nil t 1)
+	 (forward-char))))
 
 (defun ceh--in-array (element array)
   (let ((i 0))
@@ -597,6 +638,16 @@
 	(backward-char)
 	(insert ")"))))
 
+(defun ceh-unparametrize ()
+  (interactive)
+  (if (eq (char-before) ?\)) ;; barf?
+      (progn
+	(backward-char)
+	(delete-char 1)
+	(ceh--bck-expression)
+	(ceh--bck-operators)
+	(insert ")"))))
+
 (defun ceh-next-line ()
   (interactive)
   (end-of-line)
@@ -617,7 +668,7 @@
 (defun ceh-finish-expression ()
   (interactive)
   (end-of-line)
-  (if (not (ceh--in-array (char-before) ";:}{+-|&<\\//.,!*"))
+  (if (not (ceh--in-array (char-before) ";:}{+-|&<\\//.,!*="))
       (insert ";"))
   (newline)
   (indent-for-tab-command))
@@ -630,6 +681,7 @@
 	    (define-key map (kbd "<M-return>") 'ceh-new-brace)
 	    (define-key map (kbd "<S-return>") 'ceh-finish-expression)
 	    (define-key map (kbd "C-(") 'ceh-parametrize)
+	    (define-key map (kbd "C-)") 'ceh-unparametrize)
 	    map))
 
 ;; add hooks
