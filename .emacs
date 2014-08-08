@@ -593,7 +593,7 @@
 	    (setq nest-level 0))
 	  (> nest-level 0)))))
 
-(defconst ceh--operators "- */\+|&^%!,<>=")
+(defconst ceh--operators "- */\+|&^%!,<>=\n\t")
 (defconst ceh--id "A-Za-z0-9_\\-\\.\\>\\<")
 (defun ceh--fwd-operators ()
   (skip-chars-forward ceh--operators))
@@ -609,14 +609,14 @@
   (cond ((eq (char-after) ?\()
 	 (ceh--search-forward-skip-nested ?\( ?\))) ;; function
 	(t
-	 (re-search-forward "[),; \n]" nil t 1)))) ;; expression
+	 (re-search-forward "[),; \n\t]" nil t 1)))) ;; expression
 
 (defun ceh--bck-expression ()
   (cond ((eq (char-before) ?\))
 	 (ceh--search-backward-skip-nested ?\( ?\))
 	 (ceh--bck-id))
 	(t
-	 (re-search-backward "[(,; \n]" nil t 1)
+	 (re-search-backward "[(,; \n\t]" nil t 1)
 	 (forward-char))))
 
 (defun ceh--in-array (element array)
@@ -630,7 +630,7 @@
 ;; interactives
 (defun ceh-parametrize ()
   (interactive)
-  (cond ((ceh--in-array (char-before) ceh--operators) ;; when in middle of operators lr slutp
+  (cond ((ceh--in-array (char-before) ceh--operators) ;; when in middle of operators lr slurp
 	 (let ((pt (point)))
 	   (ceh--bck-operators)
 	   (ceh--bck-expression)
