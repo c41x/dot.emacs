@@ -562,6 +562,10 @@
 
 ;; --------------------------------------------------------------------------------------------------
 ;; CEH - C Edit Helper
+;; TODO: add string skipping
+;; TODO: intelligent killing
+;; TODO: curly brackets barf/slurp
+;; TODO: killing brackets
 
 ;; helpers
 (defun ceh--search-forward-skip-nested (opening-char closing-char)
@@ -599,7 +603,6 @@
 (defun ceh--bck-id ()
   (skip-chars-backward ceh--id))
 
-;; TODO: add string skipping
 (defun ceh--fwd-expression ()
   (ceh--fwd-id)
   (cond ((eq (char-after) ?\()
