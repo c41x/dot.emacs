@@ -630,24 +630,26 @@
 ;; interactives
 (defun ceh-parametrize ()
   (interactive)
-  (cond ((ceh--in-array (char-before) ceh--operators) ;; when in middle of operators lr slurp
-	 (let ((pt (point)))
-	   (ceh--bck-operators)
-	   (ceh--bck-expression)
-	   (insert "(")
-	   (goto-char (+ pt 1))
-	   (ceh--fwd-operators)))
-	((eq (char-before) ?\)) ;; slurp?
-	 (if (not (eq (char-after) ?\)))
-	     (backward-char))
-	 (delete-char 1)
-	 (ceh--fwd-operators))
-	(t ;; insert new parenthesis
-	 (insert "(")))
-  (if (ceh--fwd-expression) ;; (re)insert closing parenthesis
-      (progn
-	(backward-char)
-	(insert ")"))))
+  (let ((c-prev (char-before))
+	(c-next (char-after)))
+    (cond ((ceh--in-array c-prev ceh--operators) ;; when in middle of operators lr slurp
+	   (let ((pt (point)))
+	     (ceh--bck-operators)
+	     (ceh--bck-expression)
+	     (insert "(")
+	     (goto-char (+ pt 1))
+	     (ceh--fwd-operators)))
+	  ((or (eq c-prev ?\)) (eq c-next ?\))) ;; slurp?
+	   (if (not (eq c-next ?\)))
+	       (backward-char))
+	   (delete-char 1)
+	   (ceh--fwd-operators))
+	  (t ;; insert new parenthesis
+	   (insert "(")))
+    (if (ceh--fwd-expression) ;; (re)insert closing parenthesis
+	(progn
+	  (backward-char)
+	  (insert ")")))))
 
 (defun ceh-unparametrize ()
   (interactive)
