@@ -119,6 +119,7 @@
 ;; ido mode / smex for M-x
 (require 'ido)
 (ido-mode t)
+(setq ido-enable-flex-matching t)
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
 
@@ -427,7 +428,6 @@
 		 (eq major-mode 'c-mode)
 		 (eq major-mode 'c++-mode)
 		 (eq major-mode 'js-mode)
-		 (eq major-mode 'cs-mode)
 		 (eq major-mode 'csharp-mode))
 		(progn (highlight-page-breaks)
 		       (highlight-todos)))))
@@ -559,6 +559,89 @@
   (find-inproject-executable-base "/project/debug"))
 (defun find-inproject-executable-release ()
   (find-inproject-executable-base "/project/release"))
+
+;; --------------------------------------------------------------------------------------------------
+;; CEH - C Edit Helper
+
+;; helpers
+(defun ceh--fwd-expression ()
+  ;; TODO: add string skipping
+  (skip-chars-forward "A-Za-z0-9_-")
+  (if (eq (char-after) ?\()
+      (re-search-forward "[)]" nil t 1) ;; function
+    (re-search-forward "[),; ]" nil t 1))) ;; expression
+
+(defun ceh--fwd-operators ()
+  (skip-chars-forward "- */\+|&^%!,"))
+
+(defun ceh--in-array (element array)
+  (let ((i 0))
+    (while (and
+	    (< i (length array))
+	    (not (= element (elt array i))))
+      (setq i (+ i 1)))
+    (not (= i (length array)))))
+
+;; interactives
+(defun ceh-parametrize ()
+  (interactive)
+  (if (eq (char-before) ?\)) ;; slurp?
+      (progn
+	(if (not (eq (char-after) ?\)))
+	    (backward-char))
+	(delete-char 1)
+	(ceh--fwd-operators))
+    (insert "(")) ;; insert parenthesis
+  (if (ceh--fwd-expression) ;; (re)insert closing parenthesis
+      (progn
+	(backward-char)
+	(insert ")"))))
+
+(defun ceh-next-line ()
+  (interactive)
+  (end-of-line)
+  (next-line)
+  (end-of-line))
+
+(defun ceh-new-brace ()
+  (interactive)
+  (end-of-line)
+  (insert " {")
+  (newline)
+  (newline)
+  (insert "}")
+  (indent-for-tab-command)
+  (previous-line)
+  (indent-for-tab-command))
+
+(defun ceh-finish-expression ()
+  (interactive)
+  (end-of-line)
+  (if (not (ceh--in-array (char-before) ";:}{+-|&<\\//.,!*"))
+      (insert ";"))
+  (newline)
+  (indent-for-tab-command))
+
+;; specify mode
+(define-minor-mode ceh-mode
+  "C Edit Helper - mode for enhancing C - like languages editing"
+  :lighter " CEH"
+  :keymap (let ((map (make-sparse-keymap)))
+	    (define-key map (kbd "<M-return>") 'ceh-new-brace)
+	    (define-key map (kbd "<S-return>") 'ceh-finish-expression)
+	    (define-key map (kbd "C-(") 'ceh-parametrize)
+	    map))
+
+;; add hooks
+(defun add-hooks (function hooks)
+  (mapc (lambda (hook) (add-hook hook function)) hooks))
+
+(add-hooks 'ceh-mode
+	   '(cg-mode-hook
+	     c-mode-hook
+	     c++-mode-hook
+	     js-mode-hook
+	     csharp-mode-hook))
 
 ;; --------------------------------------------------------------------------------------------------
 ;; settings made by customize
