@@ -566,6 +566,7 @@
 ;; TODO: intelligent killing
 ;; TODO: curly brackets barf/slurp
 ;; TODO: killing brackets
+;; TODO: intelligent transpose parameters
 
 ;; helpers
 (defun ceh--search-forward-skip-nested (opening-char closing-char)
@@ -608,14 +609,14 @@
   (cond ((eq (char-after) ?\()
 	 (ceh--search-forward-skip-nested ?\( ?\))) ;; function
 	(t
-	 (re-search-forward "[),; ]" nil t 1)))) ;; expression
+	 (re-search-forward "[),; \n]" nil t 1)))) ;; expression
 
 (defun ceh--bck-expression ()
   (cond ((eq (char-before) ?\))
 	 (ceh--search-backward-skip-nested ?\( ?\))
 	 (ceh--bck-id))
 	(t
-	 (re-search-backward "[(,; ]" nil t 1)
+	 (re-search-backward "[(,; \n]" nil t 1)
 	 (forward-char))))
 
 (defun ceh--in-array (element array)
@@ -680,7 +681,6 @@
   (end-of-line)
   (if (not (ceh--in-array (char-before) ";:}{+-|&<\\//.,!*="))
       (insert ";"))
-  (newline)
   (indent-for-tab-command))
 
 ;; specify mode
