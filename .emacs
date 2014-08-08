@@ -629,13 +629,20 @@
 ;; interactives
 (defun ceh-parametrize ()
   (interactive)
-  (if (eq (char-before) ?\)) ;; slurp?
-      (progn
-	(if (not (eq (char-after) ?\)))
-	    (backward-char))
-	(delete-char 1)
-	(ceh--fwd-operators))
-    (insert "(")) ;; insert parenthesis
+  (cond ((ceh--in-array (char-before) ceh--operators) ;; when in middle of operators lr slutp
+	 (let ((pt (point)))
+	   (ceh--bck-operators)
+	   (ceh--bck-expression)
+	   (insert "(")
+	   (goto-char (+ pt 1))
+	   (ceh--fwd-operators)))
+	((eq (char-before) ?\)) ;; slurp?
+	 (if (not (eq (char-after) ?\)))
+	     (backward-char))
+	 (delete-char 1)
+	 (ceh--fwd-operators))
+	(t ;; insert new parenthesis
+	 (insert "(")))
   (if (ceh--fwd-expression) ;; (re)insert closing parenthesis
       (progn
 	(backward-char)
