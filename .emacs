@@ -224,18 +224,51 @@
 ;; C++ compiling keybindings (CMake)
 ;; keybinds:
 ;; F5 - run & debug
+;; SHIFT + F5 - restore window layout after debug
 ;; F6 - run
 ;; F7 - compile
 ;; Modifiers:
 ;; Shift - Release version
 ;; Control - Recompile project
-(global-set-key (kbd "<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-debug)))))
-(global-set-key (kbd "S-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-release)))))
-(global-set-key (kbd "C-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-debug))))) ; compile full project
-(global-set-key (kbd "C-S-<f7>") '(lambda () (interactive) (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-release))))) ; compile full project
-(global-set-key (kbd "<f6>") '(lambda () (interactive) (compile (format "%s" (find-inproject-executable-debug)))))
-(global-set-key (kbd "S-<f6>") '(lambda () (interactive) (compile (format "%s" (find-inproject-executable-release)))))
-(global-set-key (kbd "<f5>") '(lambda () (interactive) (gdb (format "gdb -i=mi %s" (find-inproject-executable-debug)))))
+(global-set-key (kbd "<f7>")
+		'(lambda ()
+		   (interactive)
+		   (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-debug)))))
+(global-set-key (kbd "S-<f7>")
+		'(lambda ()
+		   (interactive)
+		   (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-release)))))
+(global-set-key (kbd "C-<f7>")
+		'(lambda ()
+		   (interactive)
+		   (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-debug))))) ; compile full project
+(global-set-key (kbd "C-S-<f7>")
+		'(lambda ()
+		   (interactive)
+		   (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-release))))) ; compile full project
+(global-set-key (kbd "<f6>")
+		'(lambda ()
+		   (interactive)
+		   (compile (format "%s" (find-inproject-executable-debug)) t)
+		   (select-window (get-buffer-window "*compilation*"))
+		   (end-of-buffer)))
+(global-set-key (kbd "S-<f6>")
+		'(lambda ()
+		   (interactive)
+		   (compile (format "%s" (find-inproject-executable-release)) t)
+		   (select-window (get-buffer-window "*compilation*"))
+		   (end-of-buffer)))
+(global-set-key (kbd "<f5>")
+		'(lambda ()
+		   (interactive)
+		   (frame-configuration-to-register 1)
+		   (gdb (format "gdb -i=mi %s" (find-inproject-executable-debug)))
+		   (setq gdb-many-windows t)))
+(global-set-key (kbd "S-<f5>")
+		'(lambda ()
+		   (interactive)
+		   (setq gdb-many-windows nil)
+		   (jump-to-register 1)))
 (global-set-key (kbd "<f9>") 'gdb-toggle-breakpoint) ; toggle breakpoint
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
 
@@ -567,6 +600,7 @@
 ;; TODO: curly brackets barf/slurp
 ;; TODO: killing brackets
 ;; TODO: intelligent transpose parameters
+;; TODO: ALT + , step out of args: (abc|) press, then: (abc),
 
 ;; helpers
 (defun ceh--search-forward-skip-nested (opening-char closing-char)
