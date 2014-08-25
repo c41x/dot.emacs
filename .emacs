@@ -719,6 +719,16 @@
       (insert ";"))
   (indent-for-tab-command))
 
+(defun ceh-step-out-of-args ()
+  (interactive)
+  (ceh--search-forward-skip-nested ?\( ?\)))
+
+(defun ceh-step-in-args ()
+  (interactive)
+  (ceh--search-backward-skip-nested ?\( ?\))
+  (if (eq (char-after) ?\()
+      (forward-char)))
+
 ;; specify mode
 (define-minor-mode ceh-mode
   "C Edit Helper - mode for enhancing C - like languages editing"
@@ -728,6 +738,8 @@
 	    (define-key map (kbd "<S-return>") 'ceh-finish-expression)
 	    (define-key map (kbd "C-(") 'ceh-parametrize)
 	    (define-key map (kbd "C-)") 'ceh-unparametrize)
+	    (define-key map (kbd "M-,") 'ceh-step-in-args) ;; tags!
+	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
 	    map))
 
 ;; add hooks
