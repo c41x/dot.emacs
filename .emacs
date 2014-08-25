@@ -7,7 +7,7 @@
 
 (package-initialize)
 (setq package-archives
-	  '(("marmalade" . "http://marmalade-repo.org/packages/")
+      '(("marmalade" . "http://marmalade-repo.org/packages/")
 	("melpa" . "http://melpa.milkbox.net/packages/")))
 
 (defvar required-packages
@@ -38,8 +38,8 @@
   (package-refresh-contents)
   (message "done.")
   (dolist (p required-packages)
-	(when (not (package-installed-p p))
-	  (package-install p))))
+    (when (not (package-installed-p p))
+      (package-install p))))
 
 ;; --------------------------------------------------------------------------------------------------
 
@@ -195,7 +195,7 @@
 ;; cmake-mode
 (require 'cmake-mode)
 (setq auto-mode-alist
-	  (append '(("CMakeLists\\.txt\\'" . cmake-mode)
+      (append '(("CMakeLists\\.txt\\'" . cmake-mode)
 		("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
 
 ;; font lock decoration level: 1-3 | 2 is enough, 3 is too slow
