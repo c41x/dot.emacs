@@ -597,10 +597,8 @@
 ;; CEH - C Edit Helper
 ;; TODO: add string skipping
 ;; TODO: intelligent killing
-;; TODO: curly brackets barf/slurp
+;; TODO: curly brackets barf/slurp (and others)
 ;; TODO: killing brackets
-;; TODO: intelligent transpose parameters
-;; TODO: ALT + , step out of args: (abc|) press, then: (abc),
 
 ;; helpers
 (defun ceh--search-forward-skip-nested (opening-char closing-char)
@@ -729,6 +727,23 @@
   (if (eq (char-after) ?\()
       (forward-char)))
 
+(defun ceh-transpose-args ()
+  (interactive)
+  (ceh--fwd-operators)
+  (let* ((rstart (point))
+	 (rend (progn (ceh--fwd-expression) (- (point) 1)))
+	 (lend (progn (goto-char rstart) (ceh--bck-operators) (point)))
+	 (lstart (progn (ceh--bck-expression) (point)))
+	 (lstr (buffer-substring-no-properties lstart lend))
+	 (rstr (buffer-substring-no-properties rstart rend)))
+    (message (format "replacing strings: {%s} -> {%s}" lstr rstr))
+    (goto-char rstart)
+    (delete-region rstart rend)
+    (insert lstr)
+    (goto-char lstart)
+    (delete-region lstart lend)
+    (insert rstr)))
+
 ;; specify mode
 (define-minor-mode ceh-mode
   "C Edit Helper - mode for enhancing C - like languages editing"
@@ -740,6 +755,7 @@
 	    (define-key map (kbd "C-)") 'ceh-unparametrize)
 	    (define-key map (kbd "M-,") 'ceh-step-in-args) ;; tags!
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
+	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
 	    map))
 
 ;; add hooks
@@ -752,6 +768,13 @@
 	     c++-mode-hook
 	     js-mode-hook
 	     csharp-mode-hook))
+
+;; gnus
+(setq gnus-select-method
+      '(nnimap "gmail"
+	       (nnimap-address "imap.gmail.com")
+	       (nnimap-server-port 993)
+	       (nnimap-stream ssl)))
 
 ;; --------------------------------------------------------------------------------------------------
 ;; settings made by customize
