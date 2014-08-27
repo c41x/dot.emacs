@@ -438,6 +438,13 @@
 (global-set-key (kbd "C-' a") 'google-calendar-add)
 (global-set-key (kbd "C-' t") 'google-calendar-today)
 
+;; gnus
+(setq gnus-select-method
+      '(nnimap "gmail"
+	       (nnimap-address "imap.gmail.com")
+	       (nnimap-server-port 993)
+	       (nnimap-stream ssl)))
+
 ;; --------------------------------------------------------------------------------------------------
 ;; page breaks / tags utility
 
@@ -638,10 +645,11 @@
 
 (defun ceh--fwd-expression ()
   (ceh--fwd-id)
-  (cond ((eq (char-after) ?\()
-	 (ceh--search-forward-skip-nested ?\( ?\))) ;; function
-	(t
-	 (re-search-forward "[),; \n\t]" nil t 1)))) ;; expression
+  (cond ((eq (char-after) ?\() ;; function
+	 (ceh--search-forward-skip-nested ?\( ?\))
+	 (forward-char))
+	(t ;; expression
+	 (re-search-forward "[),; \n\t]" nil t 1))))
 
 (defun ceh--bck-expression ()
   (cond ((eq (char-before) ?\))
@@ -671,17 +679,17 @@
 	     (insert "(")
 	     (goto-char (+ pt 1))
 	     (ceh--fwd-operators)))
-	  ((or (eq c-prev ?\)) (eq c-next ?\))) ;; slurp?
-	   (if (not (eq c-next ?\)))
+	  ((or (eq c-prev ?\)) (eq c-next ?\))) ;; when parens here -> slurp argument from r
+	   (if (not (eq c-next ?\))) ;; make sure that we are before closing paren
 	       (backward-char))
 	   (delete-char 1)
 	   (ceh--fwd-operators))
-	  (t ;; insert new parenthesis
+	  (t ;; otherwise insert new parenthesis
 	   (insert "(")))
-    (if (ceh--fwd-expression) ;; (re)insert closing parenthesis
-	(progn
-	  (backward-char)
-	  (insert ")")))))
+    (progn
+      (ceh--fwd-expression) ;; (re)insert closing parenthesis
+      (backward-char)
+      (insert ")"))))
 
 (defun ceh-unparametrize ()
   (interactive)
@@ -736,7 +744,6 @@
 	 (lstart (progn (ceh--bck-expression) (point)))
 	 (lstr (buffer-substring-no-properties lstart lend))
 	 (rstr (buffer-substring-no-properties rstart rend)))
-    (message (format "replacing strings: {%s} -> {%s}" lstr rstr))
     (goto-char rstart)
     (delete-region rstart rend)
     (insert lstr)
@@ -768,13 +775,6 @@
 	     c++-mode-hook
 	     js-mode-hook
 	     csharp-mode-hook))
-
-;; gnus
-(setq gnus-select-method
-      '(nnimap "gmail"
-	       (nnimap-address "imap.gmail.com")
-	       (nnimap-server-port 993)
-	       (nnimap-stream ssl)))
 
 ;; --------------------------------------------------------------------------------------------------
 ;; settings made by customize
