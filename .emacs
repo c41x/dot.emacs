@@ -26,7 +26,8 @@
     helm
     helm-swoop
     smex
-    popup))
+    popup
+    jedi))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -444,6 +445,19 @@
 	       (nnimap-address "imap.gmail.com")
 	       (nnimap-server-port 993)
 	       (nnimap-stream ssl)))
+
+;; python
+;;
+;; on windows:
+;; install python pip
+;;
+;; in command line:
+;; python -m pip install virtualenv
+;; python -m pip install epc
+;; python -m pip install jedi
+;; M-x jedi:start-dedicated-server
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
 
 ;; --------------------------------------------------------------------------------------------------
 ;; page breaks / tags utility
