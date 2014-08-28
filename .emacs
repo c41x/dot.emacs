@@ -27,6 +27,7 @@
     helm-swoop
     smex
     popup
+    highlight-symbol
     jedi))
 
 (defun has-package-to-install ()
@@ -465,6 +466,7 @@
 (setq jedi:complete-on-dot t)
 
 ;; highlight-symbol mode
+(require 'highlight-symbol)
 (add-hooks 'highlight-symbol-mode
 	   '(emacs-lisp-mode-hook
 	     c-mode-hook
