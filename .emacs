@@ -44,6 +44,11 @@
 
 ;; --------------------------------------------------------------------------------------------------
 
+;; add hooks helper
+(defun add-hooks (function hooks)
+  "runs [function] for given [hooks]"
+  (mapc (lambda (hook) (add-hook hook function)) hooks))
+
 ;; no start screen
 (setq inhibit-startup-screen 1)
 
@@ -459,6 +464,19 @@
 (add-hook 'python-mode-hook 'jedi:setup)
 (setq jedi:complete-on-dot t)
 
+;; highlight-symbol mode
+(add-hooks 'highlight-symbol-mode
+	   '(emacs-lisp-mode-hook
+	     c-mode-hook
+	     c++-mode-hook
+	     csharp-mode-hook
+	     js-mode-hook
+	     python-mode-hook))
+(global-set-key [(control f3)] 'highlight-symbol-at-point)
+(global-set-key [f3] 'highlight-symbol-next)
+(global-set-key [(shift f3)] 'highlight-symbol-prev)
+(global-set-key [(meta f3)] 'highlight-symbol-query-replace)
+
 ;; --------------------------------------------------------------------------------------------------
 ;; page breaks / tags utility
 
@@ -780,9 +798,6 @@
 	    map))
 
 ;; add hooks
-(defun add-hooks (function hooks)
-  (mapc (lambda (hook) (add-hook hook function)) hooks))
-
 (add-hooks 'ceh-mode
 	   '(cg-mode-hook
 	     c-mode-hook
@@ -803,6 +818,8 @@
  '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
  '(cua-mode t nil (cua-base))
  '(custom-safe-themes (quote ("12d9cd1e2bdcaf8f18c6e9bb56336f7a62c39ed034f8eb5d17ef66ec4fef03de" default)))
+ '(highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1")))
+ '(highlight-symbol-idle-delay 0.5)
  '(mode-line-format (quote ("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification "   " mode-line-position (vc-mode vc-mode) "  " mode-line-modes mode-line-misc-info mode-line-end-spaces "%-")))
  '(query-replace-show-replacement t)
  '(sml/active-background-color "green4"))

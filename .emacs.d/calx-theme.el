@@ -100,6 +100,7 @@
  '(flymake-warnline ((((class color)) (:underline "#aaff33"))))
  '(font-lock-number-face ((t (:foreground "#dd5522")))) ;66aa33
  '(font-lock-operator-face ((t (:foreground "#99bde6"))))
- '(font-lock-over-80-face ((t (:foreground "#ff2211")))))
+ '(font-lock-over-80-face ((t (:foreground "#ff2211"))))
+ '(highlight-symbol-face ((t (:background "gray25")))))
 
 (provide-theme 'calx)
