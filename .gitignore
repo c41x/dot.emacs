@@ -1,0 +1,7 @@
+*
+!.gitignore
+!.emacs.d
+!.emacs
+!README
+!runemacsclient.bat
+!runemacsclient.exe
