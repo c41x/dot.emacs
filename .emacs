@@ -478,6 +478,11 @@
 (global-set-key [(shift f3)] 'highlight-symbol-prev)
 (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
 
+;; recompiling stuff
+(defun recompile-scripts ()
+  (interactive)
+  (byte-recompile-directory (expand-file-name "~/.emacs.d") 0))
+
 ;; --------------------------------------------------------------------------------------------------
 ;; page breaks / tags utility
 
