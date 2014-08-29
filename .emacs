@@ -118,8 +118,7 @@
 
 ;; yasnippet
 (require 'yasnippet)
-(yas--initialize)
-(yas-load-directory "~/.emacs.d/snippets")
+(setq yas-snippet-dirs "~/.emacs.d/yasnippet-snippets")
 (yas-global-mode 1)
 (setq-default yas/trigger-key (kbd "C-;"))
 
