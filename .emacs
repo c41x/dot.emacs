@@ -28,7 +28,8 @@
     smex
     popup
     highlight-symbol
-    jedi))
+    jedi
+    flycheck))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -637,6 +638,42 @@
   (find-inproject-executable-base "/project/debug"))
 (defun find-inproject-executable-release ()
   (find-inproject-executable-base "/project/release"))
+
+;; flycheck for CMake project
+(defun get-string-from-file (file-path)
+  (with-temp-buffer
+    (insert-file-contents file-path)
+    (buffer-string)))
+
+(defun extract-includes-from-file (file-name project-source-dir)
+  (let ((i 0) (matches '()) (file-buffer (get-string-from-file file-name)))
+    (save-match-data
+      (while (string-match "include_directories(\"\\([^\"]*\\)\")" file-buffer i)
+	(setq i (match-end 1))
+	(add-to-list 'matches
+		     (replace-regexp-in-string
+		      "//" "/"
+		      (replace-regexp-in-string
+		       "${project_source_dir}"
+		       project-source-dir
+		       (match-string-no-properties 1 file-buffer)
+		       1)
+		      1))))
+    matches))
+
+(defun get-current-project-include-list ()
+  (let ((proj-dir (find-project-directory)))
+    (if proj-dir
+	(extract-includes-from-file (concat proj-dir "CMakeLists.txt") proj-dir)
+      nil)))
+
+(add-hook 'c++-mode-hook
+          (lambda ()
+ 	    (setq flycheck-c/c++-gcc-executable "mingw32-gcc")
+ 	    (setq flycheck-gcc-include-path (get-current-project-include-list))
+	    (setq flycheck-idle-change-delay 10.0)
+ 	    (flycheck-mode)
+ 	    (flycheck-select-checker 'c/c++-gcc)))
 
 ;; --------------------------------------------------------------------------------------------------
 ;; CEH - C Edit Helper
