@@ -826,6 +826,29 @@
     (delete-region lstart lend)
     (insert rstr)))
 
+;; smart (context aware) navigation / inserting stuff with one keystroke chord
+(defun ceh--is-smart-moving-command ()
+  (and
+   (eq (char-before (point)) ?\,)
+   (eq (char-before (- (point) 1)) ?\,)))
+
+(defun ceh--is-smart-killing-command ()
+  (and
+   (eq (char-before (point)) ?\q)
+   (eq (char-before (- (point) 1)) ?\q)))
+
+(defun ceh-smart-command (begin end length)
+  (interactive)
+  (cond ((ceh--is-smart-moving-command)
+	 (delete-char -2)
+	 (cond ((eq (char-after) ?\))
+		(forward-char))))
+	((ceh--is-smart-killing-command)
+	 (delete-char -2)
+	 (beginning-of-line)
+	 (kill-line)
+	 (delete-char -1))))
+
 ;; specify mode
 (define-minor-mode ceh-mode
   "C Edit Helper - mode for enhancing C - like languages editing"
@@ -838,7 +861,10 @@
 	    (define-key map (kbd "M-,") 'ceh-step-in-args) ;; tags!
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
 	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
-	    map))
+	    map)
+  ;; chords
+  (setq inhibit-modification-hooks nil)
+  (add-hook 'after-change-functions 'ceh-smart-command t t))
 
 ;; add hooks
 (add-hooks 'ceh-mode
