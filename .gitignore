@@ -1,7 +1,12 @@
 *
 !.gitignore
-!.emacs.d
-!.emacs
-!README
+!autocomplete-dict
+!my-packages
+!neotree
+!yasnippet-snippets
+!calx-theme.el
+!help
 !runemacsclient.bat
 !runemacsclient.exe
+!init.el
+!README
