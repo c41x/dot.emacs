@@ -29,7 +29,8 @@
     popup
     highlight-symbol
     jedi
-    flycheck))
+    flycheck
+    key-chord))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -86,11 +87,17 @@
 
 ;; keystrokes
 (global-unset-key (kbd "<C-z>")) ; disable Ctrl+z hide
-(global-set-key (kbd "<C-tab>") 'other-window) ; ctrl+tab to switch panels
 (global-set-key (kbd "C-c C-<up>") (lambda () (interactive) (enlarge-window 2)))
 (global-set-key (kbd "C-c C-<down>") (lambda () (interactive) (enlarge-window -2)))
 (global-set-key (kbd "C-c C-<right>") (lambda () (interactive) (enlarge-window-horizontally 2)))
 (global-set-key (kbd "C-c C-<left>") (lambda () (interactive) (enlarge-window-horizontally -2)))
+
+;; switching frames
+(global-set-key (kbd "M-<right>") 'windmove-right)
+(global-set-key (kbd "M-<left>") 'windmove-left)
+(global-set-key (kbd "C-M-<up>") 'windmove-up)
+(global-set-key (kbd "C-M-<down>") 'windmove-down)
+
 (cua-mode 1) ; cua-mode (Ctrl+C,V,X,Z)
 (setq x-select-enable-clipboard t) ; allows to copy/paste text between emacs and other apps
 
@@ -683,8 +690,8 @@
 ;; TODO: killing brackets
 
 ;; helpers
-(defun ceh--search-forward-skip-nested (opening-char closing-char)
-  (let ((nest-level 0))
+(defun ceh--search-forward-skip-nested (opening-char closing-char &optional start-nest-level)
+  (let ((nest-level (if start-nest-level start-nest-level 0)))
     (while
 	(progn
 	  (if (re-search-forward (format "[%c%c]" opening-char closing-char) nil t 1)
@@ -692,11 +699,11 @@
 		     (setq nest-level (+ nest-level 1))) ;; down
 		    ((eq (char-before) closing-char)
 		     (setq nest-level (- nest-level 1)))) ;; up
-	    (setq nest-level 0)) ;; quit
+	    (setq nest-level 0))
 	  (> nest-level 0)))))
 
-(defun ceh--search-backward-skip-nested (opening-char closing-char)
-  (let ((nest-level 0))
+(defun ceh--search-backward-skip-nested (opening-char closing-char &optional start-nest-level)
+  (let ((nest-level (if start-nest-level start-nest-level 0)))
     (while
 	(progn
 	  (if (re-search-backward (format "[%c%c]" opening-char closing-char) nil t 1)
@@ -704,11 +711,12 @@
 		     (setq nest-level (+ nest-level 1)))
 		    ((eq (char-after) opening-char)
 		     (setq nest-level (- nest-level 1))))
-	    (setq nest-level 0))
+		(setq nest-level 0))
 	  (> nest-level 0)))))
 
 (defconst ceh--operators "- */\+|&^%!,<>=\n\t")
 (defconst ceh--id "A-Za-z0-9_\\-\\.\\>\\<")
+(defconst ceh--whitespace " \t\n")
 (defun ceh--fwd-operators ()
   (skip-chars-forward ceh--operators))
 (defun ceh--bck-operators ()
@@ -733,6 +741,17 @@
 	(t
 	 (re-search-backward "[(,; \n\t]" nil t 1)
 	 (forward-char))))
+
+(defun ceh--fwd-skip-empty-lines ()
+  (skip-chars-forward ceh--whitespace)
+  (while (and ;; skip comments
+	  (eq (char-after) ?\/)
+	  (eq (char-after (+ 1 (point))) ?\/))
+    (end-of-line)
+    (skip-chars-forward ceh--whitespace)))
+
+(defun ceh--bck-skip-empty-lines ()
+  (skip-chars-backward ceh--whitespace))
 
 (defun ceh--in-array (element array)
   (let ((i 0))
@@ -775,6 +794,34 @@
 	(ceh--bck-expression)
 	(ceh--bck-operators)
 	(insert ")"))))
+
+(defun ceh-include-expr ()
+  (interactive)
+  (ceh--search-forward-skip-nested ?\{ ?\} 1) ;; find closing bracket
+  (let* ((whitespace-begin (point))
+	 (insert-here (- (point) 1))
+	 (str-begin (progn (ceh--fwd-skip-empty-lines) (point)))
+	 (str-end (progn
+	  	    (end-of-line)
+		    (cond ((eq (char-before) ?\;) ;; single expression
+			   (point))
+			  ((eq (char-before) ?\{) ;; block of expressions
+			   (ceh--search-forward-skip-nested ?\{ ?\} 1)
+			   (point))
+			  (t
+			   (message "could not include expr")
+			   (return)))))
+	 (redundant-ws-begin (progn (goto-char insert-here) (ceh--bck-skip-empty-lines) (point)))
+	 (block-to-insert (buffer-substring-no-properties str-begin str-end))
+	 (block-length (- str-end str-begin)))
+    (delete-region whitespace-begin str-end)
+    (goto-char insert-here)
+    (insert block-to-insert)
+    (newline)
+    (indent-region insert-here (+ insert-here block-length))
+    (delete-region redundant-ws-begin insert-here)
+    (goto-char redundant-ws-begin)
+    (newline-and-indent)))
 
 (defun ceh-next-line ()
   (interactive)
@@ -826,28 +873,17 @@
     (delete-region lstart lend)
     (insert rstr)))
 
-;; smart (context aware) navigation / inserting stuff with one keystroke chord
-(defun ceh--is-smart-moving-command ()
-  (and
-   (eq (char-before (point)) ?\,)
-   (eq (char-before (- (point) 1)) ?\,)))
-
-(defun ceh--is-smart-killing-command ()
-  (and
-   (eq (char-before (point)) ?\q)
-   (eq (char-before (- (point) 1)) ?\q)))
-
-(defun ceh-smart-command (begin end length)
+;; key chords
+(defun ceh--chord-kill-line ()
   (interactive)
-  (cond ((ceh--is-smart-moving-command)
-	 (delete-char -2)
-	 (cond ((eq (char-after) ?\))
-		(forward-char))))
-	((ceh--is-smart-killing-command)
-	 (delete-char -2)
-	 (beginning-of-line)
-	 (kill-line)
-	 (delete-char -1))))
+  (kill-whole-line)
+  (previous-line)
+  (end-of-line))
+
+(defun ceh--chord-skip-chars ()
+  (interactive)
+  (if (ceh--in-array (char-after) "),\"]")
+      (forward-char)))
 
 ;; specify mode
 (define-minor-mode ceh-mode
@@ -863,8 +899,11 @@
 	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
 	    map)
   ;; chords
-  (setq inhibit-modification-hooks nil)
-  (add-hook 'after-change-functions 'ceh-smart-command t t))
+  (require 'key-chord)
+  (key-chord-define-global "qq" 'ceh--chord-kill-line)
+  (key-chord-define-global ",," 'ceh--chord-skip-chars)
+  (key-chord-define-global "[[" 'ceh-include-expr)
+  (key-chord-mode +1))
 
 ;; add hooks
 (add-hooks 'ceh-mode
