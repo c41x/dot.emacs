@@ -30,7 +30,8 @@
     highlight-symbol
     jedi
     flycheck
-    key-chord))
+    key-chord
+    indent-guide))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -490,6 +491,13 @@
 (defun recompile-scripts ()
   (interactive)
   (byte-recompile-directory (expand-file-name "~/.emacs.d") 0))
+
+;; indent guide for LISP
+(require 'indent-guide)
+(add-hook 'emacs-lisp-mode-hook 'indent-guide-mode)
+
+;; flycheck in LISP
+(add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
 
 ;; --------------------------------------------------------------------------------------------------
 ;; page breaks / tags utility
