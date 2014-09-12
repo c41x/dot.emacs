@@ -1,0 +1,6 @@
+# name: for ( in ) { ... }
+# key: foe
+# --
+foreach(${1:} in ${3:}) {
+    $0
+}

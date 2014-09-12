@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: debug log for unity
+# key: dl
+# --
+Debug.Log($0);
