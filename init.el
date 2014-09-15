@@ -113,7 +113,7 @@
 ;; open config file
 (defun cfg ()
   (interactive)
-  (find-file "~/.emacs"))
+  (find-file "~/.emacs.d/init.el"))
 
 ;; fix to conflict between cua rectangle mode and autopair (autopair overrides enter key (cua-rotate-rectangle))
 ;; just bind cua-rotate-rectangle to other keybind | TODO: check if is in rectangle mode
