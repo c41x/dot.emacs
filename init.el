@@ -499,6 +499,44 @@
 ;; flycheck in LISP
 (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
 
+;; GLSL
+(add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.tesc\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.tese\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.geom\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
+(add-to-list 'auto-mode-alist '("\\.comp\\'" . glsl-mode))
+
+;; flycheck
+(require 'flycheck)
+(flycheck-define-checker glsl-checker
+  "A GLSL syntax checker using glslangValidator."
+  :command ("glslangValidator" source)
+  :error-patterns
+  ((error line-start
+	  "ERROR: "
+          column ":"
+          line ":"
+	  (message)
+          line-end)
+   (warning line-start
+	    "wARNING: "
+	    column ":"
+	    line ":"
+	    (message)
+	    line-end)
+   (info line-start
+	 "NOTE: "
+	 column ":"
+	 line ":"
+	 (message)
+	 line-end))
+  :modes (glsl-mode))
+
+(add-hook 'glsl-mode-hook (lambda ()
+			    (flycheck-mode)
+			    (flycheck-select-checker 'glsl-checker)))
+
 ;; --------------------------------------------------------------------------------------------------
 ;; page breaks / tags utility
 
