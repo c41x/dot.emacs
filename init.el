@@ -96,8 +96,8 @@
 ;; switching frames
 (global-set-key (kbd "M-<right>") 'windmove-right)
 (global-set-key (kbd "M-<left>") 'windmove-left)
-(global-set-key (kbd "C-M-<up>") 'windmove-up)
-(global-set-key (kbd "C-M-<down>") 'windmove-down)
+(global-set-key (kbd "M-S-<up>") 'windmove-up)
+(global-set-key (kbd "M-S-<down>") 'windmove-down)
 
 (cua-mode 1) ; cua-mode (Ctrl+C,V,X,Z)
 (setq x-select-enable-clipboard t) ; allows to copy/paste text between emacs and other apps
