@@ -789,15 +789,27 @@
 	 (forward-char))))
 
 (defun ceh--fwd-skip-empty-lines ()
-  (skip-chars-forward ceh--whitespace)
-  (while (and ;; skip comments
-	  (eq (char-after) ?\/)
-	  (eq (char-after (+ 1 (point))) ?\/))
-    (end-of-line)
-    (skip-chars-forward ceh--whitespace)))
+  (skip-chars-forward ceh--whitespace))
+
+(defun ceh--peek? (search)
+  (string= search
+   (buffer-substring-no-properties (point) (+ (point) (length search)))))
+
+(defun ceh--fwd-skip-comment ()
+  (cond ((ceh--peek? "//")
+	 (end-of-line))
+	((ceh--peek? "/*")
+	 (re-search-forward "\\*\\/" nil t 1))))
 
 (defun ceh--bck-skip-empty-lines ()
   (skip-chars-backward ceh--whitespace))
+
+(defun ceh--fwd-skip-comments-and-empty-lines ()
+  (while (progn
+	   (let ((pt (point)))
+	     (ceh--fwd-skip-comment)
+	     (ceh--fwd-skip-empty-lines)
+	     (not (eq pt (point)))))))
 
 (defun ceh--in-array (element array)
   (let ((i 0))
@@ -848,6 +860,7 @@
 	 (insert-here (- (point) 1))
 	 (str-begin (progn (ceh--fwd-skip-empty-lines) (point)))
 	 (str-end (progn
+		    (ceh--fwd-skip-comments-and-empty-lines)
 	  	    (end-of-line)
 		    (cond ((eq (char-before) ?\;) ;; single expression
 			   (point))
