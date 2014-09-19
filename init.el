@@ -311,6 +311,7 @@
 			(inclass . 4)
 			(innamespace . 0)
 			(comment-intro . 0)
+			(cpp-macro . 0)
 			(knr-argdecl-intro . -)))
     (c-echo-syntactic-information-p . t))
   "calx programming style")
@@ -865,8 +866,19 @@
 		    (cond ((eq (char-before) ?\;) ;; single expression
 			   (point))
 			  ((eq (char-before) ?\{) ;; block of expressions
-			   (ceh--search-forward-skip-nested ?\{ ?\} 1)
+			   (backward-char)
+			   (forward-sexp)
 			   (point))
+			  ((eq (char-before) ?\)) ;; block of expressions #2
+			   (next-line)
+			   (end-of-line)
+			   (cond ((eq (char-before) ?\{)
+				  (backward-char)
+				  (forward-sexp)
+				  (point))
+				 (t
+				  (message "could not include expr")
+				  (return))))
 			  (t
 			   (message "could not include expr")
 			   (return)))))
@@ -881,6 +893,15 @@
     (delete-region redundant-ws-begin insert-here)
     (goto-char redundant-ws-begin)
     (newline-and-indent)))
+
+(defun ceh-create-block-include-expr ()
+  (interactive)
+  (end-of-line)
+  (cond ((eq (char-before) ?\;)
+	 (delete-char -1)))
+  (insert " {}")
+  (backward-char)
+  (ceh-include-expr))
 
 (defun ceh-next-line ()
   (interactive)
@@ -962,6 +983,7 @@
   (key-chord-define-global "qq" 'ceh--chord-kill-line)
   (key-chord-define-global ",," 'ceh--chord-skip-chars)
   (key-chord-define-global "[[" 'ceh-include-expr)
+  (key-chord-define-global "[]" 'ceh-create-block-include-expr)
   (key-chord-mode +1))
 
 ;; add hooks
