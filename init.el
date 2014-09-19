@@ -378,6 +378,36 @@
 (defvar preprocessor-rex '(("\\#[A-Za-z]+" . font-lock-preprocessor-face)))
 (font-lock-add-keywords 'cg-mode preprocessor-rex) ; highlight operators
 
+;; shaderlab indenting
+(defconst my-shaderlab-style
+  '((c-tab-always-indent . t)
+    (c-comment-only-line-offset . 4)
+    (c-hanging-braces-alist . ((substatement-open after)
+			       (brace-list-open)))
+    (c-hanging-colons-alist . ((member-init-intro before)
+			       (inher-intro)
+			       (case-label after)
+			       (label after)
+			       (access-label after)))
+    (c-cleanup-list . (scope-operator
+		       empty-defun-braces
+		       defun-close-semi))
+    (c-offsets-alist . ((arglist-close . c-lineup-arglist)
+			(substatement-open . 0)
+			(case-label . 4)
+			(block-open . 0)
+			(inclass . 4)
+			(innamespace . 0)
+			(comment-intro . 0)
+			(cpp-macro . 0)
+			(statement-cont . 0)
+			(knr-argdecl-intro . -)))
+    (c-echo-syntactic-information-p . t))
+  "calx Unity ShaderLab style")
+
+(c-add-style "CALX-SL" my-shaderlab-style)
+(add-hook 'cg-mode-hook (lambda () (c-set-style "CALX-SL")))
+
 ;; pretty lambda
 (require 'pretty-lambdada)
 (pretty-lambda-for-modes)
