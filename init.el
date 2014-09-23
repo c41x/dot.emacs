@@ -288,7 +288,6 @@
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
 
 ;; C++ coding style (indenting)
-(setq c-offsets-alist '((member-init-intro . ++)))
 (setq indent-tabs-mode t) ; no shitty spaces
 
 (defconst my-c-style
@@ -306,6 +305,7 @@
 		       defun-close-semi))
     (c-offsets-alist . ((arglist-close . c-lineup-arglist)
 			(substatement-open . 0)
+			(member-init-intro . ++)
 			(case-label . 4)
 			(block-open . 0)
 			(inclass . 4)
@@ -340,7 +340,7 @@
   (interactive)
   (if (re-search-backward "[0-9]+" -200 t 1) ; no forward searching
       (progn
-	(message "changing: %s->%d" (match-string 0) (+ increase-by (string-to-int (match-string 0))))
+	(message "changing: %s->%d" (match-string 0) (+ increase-by (string-to-number (match-string 0))))
 	(replace-match (number-to-string (+ increase-by (string-to-number (match-string 0))))))
     (error "No number found at this point")))
 
@@ -377,6 +377,11 @@
 (font-lock-add-keywords 'cg-mode number-rex) ; highlight numbers
 (defvar preprocessor-rex '(("\\#[A-Za-z]+" . font-lock-preprocessor-face)))
 (font-lock-add-keywords 'cg-mode preprocessor-rex) ; highlight operators
+
+;; GLSL (regex)
+(font-lock-add-keywords 'glsl-mode operator-rex)
+(font-lock-add-keywords 'glsl-mode number-rex)
+(font-lock-add-keywords 'glsl-mode preprocessor-rex)
 
 ;; shaderlab indenting
 (defconst my-shaderlab-style
