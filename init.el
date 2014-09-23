@@ -824,6 +824,9 @@
 	 (re-search-backward "[(,; \n\t]" nil t 1)
 	 (forward-char))))
 
+(defun ceh--fwd-end-of-expr ()
+  (re-search-forward "[;]" nil t 1))
+
 (defun ceh--fwd-skip-empty-lines ()
   (skip-chars-forward ceh--whitespace))
 
@@ -929,6 +932,18 @@
     (goto-char redundant-ws-begin)
     (newline-and-indent)))
 
+(defun ceh-exclude-expr ()
+  (interactive)
+  (beginning-of-line)
+  (let* ((whitespace-str-begin (progn (ceh--bck-skip-empty-lines) (point)))
+	 (str-begin (progn (ceh--fwd-skip-empty-lines) (point)))
+	 (str-end (progn (ceh--fwd-end-of-expr) (point)))
+	 (str-to-insert (buffer-substring-no-properties str-begin str-end))
+	 (insert-here (progn (ceh--search-forward-skip-nested ?\{ ?\} -1) (point))))
+    (newline-and-indent)
+    (insert str-to-insert)
+    (delete-region whitespace-str-begin str-end)))
+
 (defun ceh-create-block-include-expr ()
   (interactive)
   (end-of-line)
@@ -1018,6 +1033,7 @@
   (key-chord-define-global "qq" 'ceh--chord-kill-line)
   (key-chord-define-global ",," 'ceh--chord-skip-chars)
   (key-chord-define-global "[[" 'ceh-include-expr)
+  (key-chord-define-global "]]" 'ceh-exclude-expr)
   (key-chord-define-global "[]" 'ceh-create-block-include-expr)
   (key-chord-mode +1))
 
