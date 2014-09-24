@@ -768,7 +768,6 @@
 ;; CEH - C Edit Helper
 ;; TODO: add string skipping
 ;; TODO: intelligent killing
-;; TODO: curly brackets barf/slurp (and others)
 ;; TODO: killing brackets
 
 ;; helpers
@@ -784,6 +783,22 @@
 	    (setq nest-level 0))
 	  (> nest-level 0)))))
 
+(defun ceh--search-for-forward-skip-nested (opening-char closing-char chars &optional start-nest-level)
+  (let ((nest-level (if start-nest-level start-nest-level 0)))
+    (while
+	(progn
+	  (if (re-search-forward (format "[%c%c%s]" opening-char closing-char chars) nil t 1)
+	      (cond ((eq (char-before) opening-char)
+		     (setq nest-level (+ nest-level 1)))
+		    ((eq (char-before) closing-char)
+		     (setq nest-level (- nest-level 1)))
+		    ((and
+		      (ceh--in-array (char-before) chars)
+		      (<= nest-level 0))
+		     (setq nest-level -1)))
+	    (setq nest-level 0))
+	  (>= nest-level 0)))))
+
 (defun ceh--search-backward-skip-nested (opening-char closing-char &optional start-nest-level)
   (let ((nest-level (if start-nest-level start-nest-level 0)))
     (while
@@ -795,6 +810,23 @@
 		     (setq nest-level (- nest-level 1))))
 		(setq nest-level 0))
 	  (> nest-level 0)))))
+
+(defun ceh--search-for-backward-skip-nested (opening-char closing-char chars &optional start-nest-level)
+  (let ((nest-level (if start-nest-level start-nest-level 0)))
+    (while
+	(progn
+	  (if (re-search-backward (format "[%c%c%s]" opening-char closing-char chars) nil t 1)
+	      (progn
+		(cond ((eq (char-after) closing-char)
+		       (setq nest-level (+ nest-level 1)))
+		      ((eq (char-after) opening-char)
+		       (setq nest-level (- nest-level 1)))
+		      ((and
+			(ceh--in-array (char-after) chars)
+			(<= nest-level 0))
+		       (setq nest-level -1))))
+	    (setq nest-level 0))
+	  (>= nest-level 0)))))
 
 (defconst ceh--operators "- */\+|&^%!,<>=\n\t")
 (defconst ceh--id "A-Za-z0-9_\\-\\.\\>\\<")
@@ -1003,6 +1035,53 @@
     (delete-region lstart lend)
     (insert rstr)))
 
+(defun ceh-args-begin ()
+  (interactive)
+  (ceh--search-backward-skip-nested ?\( ?\) 1))
+
+(defun ceh-args-end ()
+  (interactive)
+  (ceh--search-forward-skip-nested ?\( ?\) 1))
+
+(defun ceh-next-argument ()
+  (interactive)
+  (let* ((pt (point))
+	 (args-r (progn (ceh-args-end) (point))))
+    (goto-char pt)
+    (ceh--search-for-forward-skip-nested ?\( ?\) ",")
+    (if (= (point) args-r)
+	(goto-char pt)
+      (ceh--fwd-skip-comments-and-empty-lines))))
+
+(defun ceh-previous-argument ()
+  (interactive)
+  (let ((pt (point))
+	(args-l (progn (ceh-args-begin) (point))))
+    (goto-char pt)
+    (ceh--search-for-backward-skip-nested ?\( ?\) ",")
+    (if (not (= (point) args-l))
+	(ceh--search-for-backward-skip-nested ?\( ?\) ","))
+    (if (not (= (point) args-l))
+	(ceh-next-argument)
+      (forward-char))))
+
+;; killing
+(defun ceh-leave-me ()
+  (interactive)
+  (let* ((expr-begin (progn (ceh--search-for-backward-skip-nested ?\( ?\) ",")
+			    (forward-char)
+			    (ceh--fwd-skip-empty-lines)
+			    (point)))
+	 (expr-end (progn (ceh--search-for-forward-skip-nested ?\( ?\) ",")
+			  (backward-char)
+			  (ceh--bck-skip-empty-lines)
+			  (point)))
+	 (del-begin (progn (ceh-args-begin) (ceh--bck-expression) (point)))
+	 (del-end (progn (ceh--fwd-expression) (backward-char) (point)))
+	 (expr (buffer-substring-no-properties expr-begin expr-end)))
+    (delete-region del-begin del-end)
+    (insert expr)))
+
 ;; key chords
 (defun ceh--chord-kill-line ()
   (interactive)
@@ -1027,6 +1106,7 @@
 	    (define-key map (kbd "M-,") 'ceh-step-in-args) ;; tags!
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
 	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
+	    (define-key map (kbd "C-' d") 'ceh-leave-me)
 	    map)
   ;; chords
   (require 'key-chord)
