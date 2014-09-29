@@ -1127,8 +1127,6 @@
 
 ;; --------------------------------------------------------------------------------------------------
 ;; settings made by customize
-;; additional help ;
-;; to refresh settings just run M-x (eval-buffer)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
