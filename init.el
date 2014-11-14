@@ -8,7 +8,7 @@
 (package-initialize)
 (setq package-archives
       '(("marmalade" . "http://marmalade-repo.org/packages/")
-	("melpa" . "http://melpa.milkbox.net/packages/")))
+	("melpa" . "http://stable.melpa.org/packages/")))
 
 (defvar required-packages
   '(yasnippet
@@ -589,16 +589,10 @@
   (interactive)
   (highlight-lines-matching-regexp re-todo 'font-lock-todo-face))
 
-(add-hook 'after-change-major-mode-hook
-	  (lambda ()
-	    (if (or
-		 (eq major-mode 'cg-mode)
-		 (eq major-mode 'c-mode)
-		 (eq major-mode 'c++-mode)
-		 (eq major-mode 'js-mode)
-		 (eq major-mode 'csharp-mode))
-		(progn (highlight-page-breaks)
-		       (highlight-todos)))))
+(add-hooks (lambda ()
+	     (highlight-page-breaks)
+	     (highlight-todos))
+	   '(cg-mode-hook c-mode-hook c++-mode-hook js-mode-hook csharp-mode-hook))
 
 (defvar page-break-wrap-search nil)
 (defun page-break-navigate (dir)
@@ -694,6 +688,9 @@
   (let ((file (upward-check-file "CMakeLists.txt" ".")))
     (if file (concat (file-name-as-directory file) project-dir) nil)))
 
+(defun is-cmake-project ()
+  (if (upward-check-file "CMakeLists.txt" ".") t nil))
+
 (defun find-inproject-directory-base (project-dir tail)
   "returns corresponding directory in CMake project directory structure"
   (let ((project-root (upward-check-file "CMakeLists.txt" "."))
@@ -758,11 +755,12 @@
 
 (add-hook 'c++-mode-hook
           (lambda ()
- 	    (setq flycheck-c/c++-gcc-executable "mingw32-gcc")
- 	    (setq flycheck-gcc-include-path (get-current-project-include-list))
-	    (setq flycheck-idle-change-delay 10.0)
- 	    (flycheck-mode)
- 	    (flycheck-select-checker 'c/c++-gcc)))
+	    (when (is-cmake-project)
+	      (setq flycheck-c/c++-gcc-executable "mingw32-gcc")
+	      (setq flycheck-gcc-include-path (get-current-project-include-list))
+	      (setq flycheck-idle-change-delay 10.0)
+	      (flycheck-mode)
+	      (flycheck-select-checker 'c/c++-gcc))))
 
 ;; --------------------------------------------------------------------------------------------------
 ;; CEH - C Edit Helper
