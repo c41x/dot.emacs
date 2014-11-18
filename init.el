@@ -7,7 +7,7 @@
 
 (package-initialize)
 (setq package-archives
-      '(("marmalade" . "http://marmalade-repo.org/packages/")
+      '(("marmalade" . "https://marmalade-repo.org/packages/")
 	("melpa" . "http://stable.melpa.org/packages/")))
 
 (defvar required-packages
@@ -129,6 +129,7 @@
 (yas-global-mode t)
 (define-key yas-minor-mode-map (kbd "<tab>") nil) ;; disable tab (trigger YAS only with AC)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
+(setq yas-fallback-behavior '(apply indent-for-tab-command)) ;; indent as fallback
 
 ;; ido mode / smex for M-x
 (require 'ido)
@@ -1097,7 +1098,8 @@
   (let ((smb (buffer-substring-no-properties (- (point) 1) (point))))
     (cond ((string= smb "-")
 	   (delete-char -1)
-	   (ceh-step-out-of-args)
+	   (if (not (= (point) (line-end-position)))
+	       (ceh-step-out-of-args))
 	   (insert "->"))
 	  ((string= smb ".")
 	   (delete-char -1)
@@ -1123,7 +1125,7 @@
 	   (delete-char -1)
 	   (ceh-step-out-of-args)
 	   (insert " || "))
-	  (t (indent-for-tab-command)))))
+	  (t (yas-expand)))))
 
 ;; specify mode
 (define-minor-mode ceh-mode
