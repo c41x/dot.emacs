@@ -119,17 +119,16 @@
 ;; just bind cua-rotate-rectangle to other keybind | TODO: check if is in rectangle mode
 (global-set-key (kbd "C-M-r") 'cua-rotate-rectangle)
 
-;; iswitchb mode for tabs
-(iswitchb-mode t)
-
 ;; file name in title bar
 (setq frame-title-format "emacs | %b")
 
 ;; yasnippet
 (require 'yasnippet)
 (setq yas-snippet-dirs "~/.emacs.d/yasnippet-snippets")
-(yas-global-mode 1)
-(setq-default yas/trigger-key (kbd "C-;"))
+(setq-default yas/trigger-key (kbd "C-S-M-;")) ;; impossibru shortcut
+(yas-global-mode t)
+(define-key yas-minor-mode-map (kbd "<tab>") nil) ;; disable tab (trigger YAS only with AC)
+(define-key yas-minor-mode-map (kbd "TAB") nil)
 
 ;; ido mode / smex for M-x
 (require 'ido)
@@ -1092,6 +1091,40 @@
   (if (ceh--in-array (char-after) "),\"]")
       (forward-char)))
 
+;; expand macro utility
+(defun ceh--expand ()
+  (interactive)
+  (let ((smb (buffer-substring-no-properties (- (point) 1) (point))))
+    (cond ((string= smb "-")
+	   (delete-char -1)
+	   (ceh-step-out-of-args)
+	   (insert "->"))
+	  ((string= smb ".")
+	   (delete-char -1)
+	   (ceh-step-out-of-args)
+	   (insert "."))
+	  ((string= smb ",")
+	   (delete-char -1)
+	   (ceh-step-out-of-args)
+	   (insert ", "))
+	  ((string= smb "+")
+	   (delete-char -1)
+	   (ceh-step-out-of-args)
+	   (insert " + "))
+	  ((string= smb "-")
+	   (delete-char -1)
+	   (ceh-step-out-of-args)
+	   (insert " - "))
+	  ((string= smb "&")
+	   (delete-char -1)
+	   (ceh-step-out-of-args)
+	   (insert " && "))
+	  ((string= smb "|")
+	   (delete-char -1)
+	   (ceh-step-out-of-args)
+	   (insert " || "))
+	  (t (indent-for-tab-command)))))
+
 ;; specify mode
 (define-minor-mode ceh-mode
   "C Edit Helper - mode for enhancing C - like languages editing"
@@ -1105,6 +1138,7 @@
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
 	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
 	    (define-key map (kbd "C-' d") 'ceh-leave-me)
+	    (define-key map (kbd "<tab>") 'ceh--expand)
 	    map)
   ;; chords
   (require 'key-chord)
@@ -1142,3 +1176,32 @@
  '(sml/active-background-color "green4"))
 
 (put 'downcase-region 'disabled nil)
+
+;; 24.4 !!!!!!!!!
+;;
+;;(setq-default abbrev-mode t)
+;;(define-abbrev-table
+;;  'global-abbrev-table
+;;  '((";xyz" "->"))
+;;  "Global abbrev table"
+;;  :regexp "\\(?:[^[:word:]_;]\\|^\\)\\(;?[[:word:]_]+\\)[^[:word:]_]*")
+;;
+;;(defun emacs-lisp-mode-abbrev-expand-function (expand)
+;;  (save-excursion
+;;    (let* ((str-begin (point))
+;; 	   (str (if (re-search-backward ";" 3 t 1)
+;; 		    (buffer-substring-no-properties (point) str-begin)
+;; 		  nil)))
+;;      (if (not str)
+;; 	  (funcall expand)
+;; 	(message (abbrev-expansion str))))))
+;;
+;;(add-hook 'emacs-lisp-mode-hook
+;; 	  #'(lambda ()
+;; 	      (add-function :around (local 'abbrev-expand-function)
+;; 			    #'emacs-lisp-mode-abbrev-expand-function)))
+;;
+;;(add-function :around (local 'abbrev-expand-function)
+;; 	      #'emacs-lisp-mode-abbrev-expand-function)
+;;
+;;
