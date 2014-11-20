@@ -144,6 +144,7 @@
 (ac-config-default)
 (setq-default auto-complete-mode t)
 (global-auto-complete-mode t)
+(delq 'ac-source-yasnippet ac-sources)
 
 ;; documentation tip
 (defun popup-doc ()
@@ -167,7 +168,8 @@
 		     ac-source-files-in-current-dir ; from files in current directory
 		     ;;ac-source-semantic ; symantic autocomplete for C/C++
 		     ac-source-words-in-all-buffer ; all stuff from buffers
-		     ac-source-yasnippet)))
+		     ;;ac-source-yasnippet
+		     )))
 
 (ac-flyspell-workaround) ; lag hack
 (add-hook 'c-mode 'ac-ccc-mode-setup)
@@ -284,7 +286,7 @@
 		   (interactive)
 		   (setq gdb-many-windows nil)
 		   (jump-to-register 1)))
-(global-set-key (kbd "<f9>") 'gdb-toggle-breakpoint) ; toggle breakpoint
+(global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
 
 ;; C++ coding style (indenting)
@@ -862,7 +864,11 @@
 
 (defun ceh--peek? (search)
   (string= search
-   (buffer-substring-no-properties (point) (+ (point) (length search)))))
+	   (buffer-substring-no-properties (point) (+ (point) (length search)))))
+
+(defun ceh--peekb? (search)
+  (string= search
+   (buffer-substring-no-properties (- (point) (length search)) (point))))
 
 (defun ceh--fwd-skip-comment ()
   (cond ((ceh--peek? "//")
@@ -1009,7 +1015,7 @@
 
 (defun ceh-step-out-of-args ()
   (interactive)
-  (ceh--search-forward-skip-nested ?\( ?\)))
+  (ceh--search-forward-skip-nested ?\( ?\) 1))
 
 (defun ceh-step-in-args ()
   (interactive)
@@ -1093,39 +1099,99 @@
       (forward-char)))
 
 ;; expand macro utility
-(defun ceh--expand ()
+(defun ceh--expand-fallback ()
+  (yas-expand))
+
+(defun ceh--not-end-of-line-p ()
+  (not (= (point) (line-end-position))))
+
+(defun ceh--end-of-line-p ()
+  (= (point) (line-end-position)))
+
+(defun ceh-expand ()
   (interactive)
-  (let ((smb (buffer-substring-no-properties (- (point) 1) (point))))
-    (cond ((string= smb "-")
+  (let ((c1 (buffer-substring-no-properties (- (point) 1) (point)))
+	(c2 (buffer-substring-no-properties (- (point) 2) (- (point) 1))))
+    (cond ((ceh--peekb? " <= ") ;; recursives first
+	   (delete-char -4)
+	   (insert "<=")
+	   (ceh-expand))
+	  ((ceh--peekb? " >= ")
+	   (delete-char -4)
+	   (insert ">=")
+	   (ceh-expand))
+	  ((ceh--peekb? "->")
 	   (delete-char -1)
-	   (if (not (= (point) (line-end-position)))
-	       (ceh-step-out-of-args))
-	   (insert "->"))
-	  ((string= smb ".")
+	   (ceh-expand))
+	  ;; construct
+	  ((string= c1 "-")
+	   (if (string= c2 "-")
+	       (progn
+		 (delete-char -2)
+		 (ceh-step-out-of-args)
+		 (insert " - "))
+	     (delete-char -1)
+	     (if (ceh--not-end-of-line-p)
+		 (ceh-step-out-of-args))
+	     (insert "->")))
+	  ((string= c1 ";")
+	   (if (ceh--end-of-line-p)
+	       (ceh--expand-fallback)
+	     (delete-char -1)
+	     (ceh-step-out-of-args)
+	     (if (not (ceh--peek? ";"))
+		 (insert "; "))))
+	  ((string= c1 "=")
+	   (if (ceh--end-of-line-p)
+	       (ceh--expand-fallback)
+	     (cond ((string= c2 "<")
+		    (delete-char -2)
+		    (ceh-step-out-of-args)
+		    (insert " <= "))
+		   ((string= c2 ">")
+		    (delete-char -2)
+		    (ceh-step-out-of-args)
+		    (insert " >= "))
+		   ((string= c2 "=")
+		    (delete-char -2)
+		    (ceh-step-out-of-args)
+		    (insert " == "))
+		   (t
+		    (delete-char -1)
+		    (end-of-line)
+		    (insert " = ")))))
+	  ((string= c1 ".")
 	   (delete-char -1)
 	   (ceh-step-out-of-args)
 	   (insert "."))
-	  ((string= smb ",")
+	  ((string= c1 ",")
 	   (delete-char -1)
 	   (ceh-step-out-of-args)
 	   (insert ", "))
-	  ((string= smb "+")
+	  ((string= c1 "+")
 	   (delete-char -1)
 	   (ceh-step-out-of-args)
 	   (insert " + "))
-	  ((string= smb "-")
-	   (delete-char -1)
-	   (ceh-step-out-of-args)
-	   (insert " - "))
-	  ((string= smb "&")
+	  ((string= c1 "&")
 	   (delete-char -1)
 	   (ceh-step-out-of-args)
 	   (insert " && "))
-	  ((string= smb "|")
+	  ((string= c1 "|")
 	   (delete-char -1)
 	   (ceh-step-out-of-args)
 	   (insert " || "))
-	  (t (yas-expand)))))
+	  ((string= c1 ">")
+	   (delete-char -1)
+	   (ceh-step-out-of-args)
+	   (insert " > "))
+	  ((string= c1 "<")
+	   (delete-char -1)
+	   (ceh-step-out-of-args)
+	   (insert " < "))
+	  ;; fallback
+	  (t (ceh--expand-fallback)))))
+
+;; TODO: S-C-"  -> stringize token
 
 ;; specify mode
 (define-minor-mode ceh-mode
@@ -1140,7 +1206,8 @@
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
 	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
 	    (define-key map (kbd "C-' d") 'ceh-leave-me)
-	    (define-key map (kbd "<tab>") 'ceh--expand)
+	    (define-key map (kbd "TAB") 'ceh-expand)
+	    (define-key map (kbd "<tab>") 'ceh-expand)
 	    map)
   ;; chords
   (require 'key-chord)
