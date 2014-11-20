@@ -753,14 +753,14 @@
 	(extract-includes-from-file (concat proj-dir "CMakeLists.txt") proj-dir)
       nil)))
 
-(add-hook 'c++-mode-hook
-          (lambda ()
-	    (when (is-cmake-project)
-	      (setq flycheck-c/c++-gcc-executable "mingw32-gcc")
-	      (setq flycheck-gcc-include-path (get-current-project-include-list))
-	      (setq flycheck-idle-change-delay 10.0)
-	      (flycheck-mode)
-	      (flycheck-select-checker 'c/c++-gcc))))
+;;(add-hook 'c++-mode-hook
+;;          (lambda ()
+;; 	    (when (is-cmake-project)
+;; 	      (setq flycheck-c/c++-gcc-executable "mingw32-gcc")
+;; 	      (setq flycheck-gcc-include-path (get-current-project-include-list))
+;; 	      (setq flycheck-idle-change-delay 10.0)
+;; 	      (flycheck-mode)
+;; 	      (flycheck-select-checker 'c/c++-gcc))))
 
 ;; --------------------------------------------------------------------------------------------------
 ;; CEH - C Edit Helper
@@ -1158,6 +1158,58 @@
 	     c++-mode-hook
 	     js-mode-hook
 	     csharp-mode-hook))
+
+
+
+(require 'url)
+
+(defun calx--request-callback-new-buffer (status)
+  (switch-to-buffer (current-buffer))
+  (rename-buffer "* todo *")
+  (org-mode)
+  (goto-char (point-min))
+  (search-forward "\n\n")
+  (delete-region (point-min) (point)))
+
+(defun calx--request-callback-status (status)
+  (switch-to-buffer (current-buffer))
+  (goto-char (point-min))
+  (search-forward "\n\n")
+  (message (buffer-substring-no-properties (point) (point-max)))
+  (kill-buffer (current-buffer)))
+
+(defun calx--http-post (url callback &optional data)
+  (let ((url-request-method "POST")
+    (url-request-extra-headers
+     '(("Content-Type" . "application/x-www-form-urlencoded")))
+    (url-request-data data))
+    (url-retrieve url callback)))
+
+(defvar calx--server-api-url "http://127.0.0.1/")
+
+(defun calx-login (username password)
+  (interactive "sLogin: \nsPassword:")
+  (calx--http-post (concat calx--server-api-url "/api_login")
+		   'calx--request-callback-status
+		   (format "username=%s&password=%s" username password)))
+
+(defun calx-get ()
+  (interactive)
+  (calx--http-post (concat calx--server-api-url "/api_get")
+		   'calx--request-callback-new-buffer))
+
+(defun calx-set ()
+  (interactive)
+  (calx--http-post (concat calx--server-api-url "/api_set")
+		   'calx--request-callback-status
+		   (concat "text=" (url-unhex-string (buffer-string)))))
+
+(defun calx-logout ()
+  (interactive)
+  (calx--http-post (concat calx--server-api-url "/api_logout")
+		   'calx--request-callback-status))
+
+
 
 ;; --------------------------------------------------------------------------------------------------
 ;; settings made by customize
