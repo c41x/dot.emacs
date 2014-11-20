@@ -286,7 +286,7 @@
 		   (interactive)
 		   (setq gdb-many-windows nil)
 		   (jump-to-register 1)))
-(global-set-key (kbd "<f9>") 'gdb-toggle-breakpoint) ; toggle breakpoint
+(global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
 
 ;; C++ coding style (indenting)
@@ -1015,7 +1015,7 @@
 
 (defun ceh-step-out-of-args ()
   (interactive)
-  (ceh--search-forward-skip-nested ?\( ?\)))
+  (ceh--search-forward-skip-nested ?\( ?\) 1))
 
 (defun ceh-step-in-args ()
   (interactive)
@@ -1152,6 +1152,10 @@
 		    (delete-char -2)
 		    (ceh-step-out-of-args)
 		    (insert " >= "))
+		   ((string= c2 "=")
+		    (delete-char -2)
+		    (ceh-step-out-of-args)
+		    (insert " == "))
 		   (t
 		    (delete-char -1)
 		    (end-of-line)
