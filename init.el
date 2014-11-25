@@ -287,6 +287,7 @@
 		   (setq gdb-many-windows nil)
 		   (jump-to-register 1)))
 (global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
+(global-set-key (kbd "<left-margin> <mouse-1>") 'gud-break)
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
 
 ;; C++ coding style (indenting)
