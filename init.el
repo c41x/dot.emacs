@@ -31,7 +31,8 @@
     jedi
     flycheck
     key-chord
-    indent-guide))
+    indent-guide
+    skewer-mode))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -225,6 +226,7 @@
 (font-lock-add-keywords 'c-mode operator-rex)
 (font-lock-add-keywords 'c++-mode operator-rex)
 (font-lock-add-keywords 'js-mode operator-rex)
+(font-lock-add-keywords 'js2-mode operator-rex)
 (font-lock-add-keywords 'csharp-mode operator-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
@@ -235,8 +237,20 @@
 (font-lock-add-keywords 'c-mode number-rex)
 (font-lock-add-keywords 'c++-mode number-rex)
 (font-lock-add-keywords 'js-mode number-rex)
+(font-lock-add-keywords 'js2-mode number-rex)
 (font-lock-add-keywords 'csharp-mode number-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\([0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
+
+;; js2 mode for .js files
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+;; skewer
+(add-hook 'js2-mode-hook 'skewer-mode)
+(add-hook 'css-mode-hook 'skewer-css-mode)
+(add-hook 'html-mode-hook 'skewer-html-mode)
+;;(require 'simple-httpd)
+;;(setq httpd-root "path to project")
+
 
 ;; C++ compiling keybindings (CMake)
 ;; keybinds:
@@ -519,6 +533,7 @@
 	     c++-mode-hook
 	     csharp-mode-hook
 	     js-mode-hook
+	     js2-mode-hook
 	     python-mode-hook))
 (global-set-key [(control f3)] 'highlight-symbol-at-point)
 (global-set-key [f3] 'highlight-symbol-next)
@@ -594,7 +609,7 @@
 (add-hooks (lambda ()
 	     (highlight-page-breaks)
 	     (highlight-todos))
-	   '(cg-mode-hook c-mode-hook c++-mode-hook js-mode-hook csharp-mode-hook))
+	   '(cg-mode-hook c-mode-hook c++-mode-hook js-mode-hook js2-mode-hook csharp-mode-hook))
 
 (defvar page-break-wrap-search nil)
 (defun page-break-navigate (dir)
@@ -1224,6 +1239,7 @@
 	     c-mode-hook
 	     c++-mode-hook
 	     js-mode-hook
+	     js2-mode-hook
 	     csharp-mode-hook))
 
 
