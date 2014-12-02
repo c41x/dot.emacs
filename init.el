@@ -248,8 +248,8 @@
 (add-hook 'js2-mode-hook 'skewer-mode)
 (add-hook 'css-mode-hook 'skewer-css-mode)
 (add-hook 'html-mode-hook 'skewer-html-mode)
-;;(require 'simple-httpd)
-;;(setq httpd-root "path to project")
+;(require 'simple-httpd)
+;(setq httpd-root "d:/repo/minigame2")
 
 
 ;; C++ compiling keybindings (CMake)
@@ -1208,6 +1208,44 @@
 	  (t (ceh--expand-fallback)))))
 
 ;; TODO: S-C-"  -> stringize token
+
+;; TODO: .h -> .cpp helper
+(defun ceh-decl-to-impl-namespace (namespace)
+  (interactive)
+  (beginning-of-line)
+  (end-of-sexp)
+  (forward-char)
+  (insert namespace)
+  (if (not (string= namespace ""))
+      (insert "::"))
+  (end-of-line)
+  (if (ceh--peekb? ";")
+      (progn (delete-char -1)
+	     (insert " {")
+	     (newline 2)
+	     (insert "}")
+	     (indent-for-tab-command)
+	     (newline)
+	     (previous-line 2)
+	     (indent-for-tab-command))))
+
+(defun ceh-decl-to-impl ()
+  (interactive)
+  (end-of-line)
+  (if (ceh--peekb? ";")
+      (progn (delete-char -1)
+	     (insert " {")
+	     (newline 2)
+	     (insert "}")
+	     (indent-for-tab-command)
+	     (newline)
+	     (previous-line 2)
+	     (indent-for-tab-command))))
+
+(defun ceh-decl-to-impl-n (namespace)
+  (interactive "sNamespace: ")
+  (while (search-forward ";" nil t 1)
+    (ceh-decl-to-impl-namespace namespace)))
 
 ;; specify mode
 (define-minor-mode ceh-mode
