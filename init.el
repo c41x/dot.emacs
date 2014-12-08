@@ -261,61 +261,108 @@
 ;; Modifiers:
 ;; Shift - Release version
 ;; Control - Recompile project
-(defconst compile-command-format "mingw32-make -C %s --no-print-directory all")
-(global-set-key (kbd "<f7>")
-		'(lambda ()
-		   (interactive)
-		   (compile (format
-			     compile-command-format
-			     (find-inproject-directory-debug)))))
+(defvar last-inproject-directory-debug nil)
+(defvar last-inproject-directory-release nil)
+(defvar last-project-directory-debug nil)
+(defvar last-project-directory-release nil)
+(defvar last-inproject-executable-debug nil)
+(defvar last-inproject-executable-release nil)
 
-(global-set-key (kbd "S-<f7>")
-		'(lambda ()
-		   (interactive)
-		   (compile (format
-			     compile-command-format
-			     (find-inproject-directory-release)))))
+(defun actualize-path-cache ()
+  (setq last-inproject-directory-debug (find-inproject-directory-debug))
+  (setq last-inproject-directory-release (find-inproject-directory-release))
+  (setq last-project-directory-debug (find-project-directory-debug))
+  (setq last-project-directory-release (find-project-directory-release))
+  (setq last-inproject-executable-debug (find-inproject-executable-debug))
+  (setq last-inproject-executable-release (find-inproject-executable-release)))
 
-(global-set-key (kbd "C-<f7>")
-		'(lambda ()
-		   (interactive)
-		   (compile (format
-			     compile-command-format
-			     (find-project-directory-debug))))) ; compile full project
+(defmacro run-compile (dir fallback-dir)
+  `(let ((dir (,dir)))
+     (when dir
+       (setq ,fallback-dir dir)
+       (actualize-path-cache))
+     (compile (format
+	       "mingw32-make -C %s --no-print-directory all"
+	       ,fallback-dir))))
 
-(global-set-key (kbd "C-S-<f7>")
-		'(lambda ()
-		   (interactive)
-		   (compile (format
-			     compile-command-format
-			     (find-project-directory-release))))) ; compile full project
+(defmacro run-exec (dir fallback-dir)
+  `(let ((dir (,dir)))
+     (when dir
+       (setq ,fallback-dir dir)
+       (actualize-path-cache))
+     (compile (format
+	       "%s"
+	       ,fallback-dir) t)))
 
-(global-set-key (kbd "<f6>")
-		'(lambda ()
-		   (interactive)
-		   (compile (format "%s" (find-inproject-executable-debug)) t)
-		   (select-window (get-buffer-window "*compilation*"))
-		   (end-of-buffer)))
+(defmacro run-debug (dir fallback-dir)
+  `(let ((dir (,dir)))
+     (when dir
+       (setq ,fallback-dir dir)
+       (actualize-path-cache))
+     (gdb (format "gdb -i=mi %s" ,fallback-dir))))
 
-(global-set-key (kbd "S-<f6>")
-		'(lambda ()
-		   (interactive)
-		   (compile (format "%s" (find-inproject-executable-release)) t)
-		   (select-window (get-buffer-window "*compilation*"))
-		   (end-of-buffer)))
 
-(global-set-key (kbd "<f5>")
-		'(lambda ()
-		   (interactive)
-		   (frame-configuration-to-register 1)
-		   (gdb (format "gdb -i=mi %s" (find-inproject-executable-debug)))
-		   (setq gdb-many-windows t)))
+(global-set-key
+ (kbd "<f7>")
+ '(lambda ()
+    (interactive)
+    (run-compile find-inproject-directory-debug
+		 last-inproject-directory-debug)))
 
-(global-set-key (kbd "S-<f5>")
-		'(lambda ()
-		   (interactive)
-		   (setq gdb-many-windows nil)
-		   (jump-to-register 1)))
+(global-set-key
+ (kbd "S-<f7>")
+ '(lambda ()
+    (interactive)
+    (run-compile find-inproject-directory-release
+		 last-inproject-directory-release)))
+
+(global-set-key
+ (kbd "C-<f7>")
+ '(lambda ()
+    (interactive)
+    (run-compile find-project-directory-debug
+		 last-project-directory-debug))) ; compile full project
+
+(global-set-key
+ (kbd "C-S-<f7>")
+ '(lambda ()
+    (interactive)
+    (run-compile find-project-directory-release
+		 last-project-directory-release))) ; compile full project
+
+(global-set-key
+ (kbd "<f6>")
+ '(lambda ()
+    (interactive)
+    (run-exec find-inproject-executable-debug
+	      last-inproject-executable-debug)
+    (select-window (get-buffer-window "*compilation*"))
+    (end-of-buffer)))
+
+(global-set-key
+ (kbd "S-<f6>")
+ '(lambda ()
+    (interactive)
+    (run-exec find-inproject-executable-release
+	      last-inproject-executable-release)
+    (select-window (get-buffer-window "*compilation*"))
+    (end-of-buffer)))
+
+(global-set-key
+ (kbd "<f5>")
+ '(lambda ()
+    (interactive)
+    (frame-configuration-to-register 1)
+    (run-debug find-inproject-executable-debug
+	       last-inproject-executable-debug)
+    (setq gdb-many-windows t)))
+
+(global-set-key
+ (kbd "S-<f5>")
+ '(lambda ()
+    (interactive)
+    (setq gdb-many-windows nil)
+    (jump-to-register 1)))
 
 (global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
 (global-set-key (kbd "<left-margin> <mouse-1>") 'gud-break)
