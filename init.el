@@ -261,45 +261,62 @@
 ;; Modifiers:
 ;; Shift - Release version
 ;; Control - Recompile project
+(defconst compile-command-format "mingw32-make -C %s --no-print-directory all")
 (global-set-key (kbd "<f7>")
 		'(lambda ()
 		   (interactive)
-		   (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-debug)))))
+		   (compile (format
+			     compile-command-format
+			     (find-inproject-directory-debug)))))
+
 (global-set-key (kbd "S-<f7>")
 		'(lambda ()
 		   (interactive)
-		   (compile (format "mingw32-make -C %s --no-print-directory all" (find-inproject-directory-release)))))
+		   (compile (format
+			     compile-command-format
+			     (find-inproject-directory-release)))))
+
 (global-set-key (kbd "C-<f7>")
 		'(lambda ()
 		   (interactive)
-		   (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-debug))))) ; compile full project
+		   (compile (format
+			     compile-command-format
+			     (find-project-directory-debug))))) ; compile full project
+
 (global-set-key (kbd "C-S-<f7>")
 		'(lambda ()
 		   (interactive)
-		   (compile (format "mingw32-make -C %s --no-print-directory all" (find-project-directory-release))))) ; compile full project
+		   (compile (format
+			     compile-command-format
+			     (find-project-directory-release))))) ; compile full project
+
 (global-set-key (kbd "<f6>")
 		'(lambda ()
 		   (interactive)
 		   (compile (format "%s" (find-inproject-executable-debug)) t)
 		   (select-window (get-buffer-window "*compilation*"))
 		   (end-of-buffer)))
+
 (global-set-key (kbd "S-<f6>")
 		'(lambda ()
 		   (interactive)
 		   (compile (format "%s" (find-inproject-executable-release)) t)
 		   (select-window (get-buffer-window "*compilation*"))
 		   (end-of-buffer)))
+
 (global-set-key (kbd "<f5>")
 		'(lambda ()
 		   (interactive)
 		   (frame-configuration-to-register 1)
 		   (gdb (format "gdb -i=mi %s" (find-inproject-executable-debug)))
 		   (setq gdb-many-windows t)))
+
 (global-set-key (kbd "S-<f5>")
 		'(lambda ()
 		   (interactive)
 		   (setq gdb-many-windows nil)
 		   (jump-to-register 1)))
+
 (global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
 (global-set-key (kbd "<left-margin> <mouse-1>") 'gud-break)
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
