@@ -281,7 +281,7 @@
      (unless ,fallback-dir
        (setq ,fallback-dir dir)
        (actualize-path-cache))
-     (message (format
+     (compile (format
 	       "mingw32-make -C %s --no-print-directory all"
 	       ,fallback-dir))))
 
