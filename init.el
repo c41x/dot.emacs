@@ -278,16 +278,16 @@
 
 (defmacro run-compile (dir fallback-dir)
   `(let ((dir (,dir)))
-     (when dir
+     (unless ,fallback-dir
        (setq ,fallback-dir dir)
        (actualize-path-cache))
-     (compile (format
+     (message (format
 	       "mingw32-make -C %s --no-print-directory all"
 	       ,fallback-dir))))
 
 (defmacro run-exec (dir fallback-dir)
   `(let ((dir (,dir)))
-     (when dir
+     (unless ,fallback-dir
        (setq ,fallback-dir dir)
        (actualize-path-cache))
      (compile (format
@@ -296,7 +296,7 @@
 
 (defmacro run-debug (dir fallback-dir)
   `(let ((dir (,dir)))
-     (when dir
+     (unless ,fallback-dir
        (setq ,fallback-dir dir)
        (actualize-path-cache))
      (gdb (format "gdb -i=mi %s" ,fallback-dir))))
