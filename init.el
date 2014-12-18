@@ -1427,32 +1427,3 @@
  '(sml/active-background-color "green4"))
 
 (put 'downcase-region 'disabled nil)
-
-;; 24.4 !!!!!!!!!
-;;
-;;(setq-default abbrev-mode t)
-;;(define-abbrev-table
-;;  'global-abbrev-table
-;;  '((";xyz" "->"))
-;;  "Global abbrev table"
-;;  :regexp "\\(?:[^[:word:]_;]\\|^\\)\\(;?[[:word:]_]+\\)[^[:word:]_]*")
-;;
-;;(defun emacs-lisp-mode-abbrev-expand-function (expand)
-;;  (save-excursion
-;;    (let* ((str-begin (point))
-;; 	   (str (if (re-search-backward ";" 3 t 1)
-;; 		    (buffer-substring-no-properties (point) str-begin)
-;; 		  nil)))
-;;      (if (not str)
-;; 	  (funcall expand)
-;; 	(message (abbrev-expansion str))))))
-;;
-;;(add-hook 'emacs-lisp-mode-hook
-;; 	  #'(lambda ()
-;; 	      (add-function :around (local 'abbrev-expand-function)
-;; 			    #'emacs-lisp-mode-abbrev-expand-function)))
-;;
-;;(add-function :around (local 'abbrev-expand-function)
-;; 	      #'emacs-lisp-mode-abbrev-expand-function)
-;;
-;;
