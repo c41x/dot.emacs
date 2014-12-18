@@ -621,6 +621,7 @@
 
 ;; flycheck in LISP
 (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
+(setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
 
 ;; GLSL
 (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
@@ -941,6 +942,3 @@
  '(sml/active-background-color "green4"))
 
 (put 'downcase-region 'disabled nil)
-
-(provide 'init)
-;;; init.el ends here
