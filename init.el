@@ -448,7 +448,7 @@
 (global-set-key (kbd "C-w") 'er/expand-region)
 
 ;; CG/HLSL mode
-(add-to-list 'load-path "~/.emacs.d/my-packages/")
+(add-to-list 'load-path "~/.emacs.d/my-packages")
 (require 'cg-mode)
 (add-to-list 'auto-mode-alist '("\\.fx\\'" . cg-mode))
 (add-to-list 'auto-mode-alist '("\\.cgfx\\'" . cg-mode))
