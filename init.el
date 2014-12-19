@@ -149,6 +149,7 @@
 (setq-default auto-complete-mode t)
 (global-auto-complete-mode t)
 (delq 'ac-source-yasnippet ac-sources)
+(setq ac-ignore-case t)
 
 ;; documentation tip
 (defun popup-doc ()
