@@ -75,5 +75,5 @@
 				:cursor (get-buffer-tags-cursor buffer-tags)))
       (message "no page breaks found"))))
 
-(provide 'page-breaks)
+(provide 'tags)
 ;;; taga.el ends here
