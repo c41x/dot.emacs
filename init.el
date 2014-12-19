@@ -49,6 +49,9 @@
 
 ;; --------------------------------------------------------------------------------------------------
 
+;; load paths
+(add-to-list 'load-path "~/.emacs.d")
+
 ;; add hooks helper
 (defun add-hooks (function hooks)
   "runs [function] for given [hooks]"
@@ -772,7 +775,6 @@
 ;; 	      (flycheck-select-checker 'c/c++-gcc))))
 
 ;; CEH
-(add-to-list 'load-path "~/.emacs.d")
 (require 'ceh)
 (add-hooks 'ceh-mode
 	   '(cg-mode-hook
