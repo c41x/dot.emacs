@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-;; highlight "page breaks" / TODOs and apply in modes specified below
+;; highlight "page breaks" / TODOs
 (defconst re-page-break ".?//-.")
 (defconst re-todo ".?TODO\\:.")
 (defconst re-page-break-or-todo "\\(.?//-.\\)\\|\\(.?TODO\\:.\\)")
