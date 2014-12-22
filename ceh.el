@@ -482,6 +482,8 @@
 	    (define-key map (kbd "C-' d") 'ceh-leave-me)
 	    (define-key map (kbd "TAB") 'ceh-expand)
 	    (define-key map (kbd "<tab>") 'ceh-expand)
+	    (define-key map (kbd "C-.") 'ceh-next-argument)
+	    (define-key map (kbd "C-,") 'ceh-previous-argument)
 	    map)
   ;; chords
   (when (require 'key-chord nil 'noerror)
