@@ -8,7 +8,8 @@
 (package-initialize)
 (setq package-archives
       '(("marmalade" . "https://marmalade-repo.org/packages/")
-	("melpa" . "http://stable.melpa.org/packages/")))
+	("melpa" . "http://stable.melpa.org/packages/")
+	("elpa" . "http://elpa.gnu.org/packages/")))
 
 (defvar required-packages
   '(yasnippet
@@ -16,7 +17,7 @@
     expand-region
     multiple-cursors
     ace-jump-mode
-    glsl-mode
+    ;glsl-mode
     cmake-mode
     pretty-lambdada
     autopair
@@ -24,14 +25,14 @@
     js2-mode
     lua-mode
     helm
-    helm-swoop
+    ;helm-swoop
     smex
     popup
     highlight-symbol
     jedi
     flycheck
     key-chord
-    indent-guide
+    ;indent-guide
     skewer-mode))
 
 (defun has-package-to-install ()
@@ -616,8 +617,8 @@
   (byte-recompile-directory (expand-file-name "~/.emacs.d") 0))
 
 ;; indent guide for LISP
-(require 'indent-guide)
-(add-hook 'emacs-lisp-mode-hook 'indent-guide-mode)
+;(require 'indent-guide)
+;(add-hook 'emacs-lisp-mode-hook 'indent-guide-mode)
 
 ;; flycheck in LISP
 (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
