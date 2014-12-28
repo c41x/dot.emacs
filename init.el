@@ -32,7 +32,6 @@
     jedi
     flycheck
     key-chord
-    ;indent-guide
     skewer-mode))
 
 (defun has-package-to-install ()
@@ -615,10 +614,6 @@
 (defun recompile-scripts ()
   (interactive)
   (byte-recompile-directory (expand-file-name "~/.emacs.d") 0))
-
-;; indent guide for LISP
-;(require 'indent-guide)
-;(add-hook 'emacs-lisp-mode-hook 'indent-guide-mode)
 
 ;; flycheck in LISP
 (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
