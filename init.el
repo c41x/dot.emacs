@@ -32,7 +32,8 @@
     flycheck
     key-chord
     indent-guide
-    skewer-mode))
+    skewer-mode
+    fuzzy))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -150,6 +151,7 @@
 (global-auto-complete-mode t)
 (delq 'ac-source-yasnippet ac-sources)
 (setq ac-ignore-case t)
+(setq ac-use-fuzzy t)
 
 ;; documentation tip
 (defun popup-doc ()
