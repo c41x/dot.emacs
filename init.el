@@ -8,7 +8,8 @@
 (package-initialize)
 (setq package-archives
       '(("marmalade" . "https://marmalade-repo.org/packages/")
-	("melpa" . "http://stable.melpa.org/packages/")))
+	("melpa" . "http://melpa.org/packages/")
+	("elpa" . "http://elpa.gnu.org/packages/")))
 
 (defvar required-packages
   '(yasnippet
@@ -31,7 +32,6 @@
     jedi
     flycheck
     key-chord
-    indent-guide
     skewer-mode
     fuzzy))
 
@@ -616,10 +616,6 @@
 (defun recompile-scripts ()
   (interactive)
   (byte-recompile-directory (expand-file-name "~/.emacs.d") 0))
-
-;; indent guide for LISP
-(require 'indent-guide)
-(add-hook 'emacs-lisp-mode-hook 'indent-guide-mode)
 
 ;; flycheck in LISP
 (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
