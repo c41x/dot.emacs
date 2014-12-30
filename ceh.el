@@ -488,7 +488,7 @@
   ;; chords
   (when (require 'key-chord nil 'noerror)
     (key-chord-define-global "qq" 'ceh--chord-kill-line)
-    (key-chord-define-global ",," 'ceh--chord-skip-chars)
+    ;;(key-chord-define-global ",," 'ceh--chord-skip-chars)
     (key-chord-define-global "[[" 'ceh-include-expr)
     (key-chord-define-global "]]" 'ceh-exclude-expr)
     (key-chord-define-global "[]" 'ceh-create-block-include-expr)
