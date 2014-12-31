@@ -111,6 +111,16 @@
 (global-unset-key (kbd "M-y"))
 (global-set-key (kbd "C-M-v") 'yank-pop)
 
+;; Ctrl + Backspace kill ring
+(defun backward-delete-word (arg)
+  (interactive "p")
+  (delete-region (point) (progn (backward-word arg) (point))))
+(defun forward-delete-word (arg)
+  (interactive "p")
+  (delete-region (point) (progn (forward-word arg) (point))))
+(global-set-key (kbd "<C-backspace>") 'backward-delete-word)
+(global-set-key (kbd "<C-delete>") 'forward-delete-word)
+
 ;; automatic brackets {}()[]""'' pairing
 (require 'autopair)
 (autopair-global-mode)
