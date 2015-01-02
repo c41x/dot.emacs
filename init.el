@@ -25,7 +25,6 @@
     js2-mode
     lua-mode
     helm
-    helm-swoop
     smex
     popup
     highlight-symbol
@@ -222,8 +221,6 @@
 (require 'helm-config)
 (set 'helm-idle-delay 0.0)
 (set 'helm-input-idle-delay 0.0)
-(global-set-key (kbd "C-,") 'helm-for-files)
-(global-set-key (kbd "C-.") 'helm-swoop)
 (global-set-key (kbd "C-x r b") 'helm-bookmarks)
 
 ;; cmake-mode
