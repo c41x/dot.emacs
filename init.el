@@ -809,7 +809,7 @@
  '(highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1")))
  '(highlight-symbol-idle-delay 0.5)
  '(highlight-symbol-ignore-list (quote ("\\`[0-9]+f?F?[ulUL]*\\'")))
- '(mode-line-format (quote ("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification (:eval (propertize "∵ " (quote face) (quote mode-line-separator-face))) mode-line-buffer-identification (:eval (propertize " ∵ " (quote face) (quote mode-line-separator-face))) mode-line-position (:eval (propertize " ∵ " (quote face) (quote mode-line-separator-face))) (vc-mode vc-mode) (:eval (propertize " ∵ " (quote face) (quote mode-line-separator-face))) mode-line-modes mode-line-misc-info mode-line-end-spaces "%-")))
+ '(mode-line-format (quote ("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification (:eval (propertize ": " (quote face) (quote mode-line-separator-face))) mode-line-buffer-identification (:eval (propertize " : " (quote face) (quote mode-line-separator-face))) mode-line-position (:eval (propertize " : " (quote face) (quote mode-line-separator-face))) (vc-mode vc-mode) (:eval (propertize " : " (quote face) (quote mode-line-separator-face))) mode-line-modes mode-line-misc-info mode-line-end-spaces "%-")))
  '(query-replace-show-replacement t)
  '(sml/active-background-color "green4"))
 
