@@ -36,6 +36,10 @@
     (t :inverse-video t))
   "Face to match page breaks (custom)." :group 'basic-faces)
 
+(make-face 'mode-line-separator-face)
+(set-face-attribute 'mode-line-separator-face nil
+		    :foreground "snow4")
+
 (custom-theme-set-faces
  'calx
  '(default ((t (:inherit nil :background "#000000" :foreground "#b2af99" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "outline" :family "Liberation Mono LS"))))
