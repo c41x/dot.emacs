@@ -38,7 +38,8 @@
 
 (make-face 'mode-line-separator-face)
 (set-face-attribute 'mode-line-separator-face nil
-		    :foreground "snow4")
+		    :foreground "dark orange"
+		    :weight 'bold)
 
 (custom-theme-set-faces
  'calx

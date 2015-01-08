@@ -806,13 +806,13 @@
 				 mode-line-modified
 				 mode-line-remote
 				 mode-line-frame-identification
-				 (:eval (propertize ": " 'face 'font-lock-operator-face))
+				 (:eval (propertize ": " 'face 'font-lock-comment-face))
 				 (:propertize (:eval mode-line-buffer-identification)  face mode-line-separator-face)
-				 (:eval (propertize " : " 'face 'font-lock-operator-face))
+				 (:eval (propertize " : " 'face 'font-lock-comment-face))
 				 mode-line-position
-				 (:eval (propertize " : " 'face 'font-lock-operator-face))
+				 (:eval (propertize " : " 'face 'font-lock-comment-face))
 				 (vc-mode vc-mode)
-				 (:eval (propertize " : " 'face 'font-lock-operator-face))
+				 (:eval (propertize " : " 'face 'font-lock-comment-face))
 				 mode-line-modes
 				 mode-line-misc-info
 				 mode-line-end-spaces
