@@ -517,6 +517,9 @@
 ;; delete trailing whitespace on save
 (add-hook 'before-save-hook 'delete-trailing-whitespace)
 
+;; automatically reload files when changed
+(global-auto-revert-mode t)
+
 ;; swapping windows / buffers
 (defun swap-windows ()
   "Swaps buffers in selected-window with next-window"
