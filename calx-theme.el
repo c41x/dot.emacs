@@ -41,6 +41,10 @@
 		    :foreground "dark orange"
 		    :weight 'bold)
 
+(set-face-attribute 'log-view-message-face nil
+		    :foreground "#aa7733"
+		    :weight 'bold)
+
 (custom-theme-set-faces
  'calx
  '(default ((t (:inherit nil :background "#000000" :foreground "#b2af99" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "outline" :family "Liberation Mono LS"))))
