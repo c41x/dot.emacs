@@ -799,6 +799,13 @@
 (require 'calx-api)
 
 ;; mode-line
+(defconst buffer-pos-indicator-length 25)
+
+(defun buffer-pos ()
+  (/ (* buffer-pos-indicator-length (point)) (point-max)))
+(defun buffer-left ()
+  (- buffer-pos-indicator-length (/ (* buffer-pos-indicator-length (point)) (point-max))))
+
 (setq-default mode-line-format '("%e"
 				 mode-line-front-space
 				 mode-line-mule-info
@@ -809,7 +816,9 @@
 				 (:eval (propertize ": " 'face 'font-lock-comment-face))
 				 (:propertize (:eval mode-line-buffer-identification)  face mode-line-separator-face)
 				 (:eval (propertize " : " 'face 'font-lock-comment-face))
-				 mode-line-position
+				 (:eval (list
+					 (propertize (make-string (buffer-pos) ?\#) 'face 'mode-line-progress-face)
+					 (propertize (make-string (buffer-left) ?\-) 'face 'font-lock-comment-face)))
 				 (:eval (propertize " : " 'face 'font-lock-comment-face))
 				 (vc-mode vc-mode)
 				 (:eval (propertize " : " 'face 'font-lock-comment-face))
