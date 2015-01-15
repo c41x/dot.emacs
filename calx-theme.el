@@ -38,12 +38,12 @@
 
 (make-face 'mode-line-separator-face)
 (set-face-attribute 'mode-line-separator-face nil
-		    :foreground "dark orange"
+		    :foreground "#66aabb"
 		    :weight 'bold)
 
 (make-face 'mode-line-progress-face)
 (set-face-attribute 'mode-line-progress-face nil
-		    :foreground "#66aabb")
+		    :foreground "dark orange")
 
 ;;(set-face-attribute 'log-view-message-face nil
 ;;		    :foreground "#aa7733"
