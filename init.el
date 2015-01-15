@@ -817,8 +817,8 @@
 				 (:propertize (:eval mode-line-buffer-identification)  face mode-line-separator-face)
 				 (:eval (propertize " : " 'face 'font-lock-comment-face))
 				 (:eval (list
-					 (propertize (make-string (buffer-pos) ?\#) 'face 'mode-line-progress-face)
-					 (propertize (make-string (buffer-left) ?\-) 'face 'font-lock-comment-face)))
+					 (propertize (make-string (buffer-pos) 9632) 'face 'mode-line-progress-face)
+					 (propertize (make-string (buffer-left) 9632) 'face 'font-lock-comment-face)))
 				 (:eval (propertize " : " 'face 'font-lock-comment-face))
 				 (vc-mode vc-mode)
 				 (:eval (propertize " : " 'face 'font-lock-comment-face))
