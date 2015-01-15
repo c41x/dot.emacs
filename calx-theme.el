@@ -41,9 +41,13 @@
 		    :foreground "dark orange"
 		    :weight 'bold)
 
-(set-face-attribute 'log-view-message-face nil
-		    :foreground "#aa7733"
-		    :weight 'bold)
+(make-face 'mode-line-progress-face)
+(set-face-attribute 'mode-line-progress-face nil
+		    :foreground "#66aabb")
+
+;;(set-face-attribute 'log-view-message-face nil
+;;		    :foreground "#aa7733"
+;;		    :weight 'bold)
 
 (custom-theme-set-faces
  'calx
