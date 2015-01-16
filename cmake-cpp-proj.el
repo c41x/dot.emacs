@@ -219,4 +219,4 @@
 ;; 	      (flycheck-select-checker 'c/c++-gcc))))
 
 (provide 'cmake-cpp-proj)
-;;; ceh.el ends here
+;;; cmake-cpp-proj.el ends here
