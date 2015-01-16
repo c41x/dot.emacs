@@ -97,7 +97,7 @@
  '(dired-directory ((t (:foreground "#eeaa11"))))
  '(fringe ((t (:background "black" :foreground "#39ae1c"))))
  '(linum ((t (:background "black" :foreground "#343434"))))
- '(mode-line ((t (:background "#777777" :foreground "black" :box nil))))
+ '(mode-line ((t (:background "#887766" :foreground "black" :box nil))))
  '(mode-line-buffer-id ((t nil)))
  '(mode-line-emphasis ((t nil)))
  '(mode-line-highlight ((t nil)))
