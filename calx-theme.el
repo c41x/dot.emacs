@@ -38,12 +38,12 @@
 
 (make-face 'mode-line-separator-face)
 (set-face-attribute 'mode-line-separator-face nil
-		    :foreground "#66aabb"
+		    :foreground "antique white"
 		    :weight 'bold)
 
 (make-face 'mode-line-progress-face)
 (set-face-attribute 'mode-line-progress-face nil
-		    :foreground "dark orange")
+		    :foreground "antique white")
 
 ;;(set-face-attribute 'log-view-message-face nil
 ;;		    :foreground "#aa7733"
@@ -97,11 +97,11 @@
  '(dired-directory ((t (:foreground "#eeaa11"))))
  '(fringe ((t (:background "black" :foreground "#39ae1c"))))
  '(linum ((t (:background "black" :foreground "#343434"))))
- '(mode-line ((t (:background "#161616" :foreground "#ff3300" :box nil))))
+ '(mode-line ((t (:background "#777777" :foreground "black" :box nil))))
  '(mode-line-buffer-id ((t nil)))
  '(mode-line-emphasis ((t nil)))
  '(mode-line-highlight ((t nil)))
- '(mode-line-inactive ((t (:inherit mode-line :background "#161616" :foreground "#857b6f" :box nil :weight light))))
+ '(mode-line-inactive ((t (:inherit mode-line :background "#222222" :foreground "#857b6f" :box nil :weight light))))
  '(popup-face ((t (:background "AntiqueWhite3" :foreground "black"))))
  '(popup-menu-selection-face ((t (:background "chartreuse4" :foreground "white"))))
  '(show-paren-match ((t (:background "#44aaee" :foreground "#000000"))))
