@@ -2,6 +2,79 @@
 ;;; Commentary:
 ;;; Code:
 
+(defun fwd-search (re)
+  (re-search-forward re nil t))
+(defun bck-search (re)
+  (re-search-backward re nil t))
+
+(defun fwd-peek (search)
+  (string= search
+	   (buffer-substring-no-properties (point) (+ (point) (length search)))))
+(defun bck-peek (search)
+  (string= search
+	   (buffer-substring-no-properties (- (point) (length search)) (point))))
+
+(defun fwd-sexp ()
+  (ignore-errors (forward-sexp) t))
+(defun bck-sexp ()
+  (ignore-errors (backward-sexp) t))
+
+(defun fwd-atom ()
+  (if (fwd-sexp)
+      (progn
+	(while (or (fwd-peek "(")
+		   (fwd-peek ".")
+		   (fwd-peek "->")
+		   (fwd-peek "::"))
+	  (fwd-sexp))
+	t)
+    nil))
+
+(defun bck-atom ()
+  (if (bck-sexp)
+      (progn
+	(while (or (fwd-peek "(")
+		   (bck-peek ".")
+		   (bck-peek "->")
+		   (bck-peek "::"))
+	  (bck-sexp))
+	t)
+    nil))
+
+(defun parametrize ()
+  (interactive)
+  (let* ((begin-point (point))
+	 (valid (fwd-atom))
+	 (end-point (point)))
+    (if valid
+	(progn
+	  (goto-char begin-point)
+	  (cond ((bck-peek ")") ;; continue parametrization
+		 (delete-char -1)
+		 (setq end-point (- end-point 1)))
+		(t ;; init parametrization
+		 (insert "(")
+		 (setq end-point (+ end-point 1))))
+	  (goto-char end-point)
+	  (insert ")"))
+      (goto-char begin-point))))
+
+(defun unparametrize ()
+  (interactive)
+  (when (bck-peek ")")
+    (let* ((begin-point (point))
+	   (valid (progn (backward-char)
+			 (bck-atom)))
+	   (end-point (progn
+			(bck-atom)
+			(fwd-atom)
+			(point))))
+      (when valid
+	(goto-char begin-point)
+	(delete-char -1)
+	(goto-char end-point)
+	(insert ")")))))
+
 ;; TODO: add string skipping
 ;; TODO: intelligent killing
 ;; TODO: killing brackets
@@ -474,8 +547,8 @@
   :keymap (let ((map (make-sparse-keymap)))
 	    (define-key map (kbd "<M-return>") 'ceh-new-brace)
 	    (define-key map (kbd "<S-return>") 'ceh-finish-expression)
-	    (define-key map (kbd "C-(") 'ceh-parametrize)
-	    (define-key map (kbd "C-)") 'ceh-unparametrize)
+	    (define-key map (kbd "C-(") 'parametrize)
+	    (define-key map (kbd "C-)") 'unparametrize) ;; TODO: check this keybind
 	    (define-key map (kbd "M-,") 'ceh-step-in-args) ;; tags!
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
 	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
