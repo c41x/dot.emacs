@@ -560,7 +560,8 @@
 (add-hooks (lambda ()
 	     (highlight-page-breaks)
 	     (highlight-todos))
-	   '(cg-mode-hook c-mode-hook c++-mode-hook js-mode-hook js2-mode-hook csharp-mode-hook))
+	   '(cg-mode-hook c-mode-hook c++-mode-hook js-mode-hook js2-mode-hook csharp-mode-hook
+			  emacs-lisp-mode-hook))
 (global-set-key (kbd "M-]") 'next-page-break)
 (global-set-key (kbd "M-[") 'prev-page-break)
 (global-set-key (kbd "C-; x") 'page-breaks-popup)
