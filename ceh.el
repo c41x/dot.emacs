@@ -2,6 +2,16 @@
 ;;; Commentary:
 ;;; Code:
 
+(defconst ceh--operators "- */\+|&^%!,<>=\n\t")
+
+(defun ceh--in-array (element array)
+  (let ((i 0))
+    (while (and
+	    (< i (length array))
+	    (not (= element (elt array i))))
+      (setq i (+ i 1)))
+    (not (= i (length array)))))
+
 (defun fwd-search (re)
   (re-search-forward re nil t))
 (defun bck-search (re)
@@ -43,21 +53,27 @@
 
 (defun parametrize ()
   (interactive)
-  (let* ((begin-point (point))
-	 (valid (fwd-atom))
-	 (end-point (point)))
-    (if valid
-	(progn
-	  (goto-char begin-point)
-	  (cond ((bck-peek ")") ;; continue parametrization
-		 (delete-char -1)
-		 (setq end-point (- end-point 1)))
-		(t ;; init parametrization
-		 (insert "(")
-		 (setq end-point (+ end-point 1))))
-	  (goto-char end-point)
-	  (insert ")"))
-      (goto-char begin-point))))
+  (if (ceh--in-array (char-before) ceh--operators) ;; lr slurp
+      (progn (bck-atom)
+	     (insert "(")
+	     (fwd-atom)
+	     (fwd-atom)
+	     (insert ")"))
+    (let* ((begin-point (point))
+	   (valid (fwd-atom))
+	   (end-point (point)))
+      (if valid
+	  (progn
+	    (goto-char begin-point)
+	    (cond ((bck-peek ")") ;; continue parametrization
+		   (delete-char -1)
+		   (setq end-point (- end-point 1)))
+		  (t ;; init parametrization
+		   (insert "(")
+		   (setq end-point (+ end-point 1))))
+	    (goto-char end-point)
+	    (insert ")"))
+	(goto-char begin-point)))))
 
 (defun unparametrize ()
   (interactive)
@@ -74,6 +90,17 @@
 	(delete-char -1)
 	(goto-char end-point)
 	(insert ")")))))
+
+(defun stringize-line ()
+  (interactive)
+  (let ((lim (progn (end-of-line)
+		    (point))))
+    (beginning-of-line-text)
+    (while (search-forward "\"" lim t) (replace-match "\\\\\"")) ;; escape strings
+    (beginning-of-line-text)
+    (insert "\"")
+    (end-of-line)
+    (insert "\"")))
 
 ;; TODO: add string skipping
 ;; TODO: intelligent killing
@@ -137,7 +164,6 @@
 	    (setq nest-level 0))
 	  (>= nest-level 0)))))
 
-(defconst ceh--operators "- */\+|&^%!,<>=\n\t")
 (defconst ceh--id "A-Za-z0-9_\\-\\.\\>\\<")
 (defconst ceh--whitespace " \t\n")
 (defun ceh--fwd-operators ()
@@ -195,48 +221,7 @@
 	     (ceh--fwd-skip-empty-lines)
 	     (not (eq pt (point)))))))
 
-(defun ceh--in-array (element array)
-  (let ((i 0))
-    (while (and
-	    (< i (length array))
-	    (not (= element (elt array i))))
-      (setq i (+ i 1)))
-    (not (= i (length array)))))
-
 ;; interactives
-(defun ceh-parametrize ()
-  (interactive)
-  (let ((c-prev (char-before))
-	(c-next (char-after)))
-    (cond ((ceh--in-array c-prev ceh--operators) ;; when in middle of operators lr slurp
-	   (let ((pt (point)))
-	     (ceh--bck-operators)
-	     (ceh--bck-expression)
-	     (insert "(")
-	     (goto-char (+ pt 1))
-	     (ceh--fwd-operators)))
-	  ((or (eq c-prev ?\)) (eq c-next ?\))) ;; when parens here -> slurp argument from r
-	   (if (not (eq c-next ?\))) ;; make sure that we are before closing paren
-	       (backward-char))
-	   (delete-char 1)
-	   (ceh--fwd-operators))
-	  (t ;; otherwise insert new parenthesis
-	   (insert "(")))
-    (progn
-      (ceh--fwd-expression) ;; (re)insert closing parenthesis
-      (backward-char)
-      (insert ")"))))
-
-(defun ceh-unparametrize ()
-  (interactive)
-  (if (eq (char-before) ?\)) ;; barf?
-      (progn
-	(backward-char)
-	(delete-char 1)
-	(ceh--bck-expression)
-	(ceh--bck-operators)
-	(insert ")"))))
-
 (defun ceh-include-expr ()
   (interactive)
   (ceh--search-forward-skip-nested ?\{ ?\} 1) ;; find closing bracket
@@ -500,8 +485,6 @@
 	  ;; fallback
 	  (t (ceh--expand-fallback)))))
 
-;; TODO: S-C-"  -> stringize token
-
 ;; TODO: .h -> .cpp helper
 (defun ceh-decl-to-impl-namespace (namespace)
   (interactive)
@@ -549,6 +532,7 @@
 	    (define-key map (kbd "<S-return>") 'ceh-finish-expression)
 	    (define-key map (kbd "C-(") 'parametrize)
 	    (define-key map (kbd "C-)") 'unparametrize) ;; TODO: check this keybind
+	    (define-key map (kbd "C-\"") 'stringize-line)
 	    (define-key map (kbd "M-,") 'ceh-step-in-args) ;; tags!
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
 	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
