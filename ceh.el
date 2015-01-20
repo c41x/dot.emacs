@@ -2,7 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
-;; detail
+;;//- general functiions / detail -
 (defconst ceh--operators "- */\+|&^%!,<>=\n\t")
 
 (defun ceh--in-array (element array)
@@ -30,6 +30,8 @@
 (defun ceh--b-sexp ()
   (ignore-errors (backward-sexp) t))
 
+;; TODO: templates?
+;; TODO: inside strings
 (defun ceh--f-atom ()
   (if (ceh--f-sexp)
       (progn
@@ -52,7 +54,17 @@
 	t)
     nil))
 
-;; interactives
+(defun ceh--f-args ()
+  "search for arguments end, returns nil if not in arguments"
+  (while (ceh--f-atom))
+  (ceh--f-peek ")"))
+
+(defun ceh--b-args ()
+  "search for arguments beginning, returns nil if not in arguments"
+  (while (ceh--b-atom))
+  (ceh--b-peek "("))
+
+;;//- interface (interactives) -
 (defun ceh-parametrize ()
   (interactive)
   (if (ceh--in-array (char-before) ceh--operators) ;; lr slurp
@@ -124,6 +136,60 @@
   (indent-for-tab-command)
   (forward-line -1)
   (indent-for-tab-command))
+
+(defun ceh-transpose-atoms ()
+  (interactive)
+  (ceh--b-atom)
+  (let* ((lstart (point))
+	 (lend (progn (ceh--f-atom) (point)))
+	 (rend (progn (ceh--f-atom) (point)))
+	 (rstart (progn (ceh--b-atom) (point)))
+	 (lstr (buffer-substring-no-properties lstart lend))
+	 (rstr (buffer-substring-no-properties rstart rend)))
+    (goto-char rstart)
+    (delete-region rstart rend)
+    (insert lstr)
+    (goto-char lstart)
+    (delete-region lstart lend)
+    (insert rstr)))
+
+(defun ceh-next-argument ()
+  (interactive)
+  (when (save-excursion (ceh--f-args))
+    (while (and
+	    (ceh--f-atom)
+	    (not (or (ceh--f-peek ",")
+		     (ceh--f-peek ";")
+		     (ceh--f-peek " :")))))))
+
+(defun ceh-previous-argument ()
+  (interactive)
+  (when (save-excursion (ceh--b-args))
+    (while (and
+	    (ceh--b-atom)
+	    (not (or (ceh--b-peek ", ")
+		     (ceh--b-peek ",")
+		     (ceh--b-peek ";") ;; for loop
+		     (ceh--b-peek "; ")
+		     (ceh--b-peek "; ++")
+		     (ceh--b-peek ";++")
+		     (ceh--b-peek ": ") ;; C++11 range loop
+		     (ceh--b-peek ":")))))))
+
+(defun ceh-leave-atom ()
+  (interactive)
+  (when (save-excursion (ceh--b-args))
+    (let* ((atom-begin (progn (ceh--b-atom) (point)))
+	   (atom-end (progn (ceh--f-atom) (point)))
+	   (atom-str (buffer-substring-no-properties atom-begin atom-end))
+	   (expr-begin (progn
+			 (ceh--b-args)
+			 (forward-char -1)
+			 (ceh--b-atom)
+			 (point)))
+	   (expr-end (progn (ceh--f-atom) (point))))
+      (delete-region expr-begin expr-end)
+      (insert atom-str))))
 
 ;; TODO: add string skipping
 ;; TODO: intelligent killing
@@ -316,69 +382,6 @@
   (if (eq (char-after) ?\()
       (forward-char)))
 
-(defun ceh-transpose-args ()
-  (interactive)
-  (ceh--fwd-operators)
-  (let* ((rstart (point))
-	 (rend (progn (ceh--fwd-expression) (- (point) 1)))
-	 (lend (progn (goto-char rstart) (ceh--bck-operators) (point)))
-	 (lstart (progn (ceh--bck-expression) (point)))
-	 (lstr (buffer-substring-no-properties lstart lend))
-	 (rstr (buffer-substring-no-properties rstart rend)))
-    (goto-char rstart)
-    (delete-region rstart rend)
-    (insert lstr)
-    (goto-char lstart)
-    (delete-region lstart lend)
-    (insert rstr)))
-
-(defun ceh-args-begin ()
-  (interactive)
-  (ceh--search-backward-skip-nested ?\( ?\) 1))
-
-(defun ceh-args-end ()
-  (interactive)
-  (ceh--search-forward-skip-nested ?\( ?\) 1))
-
-(defun ceh-next-argument ()
-  (interactive)
-  (let* ((pt (point))
-	 (args-r (progn (ceh-args-end) (point))))
-    (goto-char pt)
-    (ceh--search-for-forward-skip-nested ?\( ?\) ",")
-    (if (= (point) args-r)
-	(goto-char pt)
-      (ceh--fwd-skip-comments-and-empty-lines))))
-
-(defun ceh-previous-argument ()
-  (interactive)
-  (let ((pt (point))
-	(args-l (progn (ceh-args-begin) (point))))
-    (goto-char pt)
-    (ceh--search-for-backward-skip-nested ?\( ?\) ",")
-    (if (not (= (point) args-l))
-	(ceh--search-for-backward-skip-nested ?\( ?\) ","))
-    (if (not (= (point) args-l))
-	(ceh-next-argument)
-      (forward-char))))
-
-;; killing
-(defun ceh-leave-me ()
-  (interactive)
-  (let* ((expr-begin (progn (ceh--search-for-backward-skip-nested ?\( ?\) ",")
-			    (forward-char)
-			    (ceh--fwd-skip-empty-lines)
-			    (point)))
-	 (expr-end (progn (ceh--search-for-forward-skip-nested ?\( ?\) ",")
-			  (backward-char)
-			  (ceh--bck-skip-empty-lines)
-			  (point)))
-	 (del-begin (progn (ceh-args-begin) (ceh--bck-expression) (point)))
-	 (del-end (progn (ceh--fwd-expression) (backward-char) (point)))
-	 (expr (buffer-substring-no-properties expr-begin expr-end)))
-    (delete-region del-begin del-end)
-    (insert expr)))
-
 ;; key chords
 (defun ceh--chord-kill-line ()
   (interactive)
@@ -535,7 +538,7 @@
 	    (define-key map (kbd "M-,") 'ceh-step-in-args) ;; tags!
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
 	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
-	    (define-key map (kbd "C-' d") 'ceh-leave-me)
+	    (define-key map (kbd "C-' d") 'ceh-leave-atom)
 	    (define-key map (kbd "TAB") 'ceh-expand)
 	    (define-key map (kbd "<tab>") 'ceh-expand)
 	    (define-key map (kbd "C-.") 'ceh-next-argument)
