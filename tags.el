@@ -18,16 +18,16 @@
 (defvar page-break-wrap-search nil)
 (defun page-break-navigate (dir)
   (if (eq dir 1)
-      (next-line)
-    (previous-line))
+      (forward-line)
+    (forward-line))
   (unless (re-search-forward re-page-break-or-todo nil t dir)
     (message "label not found!")
     (if page-break-wrap-search
 	(progn
 	  (setq page-break-wrap-search nil)
 	  (if (eq dir 1)
-	      (beginning-of-buffer)
-	    (end-of-buffer))
+	      (goto-char (point-min))
+	    (goto-char (point-max)))
 	  (page-break-navigate dir))
       (progn
 	(setq page-break-wrap-search t)
@@ -47,7 +47,7 @@
   (let ((ret nil)
 	(num 1))
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (while (re-search-forward re-page-break-popup nil t 1)
 	(add-to-list 'ret (cons (concat " " (number-to-string num) ") " (match-string-no-properties 1))
 				(match-beginning 1)))
