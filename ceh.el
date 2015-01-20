@@ -2,6 +2,7 @@
 ;;; Commentary:
 ;;; Code:
 
+;; detail
 (defconst ceh--operators "- */\+|&^%!,<>=\n\t")
 
 (defun ceh--in-array (element array)
@@ -12,60 +13,61 @@
       (setq i (+ i 1)))
     (not (= i (length array)))))
 
-(defun fwd-search (re)
+(defun ceh--f-search (re)
   (re-search-forward re nil t))
-(defun bck-search (re)
+(defun ceh--b-search (re)
   (re-search-backward re nil t))
 
-(defun fwd-peek (search)
+(defun ceh--f-peek (search)
   (string= search
 	   (buffer-substring-no-properties (point) (+ (point) (length search)))))
-(defun bck-peek (search)
+(defun ceh--b-peek (search)
   (string= search
 	   (buffer-substring-no-properties (- (point) (length search)) (point))))
 
-(defun fwd-sexp ()
+(defun ceh--f-sexp ()
   (ignore-errors (forward-sexp) t))
-(defun bck-sexp ()
+(defun ceh--b-sexp ()
   (ignore-errors (backward-sexp) t))
 
-(defun fwd-atom ()
-  (if (fwd-sexp)
+(defun ceh--f-atom ()
+  (if (ceh--f-sexp)
       (progn
-	(while (or (fwd-peek "(")
-		   (fwd-peek ".")
-		   (fwd-peek "->")
-		   (fwd-peek "::"))
-	  (fwd-sexp))
+	(while (or (ceh--f-peek "(")
+		   (ceh--f-peek ".")
+		   (ceh--f-peek "->")
+		   (ceh--f-peek "::"))
+	  (ceh--f-sexp))
 	t)
     nil))
 
-(defun bck-atom ()
-  (if (bck-sexp)
+(defun ceh--b-atom ()
+  (if (ceh--b-sexp)
       (progn
-	(while (or (fwd-peek "(")
-		   (bck-peek ".")
-		   (bck-peek "->")
-		   (bck-peek "::"))
-	  (bck-sexp))
+	(while (or (ceh--f-peek "(")
+		   (ceh--b-peek ".")
+		   (ceh--b-peek "->")
+		   (ceh--b-peek "::"))
+	  (ceh--b-sexp))
 	t)
     nil))
 
-(defun parametrize ()
+;; interactives
+(defun ceh-parametrize ()
   (interactive)
   (if (ceh--in-array (char-before) ceh--operators) ;; lr slurp
-      (progn (bck-atom)
+      (progn (ceh--b-atom)
 	     (insert "(")
-	     (fwd-atom)
-	     (fwd-atom)
+	     (ceh--f-atom)
+	     (ceh--f-atom)
 	     (insert ")"))
     (let* ((begin-point (point))
-	   (valid (fwd-atom))
+	   (valid (ceh--f-atom))
 	   (end-point (point)))
       (if valid
 	  (progn
 	    (goto-char begin-point)
-	    (cond ((bck-peek ")") ;; continue parametrization
+	    (cond ((ceh--b-peek ")") ;; continue parametrization
 		   (delete-char -1)
 		   (setq end-point (- end-point 1)))
 		  (t ;; init parametrization
@@ -75,15 +77,15 @@
 	    (insert ")"))
 	(goto-char begin-point)))))
 
-(defun unparametrize ()
+(defun ceh-unparametrize ()
   (interactive)
-  (when (bck-peek ")")
+  (when (ceh--b-peek ")")
     (let* ((begin-point (point))
 	   (valid (progn (backward-char)
-			 (bck-atom)))
+			 (ceh--b-atom)))
 	   (end-point (progn
-			(bck-atom)
-			(fwd-atom)
+			(ceh--b-atom)
+			(ceh--f-atom)
 			(point))))
       (when valid
 	(goto-char begin-point)
@@ -91,7 +93,7 @@
 	(goto-char end-point)
 	(insert ")")))))
 
-(defun stringize-line ()
+(defun ceh-stringize-line ()
   (interactive)
   (let ((lim (progn (end-of-line)
 		    (point))))
@@ -101,6 +103,27 @@
     (insert "\"")
     (end-of-line)
     (insert "\"")))
+
+(defun ceh-finish-expression ()
+  (interactive)
+  (end-of-line)
+  (if (not (ceh--in-array (char-before) ";:}{+-|&<\\//.,!*="))
+      (progn
+	(insert ";")
+	(indent-for-tab-command))
+    (newline))
+  (indent-for-tab-command))
+
+(defun ceh-new-brace ()
+  (interactive)
+  (end-of-line)
+  (insert " {")
+  (newline)
+  (newline)
+  (insert "}")
+  (indent-for-tab-command)
+  (forward-line -1)
+  (indent-for-tab-command))
 
 ;; TODO: add string skipping
 ;; TODO: intelligent killing
@@ -282,30 +305,6 @@
   (insert " {}")
   (backward-char)
   (ceh-include-expr))
-
-(defun ceh-next-line ()
-  (interactive)
-  (end-of-line)
-  (next-line)
-  (end-of-line))
-
-(defun ceh-new-brace ()
-  (interactive)
-  (end-of-line)
-  (insert " {")
-  (newline)
-  (newline)
-  (insert "}")
-  (indent-for-tab-command)
-  (previous-line)
-  (indent-for-tab-command))
-
-(defun ceh-finish-expression ()
-  (interactive)
-  (end-of-line)
-  (if (not (ceh--in-array (char-before) ";:}{+-|&<\\//.,!*="))
-      (insert ";"))
-  (indent-for-tab-command))
 
 (defun ceh-step-out-of-args ()
   (interactive)
@@ -530,9 +529,9 @@
   :keymap (let ((map (make-sparse-keymap)))
 	    (define-key map (kbd "<M-return>") 'ceh-new-brace)
 	    (define-key map (kbd "<S-return>") 'ceh-finish-expression)
-	    (define-key map (kbd "C-(") 'parametrize)
-	    (define-key map (kbd "C-)") 'unparametrize) ;; TODO: check this keybind
-	    (define-key map (kbd "C-\"") 'stringize-line)
+	    (define-key map (kbd "C-(") 'ceh-parametrize)
+	    (define-key map (kbd "C-)") 'ceh-unparametrize) ;; TODO: check this keybind
+	    (define-key map (kbd "C-\"") 'ceh-stringize-line)
 	    (define-key map (kbd "M-,") 'ceh-step-in-args) ;; tags!
 	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
 	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
