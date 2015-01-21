@@ -18,6 +18,11 @@
 (defun ceh--b-search (re)
   (re-search-backward re nil t))
 
+(defun ceh--inside-string ()
+  (if (nth 3 (syntax-ppss))
+      t nil))
+
+;; TODO: or-peek
 (defun ceh--f-peek (search)
   (string= search
 	   (buffer-substring-no-properties (point) (+ (point) (length search)))))
@@ -25,34 +30,58 @@
   (string= search
 	   (buffer-substring-no-properties (- (point) (length search)) (point))))
 
+(defun ceh--whitespace-insert-re (rex)
+  (replace-regexp-in-string " " "[\t\n ]*" rex))
+
+(defun ceh--f-peekr (rex)
+  (looking-at-p (ceh--whitespace-insert-re rex)))
+(defun ceh--b-peekr (rex)
+  (looking-back (ceh--whitespace-insert-re rex)))
+
+(defun ceh--f-peekrs (rex)
+  (if (ceh--f-peekr rex)
+      (progn (ceh--f-search (ceh--whitespace-insert-re rex)) t)
+    nil))
+(defun ceh--b-peekrs (rex)
+  (if (ceh--b-peekr rex)
+      (progn (ceh--b-search (ceh--whitespace-insert-re rex)) t)
+    nil))
+
 (defun ceh--f-sexp ()
   (ignore-errors (forward-sexp) t))
 (defun ceh--b-sexp ()
   (ignore-errors (backward-sexp) t))
 
 ;; TODO: templates?
-;; TODO: inside strings
+;; TODO: array indexing []
 (defun ceh--f-atom ()
-  (if (ceh--f-sexp)
-      (progn
-	(while (or (ceh--f-peek "(")
-		   (ceh--f-peek ".")
-		   (ceh--f-peek "->")
-		   (ceh--f-peek "::"))
-	  (ceh--f-sexp))
-	t)
-    nil))
+  (cond ((ceh--inside-string)
+	 (ceh--f-search "[^\\]\""))
+	((ceh--f-sexp)
+	 (progn
+	   (while (or (ceh--f-peekr " ( ")
+		      (ceh--f-peekr " \\. ")
+		      (ceh--f-peekr " -> ")
+		      (ceh--f-peekr " :: "))
+	     (ceh--f-sexp))
+	   (ceh--f-peekrs "\\+\\+\\|\\-\\-") ;; ++ and -- are part of atom
+	   t))
+	(t nil)))
 
 (defun ceh--b-atom ()
-  (if (ceh--b-sexp)
-      (progn
-	(while (or (ceh--f-peek "(")
-		   (ceh--b-peek ".")
-		   (ceh--b-peek "->")
-		   (ceh--b-peek "::"))
-	  (ceh--b-sexp))
-	t)
-    nil))
+  (cond ((ceh--inside-string)
+	 (ceh--b-search "[^\\]\"")
+	 (forward-char))
+	((ceh--b-sexp)
+	 (progn
+	   (while (or (ceh--f-peekr " ( ")
+		      (ceh--b-peekr " \\. ")
+		      (ceh--b-peekr " -> ")
+		      (ceh--b-peekr " :: "))
+	     (ceh--b-sexp))
+	   (ceh--b-peekrs "\\+\\+\\|\\-\\-") ;; skip ++ and --
+	   t))
+	(t nil)))
 
 (defun ceh--f-args ()
   "search for arguments end, returns nil if not in arguments"
@@ -64,7 +93,24 @@
   (while (ceh--b-atom))
   (ceh--b-peek "("))
 
-;;//- interface (interactives) -
+(defun ceh--inside-args ()
+  (save-excursion (ceh--f-args)))
+
+(defun ceh--f-block ()
+  (interactive)
+  (while (ceh--inside-args) ;; skip arguments
+    (ceh--f-args)
+    (forward-char))
+  (when (save-excursion (ceh--f-sexp)) ;; last block
+    (while (progn (ceh--f-search "{\\|;")
+		  (ceh--inside-string)))
+    (when (ceh--b-peek "{")
+      (forward-char -1)
+      (ceh--f-sexp))
+    (when (ceh--f-peekr " else ") ;; else (if) -> continue
+      (ceh--f-block))))
+
+;;//- user space API (interactives) -
 (defun ceh-parametrize ()
   (interactive)
   (if (ceh--in-array (char-before) ceh--operators) ;; lr slurp
@@ -158,23 +204,18 @@
   (when (save-excursion (ceh--f-args))
     (while (and
 	    (ceh--f-atom)
-	    (not (or (ceh--f-peek ",")
-		     (ceh--f-peek ";")
-		     (ceh--f-peek " :")))))))
+	    (not (or (ceh--f-peekrs " , ")
+		     (ceh--f-peekrs " ; ")
+		     (ceh--f-peekrs " : ")))))))
 
 (defun ceh-previous-argument ()
   (interactive)
   (when (save-excursion (ceh--b-args))
     (while (and
 	    (ceh--b-atom)
-	    (not (or (ceh--b-peek ", ")
-		     (ceh--b-peek ",")
-		     (ceh--b-peek ";") ;; for loop
-		     (ceh--b-peek "; ")
-		     (ceh--b-peek "; ++")
-		     (ceh--b-peek ";++")
-		     (ceh--b-peek ": ") ;; C++11 range loop
-		     (ceh--b-peek ":")))))))
+	    (not (or (ceh--b-peekr " , ")
+		     (ceh--b-peekr " ; ")
+		     (ceh--b-peekr " : ")))))))
 
 (defun ceh-leave-atom ()
   (interactive)
@@ -190,6 +231,26 @@
 	   (expr-end (progn (ceh--f-atom) (point))))
       (delete-region expr-begin expr-end)
       (insert atom-str))))
+
+(defun ceh-step-out-of-args ()
+  (interactive)
+  (when (save-excursion (ceh--f-args))
+    (ceh--f-args)
+    (forward-char)))
+
+(defun ceh-step-in-args ()
+  (interactive)
+  (when (ceh--b-peekr " ) ")
+    (forward-char -1)
+    (ceh--b-args)))
+
+(defun ceh-kill-line ()
+  (interactive)
+  (kill-whole-line)
+  (forward-line -1)
+  (end-of-line))
+
+;;//- expand macro utility -
 
 ;; TODO: add string skipping
 ;; TODO: intelligent killing
@@ -372,28 +433,6 @@
   (backward-char)
   (ceh-include-expr))
 
-(defun ceh-step-out-of-args ()
-  (interactive)
-  (ceh--search-forward-skip-nested ?\( ?\) 1))
-
-(defun ceh-step-in-args ()
-  (interactive)
-  (ceh--search-backward-skip-nested ?\( ?\))
-  (if (eq (char-after) ?\()
-      (forward-char)))
-
-;; key chords
-(defun ceh--chord-kill-line ()
-  (interactive)
-  (kill-whole-line)
-  (previous-line)
-  (end-of-line))
-
-(defun ceh--chord-skip-chars ()
-  (interactive)
-  (if (ceh--in-array (char-after) "),\"]")
-      (forward-char)))
-
 ;; expand macro utility
 (defun ceh--expand-fallback ()
   (yas-expand))
@@ -535,9 +574,9 @@
 	    (define-key map (kbd "C-(") 'ceh-parametrize)
 	    (define-key map (kbd "C-)") 'ceh-unparametrize) ;; TODO: check this keybind
 	    (define-key map (kbd "C-\"") 'ceh-stringize-line)
-	    (define-key map (kbd "M-,") 'ceh-step-in-args) ;; tags!
-	    (define-key map (kbd "M-.") 'ceh-step-out-of-args) ;; tags!
-	    (define-key map (kbd "C-' s") 'ceh-transpose-args)
+	    (define-key map (kbd "M-,") 'ceh-step-in-args)
+	    (define-key map (kbd "M-.") 'ceh-step-out-of-args)
+	    (define-key map (kbd "C-' s") 'ceh-transpose-atoms)
 	    (define-key map (kbd "C-' d") 'ceh-leave-atom)
 	    (define-key map (kbd "TAB") 'ceh-expand)
 	    (define-key map (kbd "<tab>") 'ceh-expand)
@@ -546,7 +585,7 @@
 	    map)
   ;; chords
   (when (require 'key-chord nil 'noerror)
-    (key-chord-define-global "qq" 'ceh--chord-kill-line)
+    (key-chord-define-global "qq" 'ceh-kill-line)
     ;;(key-chord-define-global ",," 'ceh--chord-skip-chars)
     (key-chord-define-global "[[" 'ceh-include-expr)
     (key-chord-define-global "]]" 'ceh-exclude-expr)
