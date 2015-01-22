@@ -96,19 +96,43 @@
 (defun ceh--inside-args ()
   (save-excursion (ceh--f-args)))
 
+(defun ceh--step-out-of-args ()
+  (when (save-excursion (ceh--f-args))
+    (ceh--f-args)
+    (forward-char)))
+
+(defun ceh--f-search-ignoring-args-string (rex)
+  (while (progn (ceh--f-search rex)
+		(or (ceh--inside-string)
+		    (ceh--inside-args)))))
+
+(defun ceh--b-search-ignoring-args-string (rex)
+  (while (progn (ceh--b-search rex)
+		(or (ceh--inside-string)
+		    (ceh--inside-args)))))
+
 (defun ceh--f-block ()
   (interactive)
-  (while (ceh--inside-args) ;; skip arguments
-    (ceh--f-args)
-    (forward-char))
+  (ceh--step-out-of-args)
   (when (save-excursion (ceh--f-sexp)) ;; last block
-    (while (progn (ceh--f-search "{\\|;")
-		  (ceh--inside-string)))
+    (ceh--f-search-ignoring-args-string "{\\|;")
     (when (ceh--b-peek "{")
       (forward-char -1)
       (ceh--f-sexp))
     (when (ceh--f-peekr " else ") ;; else (if) -> continue
       (ceh--f-block))))
+
+(defun ceh--b-block ()
+  (interactive)
+  (ceh--step-out-of-args)
+  (when (ceh--b-sexp)
+    (ceh--b-search-ignoring-args-string "{\\|}\\|;")
+    (when (ceh--f-peekrs " } "))
+    (when (ceh--f-peekrs " { "))
+    (ceh--f-sexp)
+    (ceh--b-sexp)
+    (when (ceh--f-peekr " else ")
+      (ceh--b-block))))
 
 ;;//- user space API (interactives) -
 (defun ceh-parametrize ()
@@ -234,9 +258,7 @@
 
 (defun ceh-step-out-of-args ()
   (interactive)
-  (when (save-excursion (ceh--f-args))
-    (ceh--f-args)
-    (forward-char)))
+  (ceh--step-out-of-args))
 
 (defun ceh-step-in-args ()
   (interactive)
@@ -249,6 +271,50 @@
   (kill-whole-line)
   (forward-line -1)
   (end-of-line))
+
+(defun ceh-include-block ()
+  (interactive)
+  (while (progn (ceh--f-block) ;; move to {} block end
+		(not (ceh--f-peekrs " }"))))
+  (delete-char -1)
+  (let* ((pt-begin (point))
+	 (pt-end (progn
+		   (ceh--f-block)
+		   (newline)
+		   (insert "}")
+		   (point))))
+    (indent-region pt-begin pt-end)))
+
+(defun ceh-exclude-block ()
+  (interactive)
+  (let* ((pt-begin (progn
+		     (ceh--b-block)
+		     (skip-chars-backward " \n\t")
+		     (point)))
+	 (pt-end (progn
+		   (ceh--f-block)
+		   (point)))
+	 (pt-str (buffer-substring-no-properties pt-begin pt-end)))
+    (delete-region pt-begin pt-end)
+    (while (ceh--f-sexp))
+    (ceh--f-peekrs " }")
+    (newline)
+    (insert pt-str)
+    (indent-region pt-begin (point))))
+
+(defun ceh-create-block ()
+  (interactive)
+  (end-of-line)
+  (when (ceh--b-peek ";")
+    (delete-char -1))
+  (let* ((pt-begin (point))
+	 (pt-end (progn
+		   (insert " {")
+		   (ceh--f-block)
+		   (newline)
+		   (insert "}")
+		   (point))))
+    (indent-region pt-begin pt-end)))
 
 ;;//- expand macro utility -
 
@@ -370,68 +436,6 @@
 	     (ceh--fwd-skip-comment)
 	     (ceh--fwd-skip-empty-lines)
 	     (not (eq pt (point)))))))
-
-;; interactives
-(defun ceh-include-expr ()
-  (interactive)
-  (ceh--search-forward-skip-nested ?\{ ?\} 1) ;; find closing bracket
-  (let* ((whitespace-begin (point))
-	 (insert-here (- (point) 1))
-	 (str-begin (progn (ceh--fwd-skip-empty-lines) (point)))
-	 (str-end (progn
-		    (ceh--fwd-skip-comments-and-empty-lines)
-	  	    (end-of-line)
-		    (cond ((eq (char-before) ?\;) ;; single expression
-			   (point))
-			  ((eq (char-before) ?\{) ;; block of expressions
-			   (backward-char)
-			   (forward-sexp)
-			   (point))
-			  ((eq (char-before) ?\)) ;; block of expressions #2
-			   (next-line)
-			   (end-of-line)
-			   (cond ((eq (char-before) ?\{)
-				  (backward-char)
-				  (forward-sexp)
-				  (point))
-				 (t
-				  (message "could not include expr")
-				  (return))))
-			  (t
-			   (message "could not include expr")
-			   (return)))))
-	 (redundant-ws-begin (progn (goto-char insert-here) (ceh--bck-skip-empty-lines) (point)))
-	 (block-to-insert (buffer-substring-no-properties str-begin str-end))
-	 (block-length (- str-end str-begin)))
-    (delete-region whitespace-begin str-end)
-    (goto-char insert-here)
-    (insert block-to-insert)
-    (newline)
-    (indent-region insert-here (+ insert-here block-length))
-    (delete-region redundant-ws-begin insert-here)
-    (goto-char redundant-ws-begin)
-    (newline-and-indent)))
-
-(defun ceh-exclude-expr ()
-  (interactive)
-  (beginning-of-line)
-  (let* ((whitespace-str-begin (progn (ceh--bck-skip-empty-lines) (point)))
-	 (str-begin (progn (ceh--fwd-skip-empty-lines) (point)))
-	 (str-end (progn (ceh--fwd-end-of-expr) (point)))
-	 (str-to-insert (buffer-substring-no-properties str-begin str-end))
-	 (insert-here (progn (ceh--search-forward-skip-nested ?\{ ?\} -1) (point))))
-    (newline-and-indent)
-    (insert str-to-insert)
-    (delete-region whitespace-str-begin str-end)))
-
-(defun ceh-create-block-include-expr ()
-  (interactive)
-  (end-of-line)
-  (cond ((eq (char-before) ?\;)
-	 (delete-char -1)))
-  (insert " {}")
-  (backward-char)
-  (ceh-include-expr))
 
 ;; expand macro utility
 (defun ceh--expand-fallback ()
@@ -587,9 +591,9 @@
   (when (require 'key-chord nil 'noerror)
     (key-chord-define-global "qq" 'ceh-kill-line)
     ;;(key-chord-define-global ",," 'ceh--chord-skip-chars)
-    (key-chord-define-global "[[" 'ceh-include-expr)
-    (key-chord-define-global "]]" 'ceh-exclude-expr)
-    (key-chord-define-global "[]" 'ceh-create-block-include-expr)
+    (key-chord-define-global "[[" 'ceh-include-block)
+    (key-chord-define-global "]]" 'ceh-exclude-block)
+    (key-chord-define-global "[]" 'ceh-create-block)
     (key-chord-mode +1)))
 
 (provide 'ceh)
