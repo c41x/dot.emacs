@@ -2,6 +2,9 @@
 ;;; Commentary:
 ;;; Code:
 
+;; TODO: intelligent killing
+;; TODO: killing brackets
+
 ;;//- general functiions / detail -
 (defconst ceh--operators "- */\+|&^%!,<>=\n\t")
 
@@ -22,7 +25,6 @@
   (if (nth 3 (syntax-ppss))
       t nil))
 
-;; TODO: or-peek
 (defun ceh--f-peek (search)
   (string= search
 	   (buffer-substring-no-properties (point) (+ (point) (length search)))))
@@ -101,6 +103,11 @@
     (ceh--f-args)
     (forward-char)))
 
+(defun ceh--b-step-out-of-args ()
+  (when (save-excursion (ceh--b-args))
+    (ceh--b-args)
+    (forward-char -1)))
+
 (defun ceh--f-search-ignoring-args-string (rex)
   (while (progn (ceh--f-search rex)
 		(or (ceh--inside-string)
@@ -111,24 +118,44 @@
 		(or (ceh--inside-string)
 		    (ceh--inside-args)))))
 
-(defun ceh--f-block ()
+(defun ceh--flat-expression ()
+  (save-excursion
+    (ceh--b-step-out-of-args)
+    (while (and
+	    (ceh--b-sexp)
+	    (save-excursion
+	      (ceh--b-sexp)
+	      (ceh--f-sexp)
+	      (not (and (ceh--f-peekr " ( ")
+			(or (ceh--b-peekr " if ")
+			    (ceh--b-peekr " for ")
+			    (ceh--b-peekr " while ")))))))
+    (and (ceh--f-peek "(")
+	 (or (ceh--b-peekr " if ")
+	     (ceh--b-peekr " for ")
+	     (ceh--b-peekr " while ")))))
+
+(defun ceh--f-block (&optional is-parent-flat)
   (interactive)
-  (ceh--step-out-of-args)
-  (when (save-excursion (ceh--f-sexp)) ;; last block
-    (ceh--f-search-ignoring-args-string "{\\|;")
-    (when (ceh--b-peek "{")
-      (forward-char -1)
-      (ceh--f-sexp))
-    (when (ceh--f-peekr " else ") ;; else (if) -> continue
-      (ceh--f-block))))
+  (let ((not-flat-expression
+	 (or is-parent-flat
+	     (not (ceh--flat-expression)))))
+    (ceh--step-out-of-args)
+    (when (save-excursion (ceh--f-sexp)) ;; last block
+      (ceh--f-search-ignoring-args-string "{\\|;")
+      (when (ceh--b-peek "{")
+	(forward-char -1)
+	(ceh--f-sexp))
+      (when (and not-flat-expression (ceh--f-peekr " else ")) ;; else (if) -> continue
+	(ceh--f-block not-flat-expression)))))
 
 (defun ceh--b-block ()
   (interactive)
   (ceh--step-out-of-args)
   (when (ceh--b-sexp)
     (ceh--b-search-ignoring-args-string "{\\|}\\|;")
-    (when (ceh--f-peekrs " } "))
-    (when (ceh--f-peekrs " { "))
+    (ceh--f-peekrs " } ")
+    (ceh--f-peekrs " { ")
     (ceh--f-sexp)
     (ceh--b-sexp)
     (when (ceh--f-peekr " else ")
@@ -275,21 +302,34 @@
 (defun ceh-include-block ()
   (interactive)
   (while (progn (ceh--f-block) ;; move to {} block end
-		(not (ceh--f-peekrs " }"))))
-  (delete-char -1)
-  (let* ((pt-begin (point))
+		(not (ceh--f-peekr " }"))))
+  (skip-chars-backward " \t\n")
+  (let* ((pt-insert (point))
+	 (pt-begin (progn
+		     (ceh--f-peekrs " }")
+		     (point)))
 	 (pt-end (progn
 		   (ceh--f-block)
-		   (newline)
-		   (insert "}")
-		   (point))))
-    (indent-region pt-begin pt-end)))
+		   (point)))
+	 (pt-str (buffer-substring-no-properties pt-begin pt-end)))
+    (goto-char pt-insert)
+    (delete-region pt-begin pt-end)
+    (insert pt-str)
+    (indent-region pt-insert (point))
+    ;;(save-excursion
+    ;;  (ceh--f-peekrs " }")
+    ;;  (unless (looking-at "[ \t]*\n[ \t]*\n")
+	;;(newline)))
+    ))
 
 (defun ceh-exclude-block ()
   (interactive)
   (let* ((pt-begin (progn
 		     (ceh--b-block)
-		     (skip-chars-backward " \n\t")
+		     (if (ceh--b-sexp)
+			 (ceh--f-sexp)
+		       (skip-chars-backward " \t\n"))
+		     (ceh--f-peekrs ";")
 		     (point)))
 	 (pt-end (progn
 		   (ceh--f-block)
@@ -298,9 +338,9 @@
     (delete-region pt-begin pt-end)
     (while (ceh--f-sexp))
     (ceh--f-peekrs " }")
-    (newline)
     (insert pt-str)
-    (indent-region pt-begin (point))))
+    (indent-region pt-begin (point))
+    (goto-char pt-begin)))
 
 (defun ceh-create-block ()
   (interactive)
@@ -309,135 +349,18 @@
     (delete-char -1))
   (let* ((pt-begin (point))
 	 (pt-end (progn
-		   (insert " {")
 		   (ceh--f-block)
-		   (newline)
-		   (insert "}")
 		   (point))))
-    (indent-region pt-begin pt-end)))
+    (goto-char pt-begin)
+    (insert " {")
+    (goto-char (+ 2 pt-end))
+    (newline)
+    (insert "}")
+    (indent-region pt-begin (point))
+    (forward-char -1)
+    (skip-chars-backward " \n\t")))
 
 ;;//- expand macro utility -
-
-;; TODO: add string skipping
-;; TODO: intelligent killing
-;; TODO: killing brackets
-
-;; helpers
-(defun ceh--search-forward-skip-nested (opening-char closing-char &optional start-nest-level)
-  (let ((nest-level (if start-nest-level start-nest-level 0)))
-    (while
-	(progn
-	  (if (re-search-forward (format "[%c%c]" opening-char closing-char) nil t 1)
-	      (cond ((eq (char-before) opening-char)
-		     (setq nest-level (+ nest-level 1))) ;; down
-		    ((eq (char-before) closing-char)
-		     (setq nest-level (- nest-level 1)))) ;; up
-	    (setq nest-level 0))
-	  (> nest-level 0)))))
-
-(defun ceh--search-for-forward-skip-nested (opening-char closing-char chars &optional start-nest-level)
-  (let ((nest-level (if start-nest-level start-nest-level 0)))
-    (while
-	(progn
-	  (if (re-search-forward (format "[%c%c%s]" opening-char closing-char chars) nil t 1)
-	      (cond ((eq (char-before) opening-char)
-		     (setq nest-level (+ nest-level 1)))
-		    ((eq (char-before) closing-char)
-		     (setq nest-level (- nest-level 1)))
-		    ((and
-		      (ceh--in-array (char-before) chars)
-		      (<= nest-level 0))
-		     (setq nest-level -1)))
-	    (setq nest-level 0))
-	  (>= nest-level 0)))))
-
-(defun ceh--search-backward-skip-nested (opening-char closing-char &optional start-nest-level)
-  (let ((nest-level (if start-nest-level start-nest-level 0)))
-    (while
-	(progn
-	  (if (re-search-backward (format "[%c%c]" opening-char closing-char) nil t 1)
-	      (cond ((eq (char-after) closing-char)
-		     (setq nest-level (+ nest-level 1)))
-		    ((eq (char-after) opening-char)
-		     (setq nest-level (- nest-level 1))))
-		(setq nest-level 0))
-	  (> nest-level 0)))))
-
-(defun ceh--search-for-backward-skip-nested (opening-char closing-char chars &optional start-nest-level)
-  (let ((nest-level (if start-nest-level start-nest-level 0)))
-    (while
-	(progn
-	  (if (re-search-backward (format "[%c%c%s]" opening-char closing-char chars) nil t 1)
-	      (progn
-		(cond ((eq (char-after) closing-char)
-		       (setq nest-level (+ nest-level 1)))
-		      ((eq (char-after) opening-char)
-		       (setq nest-level (- nest-level 1)))
-		      ((and
-			(ceh--in-array (char-after) chars)
-			(<= nest-level 0))
-		       (setq nest-level -1))))
-	    (setq nest-level 0))
-	  (>= nest-level 0)))))
-
-(defconst ceh--id "A-Za-z0-9_\\-\\.\\>\\<")
-(defconst ceh--whitespace " \t\n")
-(defun ceh--fwd-operators ()
-  (skip-chars-forward ceh--operators))
-(defun ceh--bck-operators ()
-  (skip-chars-backward ceh--operators))
-(defun ceh--fwd-id ()
-  (skip-chars-forward ceh--id))
-(defun ceh--bck-id ()
-  (skip-chars-backward ceh--id))
-
-(defun ceh--fwd-expression ()
-  (ceh--fwd-id)
-  (cond ((eq (char-after) ?\() ;; function
-	 (ceh--search-forward-skip-nested ?\( ?\))
-	 (forward-char))
-	(t ;; expression
-	 (re-search-forward "[),; \n\t]" nil t 1))))
-
-(defun ceh--bck-expression ()
-  (cond ((eq (char-before) ?\))
-	 (ceh--search-backward-skip-nested ?\( ?\))
-	 (ceh--bck-id))
-	(t
-	 (re-search-backward "[(,; \n\t]" nil t 1)
-	 (forward-char))))
-
-(defun ceh--fwd-end-of-expr ()
-  (re-search-forward "[;]" nil t 1))
-
-(defun ceh--fwd-skip-empty-lines ()
-  (skip-chars-forward ceh--whitespace))
-
-(defun ceh--peek? (search)
-  (string= search
-	   (buffer-substring-no-properties (point) (+ (point) (length search)))))
-
-(defun ceh--peekb? (search)
-  (string= search
-   (buffer-substring-no-properties (- (point) (length search)) (point))))
-
-(defun ceh--fwd-skip-comment ()
-  (cond ((ceh--peek? "//")
-	 (end-of-line))
-	((ceh--peek? "/*")
-	 (re-search-forward "\\*\\/" nil t 1))))
-
-(defun ceh--bck-skip-empty-lines ()
-  (skip-chars-backward ceh--whitespace))
-
-(defun ceh--fwd-skip-comments-and-empty-lines ()
-  (while (progn
-	   (let ((pt (point)))
-	     (ceh--fwd-skip-comment)
-	     (ceh--fwd-skip-empty-lines)
-	     (not (eq pt (point)))))))
-
-;; expand macro utility
 (defun ceh--expand-fallback ()
   (yas-expand))
 
@@ -451,15 +374,15 @@
   (interactive)
   (let ((c1 (buffer-substring-no-properties (- (point) 1) (point)))
 	(c2 (buffer-substring-no-properties (- (point) 2) (- (point) 1))))
-    (cond ((ceh--peekb? " <= ") ;; recursives first
+    (cond ((ceh--b-peek " <= ") ;; recursives first
 	   (delete-char -4)
 	   (insert "<=")
 	   (ceh-expand))
-	  ((ceh--peekb? " >= ")
+	  ((ceh--b-peek " >= ")
 	   (delete-char -4)
 	   (insert ">=")
 	   (ceh-expand))
-	  ((ceh--peekb? "->")
+	  ((ceh--b-peek "->")
 	   (delete-char -1)
 	   (ceh-expand))
 	  ;; construct
@@ -478,7 +401,7 @@
 	       (ceh--expand-fallback)
 	     (delete-char -1)
 	     (ceh-step-out-of-args)
-	     (if (not (ceh--peek? ";"))
+	     (if (not (ceh--f-peek ";"))
 		 (insert "; "))))
 	  ((string= c1 "=")
 	   (if (ceh--end-of-line-p)
@@ -531,43 +454,44 @@
 	  (t (ceh--expand-fallback)))))
 
 ;; TODO: .h -> .cpp helper
-(defun ceh-decl-to-impl-namespace (namespace)
-  (interactive)
-  (beginning-of-line)
-  (end-of-sexp)
-  (forward-char)
-  (insert namespace)
-  (if (not (string= namespace ""))
-      (insert "::"))
-  (end-of-line)
-  (if (ceh--peekb? ";")
-      (progn (delete-char -1)
-	     (insert " {")
-	     (newline 2)
-	     (insert "}")
-	     (indent-for-tab-command)
-	     (newline)
-	     (previous-line 2)
-	     (indent-for-tab-command))))
+;(defun ceh-decl-to-impl-namespace (namespace)
+;  (interactive)
+;  (beginning-of-line)
+;  (end-of-sexp)
+;  (forward-char)
+;  (insert namespace)
+;  (if (not (string= namespace ""))
+;      (insert "::"))
+;  (end-of-line)
+;  (if (ceh--peekb? ";")
+;      (progn (delete-char -1)
+; 	     (insert " {")
+; 	     (newline 2)
+; 	     (insert "}")
+; 	     (indent-for-tab-command)
+; 	     (newline)
+; 	     (previous-line 2)
+; 	     (indent-for-tab-command))))
+;
+;(defun ceh-decl-to-impl ()
+;  (interactive)
+;  (end-of-line)
+;  (if (ceh--peekb? ";")
+;      (progn (delete-char -1)
+; 	     (insert " {")
+; 	     (newline 2)
+; 	     (insert "}")
+; 	     (indent-for-tab-command)
+; 	     (newline)
+; 	     (previous-line 2)
+; 	     (indent-for-tab-command))))
+;
+;(defun ceh-decl-to-impl-n (namespace)
+;  (interactive "sNamespace: ")
+;  (while (search-forward ";" nil t 1)
+;    (ceh-decl-to-impl-namespace namespace)))
 
-(defun ceh-decl-to-impl ()
-  (interactive)
-  (end-of-line)
-  (if (ceh--peekb? ";")
-      (progn (delete-char -1)
-	     (insert " {")
-	     (newline 2)
-	     (insert "}")
-	     (indent-for-tab-command)
-	     (newline)
-	     (previous-line 2)
-	     (indent-for-tab-command))))
-
-(defun ceh-decl-to-impl-n (namespace)
-  (interactive "sNamespace: ")
-  (while (search-forward ";" nil t 1)
-    (ceh-decl-to-impl-namespace namespace)))
-
+;;//- mode definition -
 ;; specify mode
 (define-minor-mode ceh-mode
   "C Edit Helper - mode for enhancing C - like languages editing"
