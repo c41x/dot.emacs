@@ -25,6 +25,12 @@
   (if (nth 3 (syntax-ppss))
       t nil))
 
+(defun ceh--f-step-out-of-string ()
+  (ceh--f-search "[^\\]\""))
+(defun ceh--b-step-out-of-string ()
+  (ceh--b-search "[^\\]\"")
+  (forward-char))
+
 (defun ceh--f-peek (search)
   (string= search
 	   (buffer-substring-no-properties (point) (+ (point) (length search)))))
@@ -58,7 +64,7 @@
 ;; TODO: array indexing []
 (defun ceh--f-atom ()
   (cond ((ceh--inside-string)
-	 (ceh--f-search "[^\\]\""))
+	 (ceh--f-step-out-of-string))
 	((ceh--f-sexp)
 	 (progn
 	   (while (or (ceh--f-peekr " ( ")
@@ -72,8 +78,7 @@
 
 (defun ceh--b-atom ()
   (cond ((ceh--inside-string)
-	 (ceh--b-search "[^\\]\"")
-	 (forward-char))
+	 (ceh--b-step-out-of-string))
 	((ceh--b-sexp)
 	 (progn
 	   (while (or (ceh--f-peekr " ( ")
@@ -135,22 +140,17 @@
 	     (ceh--b-peekr " for ")
 	     (ceh--b-peekr " while ")))))
 
-(defun ceh--f-block (&optional is-parent-flat)
-  (interactive)
-  (let ((not-flat-expression
-	 (or is-parent-flat
-	     (not (ceh--flat-expression)))))
-    (ceh--step-out-of-args)
-    (when (save-excursion (ceh--f-sexp)) ;; last block
-      (ceh--f-search-ignoring-args-string "{\\|;")
-      (when (ceh--b-peek "{")
-	(forward-char -1)
-	(ceh--f-sexp))
-      (when (and not-flat-expression (ceh--f-peekr " else ")) ;; else (if) -> continue
-	(ceh--f-block not-flat-expression)))))
+(defun ceh--f-block ()
+  (ceh--step-out-of-args)
+  (when (save-excursion (ceh--f-sexp)) ;; last block
+    (ceh--f-search-ignoring-args-string "{\\|;")
+    (when (ceh--b-peek "{")
+      (forward-char -1)
+      (ceh--f-sexp))
+    (when (ceh--f-peekr " else ") ;; else (if) -> continue
+      (ceh--f-block))))
 
 (defun ceh--b-block ()
-  (interactive)
   (ceh--step-out-of-args)
   (when (ceh--b-sexp)
     (ceh--b-search-ignoring-args-string "{\\|}\\|;")
@@ -315,41 +315,65 @@
     (goto-char pt-insert)
     (delete-region pt-begin pt-end)
     (insert pt-str)
-    (indent-region pt-insert (point))
-    ;;(save-excursion
-    ;;  (ceh--f-peekrs " }")
-    ;;  (unless (looking-at "[ \t]*\n[ \t]*\n")
-	;;(newline)))
-    ))
+    (indent-region pt-insert (point))))
 
 (defun ceh-exclude-block ()
   (interactive)
-  (let* ((pt-begin (progn
-		     (ceh--b-block)
-		     (if (ceh--b-sexp)
-			 (ceh--f-sexp)
-		       (skip-chars-backward " \t\n"))
-		     (ceh--f-peekrs ";")
+  (if (and (ceh--f-peekr " } ")
+	   (ceh--b-peekr " { "))
+      (progn
+	(let* ((pt-begin (save-excursion
+			   (skip-chars-backward "{ \t\n")
+			   (point)))
+	       (pt-end (save-excursion
+			 (skip-chars-forward "} \t\n")
+			 (point))))
+	  (delete-region pt-begin pt-end)
+	  (insert ";")
+	  (newline-and-indent)
+	  (forward-line -1)
+	  (end-of-line)))
+    (let* ((pt-begin (progn
+		       (ceh--b-block)
+		       (if (ceh--b-sexp)
+			   (ceh--f-sexp)
+			 (skip-chars-backward " \t\n"))
+		       (ceh--f-peekrs ";")
+		       (point)))
+	   (pt-end (progn
+		     (ceh--f-block)
 		     (point)))
-	 (pt-end (progn
-		   (ceh--f-block)
-		   (point)))
-	 (pt-str (buffer-substring-no-properties pt-begin pt-end)))
-    (delete-region pt-begin pt-end)
-    (while (ceh--f-sexp))
-    (ceh--f-peekrs " }")
-    (insert pt-str)
-    (indent-region pt-begin (point))
-    (goto-char pt-begin)))
+	   (pt-str (buffer-substring-no-properties pt-begin pt-end)))
+      (delete-region pt-begin pt-end)
+      (while (ceh--f-sexp))
+      (ceh--f-search "}")
+      (insert pt-str)
+      (indent-region pt-begin (point))
+      (goto-char pt-begin))))
 
 (defun ceh-create-block ()
   (interactive)
-  (end-of-line)
-  (when (ceh--b-peek ";")
-    (delete-char -1))
+  (if (and (save-excursion ;; when expr is in the same line
+	     (beginning-of-line-text)
+	     (or (ceh--f-peekr " if ")
+		 (ceh--f-peekr " else ")
+		 (ceh--f-peekr " while ")
+		 (ceh--f-peekr " for ")))
+	   (save-excursion
+	     (end-of-line)
+	     (ceh--b-peekr ";")))
+      (progn ;; put point after (if|else|while|...)
+	(beginning-of-line-text)
+	(ceh--f-sexp)
+	(newline)
+	(forward-line -1)
+	(end-of-line))
+    (end-of-line)
+    (when (ceh--b-peek ";")
+      (delete-char -1))) ;; EOL, delete semicolon
   (let* ((pt-begin (point))
 	 (pt-end (progn
-		   (ceh--f-block)
+		   (ceh--f-search-ignoring-args-string ";")
 		   (point))))
     (goto-char pt-begin)
     (insert " {")
