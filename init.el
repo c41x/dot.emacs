@@ -234,7 +234,7 @@
 
 ;; highlighting operators
 ;; "\\([][|!.+=&/%*,<>(){};:^~-?]+\\)"
-(defvar operator-rex '(("\\([][|!.+=&/%*,<>(){};:^~\\-?]\\)" . font-lock-operator-face)))
+(defvar operator-rex '(("\\([][|!.+=&/%*,<>(){};:^~?-]\\)" . font-lock-operator-face)))
 (defvar operator-rex-xml '(("\\(<>/=\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'c-mode operator-rex)
 (font-lock-add-keywords 'c++-mode operator-rex)
