@@ -253,7 +253,7 @@
 (font-lock-add-keywords 'js-mode number-rex)
 (font-lock-add-keywords 'js2-mode number-rex)
 (font-lock-add-keywords 'csharp-mode number-rex)
-(font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\([0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
+(font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'python-mode number-rex)
 
 ;; js2 mode for .js files
