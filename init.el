@@ -571,6 +571,7 @@
 (require 'cmake-cpp-proj)
 
 ;; CEH
+(add-to-list 'load-path "~/.emacs.d/ceh")
 (require 'ceh)
 (add-hooks 'ceh-mode
 	   '(cg-mode-hook
