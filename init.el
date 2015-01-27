@@ -130,7 +130,7 @@
   (find-file "~/.emacs.d/init.el"))
 
 ;; fix to conflict between cua rectangle mode and autopair (autopair overrides enter key (cua-rotate-rectangle))
-;; just bind cua-rotate-rectangle to other keybind | TODO: check if is in rectangle mode
+;; just bind cua-rotate-rectangle to other keybind
 (global-set-key (kbd "C-M-r") 'cua-rotate-rectangle)
 
 ;; file name in title bar
@@ -144,6 +144,10 @@
 (define-key yas-minor-mode-map (kbd "<tab>") nil) ;; disable tab (trigger YAS only with AC)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (setq yas-fallback-behavior '(apply indent-for-tab-command)) ;; indent as fallback
+
+;; macro start/end bound to F11/F12
+(global-set-key [(f11)] 'kmacro-start-macro-or-insert-counter)
+(global-set-key [(f12)] 'kmacro-end-or-call-macro)
 
 ;; ido mode / smex for M-x
 (require 'ido)
