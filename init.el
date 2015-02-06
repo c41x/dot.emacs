@@ -48,7 +48,7 @@
       (package-install p))))
 
 ;; --------------------------------------------------------------------------------------------------
-
+;; TODO: local config
 ;; load paths
 (add-to-list 'load-path "~/.emacs.d")
 
