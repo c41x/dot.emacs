@@ -251,7 +251,7 @@
 
 ;; highlighting numbers
 ;;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
-(defvar number-rex '(("\\<\\(\\([0-9.]+[lufLU]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
+(defvar number-rex '(("\\<\\(\\([0-9.]+[lufLUe]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'c-mode number-rex)
 (font-lock-add-keywords 'c++-mode number-rex)
 (font-lock-add-keywords 'js-mode number-rex)
