@@ -110,6 +110,9 @@
 (global-unset-key (kbd "M-y"))
 (global-set-key (kbd "C-M-v") 'yank-pop)
 
+;; C-x f opens file (by default this (annoying) shortcut calls set-fill-column)
+(global-set-key (kbd "C-x f") 'ido-find-file)
+
 ;; Ctrl + Backspace kill ring
 (defun backward-delete-word (arg)
   (interactive "p")
