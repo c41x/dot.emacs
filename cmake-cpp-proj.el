@@ -26,14 +26,14 @@
   (setq last-inproject-executable-debug (find-inproject-executable-debug))
   (setq last-inproject-executable-release (find-inproject-executable-release)))
 
-(defmacro run-compile (dir fallback-dir)
+(defmacro run-compile (dir fallback-dir release)
   `(let ((dir (,dir)))
      (unless ,fallback-dir
        (setq ,fallback-dir dir)
        (actualize-path-cache))
      (compile (format
-	       "mingw32-make -C %s --no-print-directory all"
-	       ,fallback-dir))))
+	       "cmake --build \"%s\" --config %s"
+	       ,fallback-dir (if ,release "Release" "Debug")))))
 
 (defmacro run-exec (dir fallback-dir)
   `(let ((dir (,dir)))
@@ -57,28 +57,28 @@
  '(lambda ()
     (interactive)
     (run-compile find-inproject-directory-debug
-		 last-inproject-directory-debug)))
+		 last-inproject-directory-debug nil)))
 
 (global-set-key
  (kbd "S-<f7>")
  '(lambda ()
     (interactive)
     (run-compile find-inproject-directory-release
-		 last-inproject-directory-release)))
+		 last-inproject-directory-release t)))
 
 (global-set-key
  (kbd "C-<f7>")
  '(lambda ()
     (interactive)
     (run-compile find-project-directory-debug
-		 last-project-directory-debug))) ; compile full project
+		 last-project-directory-debug nil))) ; compile full project
 
 (global-set-key
  (kbd "C-S-<f7>")
  '(lambda ()
     (interactive)
     (run-compile find-project-directory-release
-		 last-project-directory-release))) ; compile full project
+		 last-project-directory-release t))) ; compile full project
 
 (global-set-key
  (kbd "<f6>")
@@ -121,22 +121,19 @@
 (defun upward-check-file (filename startdir)
   "Moves up in directory structure and checks if desired file is there"
   (let ((dirname (expand-file-name startdir))
-	(not-found nil)
 	(top nil)
-	(max-level 5)
-	(prv-dirname nil))
-
-    (while (not (or not-found top (= max-level 0)))
+	(max-level 10)
+	(prv-dirname nil)
+	(last-found nil))
+    (while (not (or top (= max-level 0)))
       (setq max-level (- max-level 1))
       (if (string= (expand-file-name dirname) "/")
 	  (setq top t))
       (if (file-exists-p (expand-file-name filename dirname))
-	  (progn
-	    (setq prv-dirname dirname)
-	    (setq dirname (expand-file-name ".." dirname)))
-	(setq not-found t)))
-
-    prv-dirname))
+	  (setq last-found dirname))
+      (setq prv-dirname dirname)
+      (setq dirname (expand-file-name ".." dirname)))
+    last-found))
 
 (defun find-project-directory-base (project-dir)
   "Returns CMake project root directory or nil"
