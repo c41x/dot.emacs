@@ -29,14 +29,23 @@
 
 ;; shold define (defvar calx--server-api-url "http://xyz.com/")
 (defvar calx--server-api-url "unknown")
+(defvar calx--server-api-username "unknown")
+(defvar calx--server-api-password "unknown")
 
-(defun calx-login (username password)
-  (interactive "sLogin: \nsPassword:")
+(defun calx--login (username password)
   (calx--http-post (concat calx--server-api-url "/api_login")
 		   (lambda (status)
 		     (calx--request-callback-status status)
 		     (calx-get))
 		   (format "username=%s&password=%s" username password)))
+
+(defun calx ()
+  (interactive)
+  (calx--login calx--server-api-username calx--server-api-password))
+
+(defun calx-login (username password)
+  (interactive "sLogin: \nsPassword:")
+  (calx--login username password))
 
 (defun calx-get ()
   (interactive)
