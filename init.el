@@ -48,7 +48,6 @@
       (package-install p))))
 
 ;; --------------------------------------------------------------------------------------------------
-
 ;; load paths
 (add-to-list 'load-path "~/.emacs.d")
 
@@ -110,6 +109,9 @@
 ;; yank-pop - more CUA - friendly
 (global-unset-key (kbd "M-y"))
 (global-set-key (kbd "C-M-v") 'yank-pop)
+
+;; C-x f opens file (by default this (annoying) shortcut calls set-fill-column)
+(global-set-key (kbd "C-x f") 'ido-find-file)
 
 ;; Ctrl + Backspace kill ring
 (defun backward-delete-word (arg)
@@ -252,7 +254,7 @@
 
 ;; highlighting numbers
 ;;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
-(defvar number-rex '(("\\<\\(\\([0-9.]+[lufLU]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
+(defvar number-rex '(("\\<\\(\\([0-9.]+[lufLUe]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'c-mode number-rex)
 (font-lock-add-keywords 'c++-mode number-rex)
 (font-lock-add-keywords 'js-mode number-rex)
@@ -268,7 +270,6 @@
 (add-hook 'js2-mode-hook 'skewer-mode)
 (add-hook 'css-mode-hook 'skewer-css-mode)
 (add-hook 'html-mode-hook 'skewer-html-mode)
-(load "~/.emacs.d/skewer-config")
 ;(require 'simple-httpd)
 ;(setq httpd-root "d:/repo/minigame2")
 
@@ -617,6 +618,10 @@
 				 mode-line-misc-info
 				 mode-line-end-spaces
 				 "%-"))
+
+;; --------------------------------------------------------------------------------------------------
+;; local custom settings
+(load "~/.emacs.d/local-config")
 
 ;; --------------------------------------------------------------------------------------------------
 ;; settings made by customize

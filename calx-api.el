@@ -28,7 +28,7 @@
     (url-retrieve url callback)))
 
 ;; shold define (defvar calx--server-api-url "http://xyz.com/")
-(load "~/.emacs.d/api-server-config")
+(defvar calx--server-api-url "unknown")
 
 (defun calx-login (username password)
   (interactive "sLogin: \nsPassword:")
