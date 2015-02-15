@@ -65,6 +65,9 @@
 (scroll-bar-mode 0) ;; disable system scrollbars
 (menu-bar-mode -1) ;; hide menu bar
 
+;; F2 - toggle menu bar
+(global-set-key [(f2)] 'menu-bar-mode)
+
 ;; theme
 (load-theme 'calx t)
 
