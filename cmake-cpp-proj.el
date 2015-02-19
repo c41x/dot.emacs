@@ -11,6 +11,23 @@
 ;; Modifiers:
 ;; Shift - Release version
 ;; Control - Recompile project
+
+(defun dirs-contains-file (name dir)
+  "Searches recursively for given file"
+  (let ((res nil))
+    (dolist (file (directory-files dir))
+      (when (string= name file)
+	(setq res (cons (file-name-as-directory dir) res)))
+      (when (and
+	     (file-directory-p (concat (file-name-as-directory dir) file))
+	     (not (or
+		   (string= file ".")
+		   (string= file ".."))))
+	(let ((subdir-result (sfl name (concat (file-name-as-directory dir) file))))
+	  (when subdir-result
+	    (setq res (append subdir-result res))))))
+    res))
+
 (defvar last-inproject-directory-debug nil)
 (defvar last-inproject-directory-release nil)
 (defvar last-project-directory-debug nil)
