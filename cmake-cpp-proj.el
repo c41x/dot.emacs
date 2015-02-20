@@ -28,6 +28,49 @@
 	    (setq res (append subdir-result res))))))
     res))
 
+(defun upward-check-file (filename startdir)
+  "Moves up in directory structure and checks if desired file is there, returns last found"
+  (let ((dirname (expand-file-name startdir))
+	(top nil)
+	(max-level 10)
+	(prv-dirname nil)
+	(last-found nil))
+    (while (not (or top (= max-level 0)))
+      (setq max-level (- max-level 1))
+      (if (string= (expand-file-name dirname) "/")
+	  (setq top t))
+      (if (file-exists-p (expand-file-name filename dirname))
+	  (setq last-found dirname))
+      (setq prv-dirname dirname)
+      (setq dirname (expand-file-name ".." dirname)))
+    last-found))
+
+(defun find-project-directory-base (project-dir)
+  "Returns CMake project root directory or nil"
+  (interactive)
+  (let ((file (upward-check-file "CMakeLists.txt" ".")))
+    (if file (concat (file-name-as-directory file) project-dir) nil)))
+
+(defun is-cmake-project ()
+  (if (upward-check-file "CMakeLists.txt" ".") t nil))
+
+(defun find-inproject-directory-base (project-dir tail)
+  "returns corresponding directory in CMake project directory structure"
+  (let ((project-root (upward-check-file "CMakeLists.txt" "."))
+	(full-path (expand-file-name ".")))
+    (if project-root
+	(concat project-root project-dir (substring full-path (length project-root)) tail)
+      nil)))
+
+(defun find-inproject-executable-base (project-dir)
+  "returns path to executable in CMake directory structure"
+  (let ((inproject-dir (find-inproject-directory-base project-dir "")))
+    (concat inproject-dir "/" (file-name-nondirectory inproject-dir))))
+
+(defun find-executable-name ()
+  "returns executable name"
+  (file-name-nondirectory (expand-file-name ".")))
+
 (defvar last-inproject-directory-debug nil)
 (defvar last-inproject-directory-release nil)
 (defvar last-project-directory-debug nil)
@@ -134,49 +177,6 @@
 (global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
 (global-set-key (kbd "<left-margin> <mouse-1>") 'gud-break)
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
-
-(defun upward-check-file (filename startdir)
-  "Moves up in directory structure and checks if desired file is there"
-  (let ((dirname (expand-file-name startdir))
-	(top nil)
-	(max-level 10)
-	(prv-dirname nil)
-	(last-found nil))
-    (while (not (or top (= max-level 0)))
-      (setq max-level (- max-level 1))
-      (if (string= (expand-file-name dirname) "/")
-	  (setq top t))
-      (if (file-exists-p (expand-file-name filename dirname))
-	  (setq last-found dirname))
-      (setq prv-dirname dirname)
-      (setq dirname (expand-file-name ".." dirname)))
-    last-found))
-
-(defun find-project-directory-base (project-dir)
-  "Returns CMake project root directory or nil"
-  (interactive)
-  (let ((file (upward-check-file "CMakeLists.txt" ".")))
-    (if file (concat (file-name-as-directory file) project-dir) nil)))
-
-(defun is-cmake-project ()
-  (if (upward-check-file "CMakeLists.txt" ".") t nil))
-
-(defun find-inproject-directory-base (project-dir tail)
-  "returns corresponding directory in CMake project directory structure"
-  (let ((project-root (upward-check-file "CMakeLists.txt" "."))
-	(full-path (expand-file-name ".")))
-    (if project-root
-	(concat project-root project-dir (substring full-path (length project-root)) tail)
-      nil)))
-
-(defun find-inproject-executable-base (project-dir)
-  "returns path to executable in CMake directory structure"
-  (let ((inproject-dir (find-inproject-directory-base project-dir "")))
-    (concat inproject-dir "/" (file-name-nondirectory inproject-dir))))
-
-(defun find-executable-name ()
-  "returns executable name"
-  (file-name-nondirectory (expand-file-name ".")))
 
 (defun find-project-directory-debug ()
   (find-project-directory-base "project/debug"))
