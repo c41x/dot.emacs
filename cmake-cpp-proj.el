@@ -47,7 +47,6 @@
 
 (defun find-project-directory-base (project-dir)
   "Returns CMake project root directory or nil"
-  (interactive)
   (let ((file (upward-check-file "CMakeLists.txt" ".")))
     (if file (concat (file-name-as-directory file) project-dir) nil)))
 
@@ -94,6 +93,58 @@
       (setq res (append res (extract-targets-from-file (concat f "CMakeLists.txt")))))
     res))
 
+(defvar selected-target nil)
+(defun popup-get-target ()
+  "displays popup and returns selected target name"
+  (interactive)
+  (let ((all-targets (find-all-targets)))
+    ;; for some reason popup-menu* does not work within let - hence global var
+    (setq selected-target (popup-menu* all-targets))
+    (if (< (length all-targets) 2)
+	"ALL_BUILD"
+      selected-target)))
+
+(defun find-project-directory-debug ()
+  (find-project-directory-base "project/debug"))
+(defun find-project-directory-release ()
+  (find-project-directory-base "project/release"))
+(defun find-project-directory ()
+  (find-project-directory-base ""))
+(defun find-inproject-directory-release ()
+  (find-inproject-directory-base "/project/release" "/"))
+(defun find-inproject-directory-debug ()
+  (find-inproject-directory-base "/project/debug" "/"))
+(defun find-inproject-executable-debug ()
+  (find-inproject-executable-base "/project/debug"))
+(defun find-inproject-executable-release ()
+  (find-inproject-executable-base "/project/release"))
+
+(defvar current-target-name nil)
+(defvar current-dir-release nil)
+(defvar current-dir-debug nil)
+(defvar current-executable-debug nil)
+(defvar current-executable-release nil)
+
+(defun run-compile (release clean &optional target-name)
+  (unless current-target-name
+    (setq current-target-name (popup-get-target)))
+  (unless current-dir-debug
+    (setq current-dir-debug (find-project-directory-debug)))
+  (unless current-dir-release
+    (setq current-dir-release (find-project-directory-release)))
+  (compile (format "cmake --build \"%s\" --config %s --target %s %s"
+		   (if release current-dir-release current-dir-debug)
+		   (if release "Release" "Debug")
+		   (if target-name target-name current-target-name)
+		   (if clean "--clean-first" ""))))
+
+(defun switch-target ()
+  (interactive)
+  (setq current-target-name (popup-get-target))
+  (setq current-dir-debug (find-project-directory-debug))
+  (setq current-dir-release (find-project-directory-release)))
+
+;;;
 (defvar last-inproject-directory-debug nil)
 (defvar last-inproject-directory-release nil)
 (defvar last-project-directory-debug nil)
@@ -109,14 +160,14 @@
   (setq last-inproject-executable-debug (find-inproject-executable-debug))
   (setq last-inproject-executable-release (find-inproject-executable-release)))
 
-(defmacro run-compile (dir fallback-dir release)
-  `(let ((dir (,dir)))
-     (unless ,fallback-dir
-       (setq ,fallback-dir dir)
-       (actualize-path-cache))
-     (compile (format
-	       "cmake --build \"%s\" --config %s"
-	       ,fallback-dir (if ,release "Release" "Debug")))))
+;;(defmacro run-compile (dir fallback-dir release)
+;;  `(let ((dir (,dir)))
+;;     (unless ,fallback-dir
+;;       (setq ,fallback-dir dir)
+;;       (actualize-path-cache))
+;;     (compile (format
+;; 	       "cmake --build \"%s\" --config %s"
+;; 	       ,fallback-dir (if ,release "Release" "Debug")))))
 
 (defmacro run-exec (dir fallback-dir)
   `(let ((dir (,dir)))
@@ -139,29 +190,25 @@
  (kbd "<f7>")
  '(lambda ()
     (interactive)
-    (run-compile find-inproject-directory-debug
-		 last-inproject-directory-debug nil)))
+    (run-compile nil nil)))
 
 (global-set-key
  (kbd "S-<f7>")
  '(lambda ()
     (interactive)
-    (run-compile find-inproject-directory-release
-		 last-inproject-directory-release t)))
+    (run-compile t nil)))
 
 (global-set-key
  (kbd "C-<f7>")
  '(lambda ()
     (interactive)
-    (run-compile find-project-directory-debug
-		 last-project-directory-debug nil))) ; compile full project
+    (run-compile nil nil "ALL_BUILD"))) ; compile full project
 
 (global-set-key
  (kbd "C-S-<f7>")
  '(lambda ()
     (interactive)
-    (run-compile find-project-directory-release
-		 last-project-directory-release t))) ; compile full project
+    (run-compile t nil "ALL_BUILD"))) ; compile full project
 
 (global-set-key
  (kbd "<f6>")
@@ -200,23 +247,6 @@
 (global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
 (global-set-key (kbd "<left-margin> <mouse-1>") 'gud-break)
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
-
-(defun find-project-directory-debug ()
-  (find-project-directory-base "project/debug"))
-(defun find-project-directory-release ()
-  (find-project-directory-base "project/release"))
-
-(defun find-project-directory ()
-  (find-project-directory-base ""))
-(defun find-inproject-directory-release ()
-  (find-inproject-directory-base "/project/release" "/"))
-(defun find-inproject-directory-debug ()
-  (find-inproject-directory-base "/project/debug" "/"))
-
-(defun find-inproject-executable-debug ()
-  (find-inproject-executable-base "/project/debug"))
-(defun find-inproject-executable-release ()
-  (find-inproject-executable-base "/project/release"))
 
 ;; flycheck for CMake project
 (defun get-string-from-file (file-path)
