@@ -230,6 +230,7 @@
 (global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
 (global-set-key (kbd "<left-margin> <mouse-1>") 'gud-break)
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
+(global-set-key (kbd "C-' t") 'switch-target)
 
 ;; flycheck for CMake project
 (defun get-string-from-file (file-path)
