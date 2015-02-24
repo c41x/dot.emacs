@@ -23,7 +23,7 @@
 	     (not (or
 		   (string= file ".")
 		   (string= file ".."))))
-	(let ((subdir-result (sfl name (concat (file-name-as-directory dir) file))))
+	(let ((subdir-result (dirs-contains-file name (concat (file-name-as-directory dir) file))))
 	  (when subdir-result
 	    (setq res (append subdir-result res))))))
     res))
@@ -201,6 +201,7 @@
     (insert-file-contents file-path)
     (buffer-string)))
 
+;; TODO: add_library / add_executable
 (defun extract-includes-from-file (file-name project-source-dir)
   (let ((i 0) (matches '()) (file-buffer (get-string-from-file file-name)))
     (save-match-data
