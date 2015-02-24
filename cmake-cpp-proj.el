@@ -71,6 +71,29 @@
   "returns executable name"
   (file-name-nondirectory (expand-file-name ".")))
 
+(defmacro find-in-file-regex (file-name regex)
+  "in-file search builder"
+  `(let ((i 0)
+	 (matches '())
+	 (file-buffer (get-string-from-file ,file-name)))
+     (save-match-data
+       (while (string-match ,regex file-buffer i)
+	 (setq i (match-end 1))
+	 (add-to-list 'matches (match-string-no-properties 1 file-buffer))))
+     matches))
+
+(defun extract-targets-from-file (file-name)
+  "searches for CMake targets in specified file"
+  (append (find-in-file-regex file-name "add_executable(\\(\\w+\\)")
+	  (find-in-file-regex file-name "add_library(\\(\\w+\\)")))
+
+(defun find-all-targets ()
+  "returns lists with all targets available in current CMake project"
+  (let ((res '()))
+    (dolist (f (dirs-contains-file "CMakeLists.txt" (find-project-directory)))
+      (setq res (append res (extract-targets-from-file (concat f "CMakeLists.txt")))))
+    res))
+
 (defvar last-inproject-directory-debug nil)
 (defvar last-inproject-directory-release nil)
 (defvar last-project-directory-debug nil)
@@ -201,7 +224,6 @@
     (insert-file-contents file-path)
     (buffer-string)))
 
-;; TODO: add_library / add_executable
 (defun extract-includes-from-file (file-name project-source-dir)
   (let ((i 0) (matches '()) (file-buffer (get-string-from-file file-name)))
     (save-match-data
