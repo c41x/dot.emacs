@@ -145,29 +145,12 @@
   (setq current-dir-release (find-project-directory-release)))
 
 ;;;
-(defvar last-inproject-directory-debug nil)
-(defvar last-inproject-directory-release nil)
-(defvar last-project-directory-debug nil)
-(defvar last-project-directory-release nil)
 (defvar last-inproject-executable-debug nil)
 (defvar last-inproject-executable-release nil)
 
 (defun actualize-path-cache ()
-  (setq last-inproject-directory-debug (find-inproject-directory-debug))
-  (setq last-inproject-directory-release (find-inproject-directory-release))
-  (setq last-project-directory-debug (find-project-directory-debug))
-  (setq last-project-directory-release (find-project-directory-release))
   (setq last-inproject-executable-debug (find-inproject-executable-debug))
   (setq last-inproject-executable-release (find-inproject-executable-release)))
-
-;;(defmacro run-compile (dir fallback-dir release)
-;;  `(let ((dir (,dir)))
-;;     (unless ,fallback-dir
-;;       (setq ,fallback-dir dir)
-;;       (actualize-path-cache))
-;;     (compile (format
-;; 	       "cmake --build \"%s\" --config %s"
-;; 	       ,fallback-dir (if ,release "Release" "Debug")))))
 
 (defmacro run-exec (dir fallback-dir)
   `(let ((dir (,dir)))
