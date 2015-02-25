@@ -28,6 +28,10 @@
 	    (setq res (append subdir-result res))))))
     res))
 
+(defun search-file (name dir)
+  "find file in directory recursively, returns first found"
+  (car (dirs-contains-file name dir)))
+
 (defun upward-check-file (filename startdir)
   "Moves up in directory structure and checks if desired file is there, returns last found"
   (let ((dirname (expand-file-name startdir))
@@ -101,7 +105,7 @@
     ;; for some reason popup-menu* does not work within let - hence global var
     (setq selected-target (popup-menu* all-targets))
     (if (< (length all-targets) 2)
-	"ALL_BUILD"
+	""
       selected-target)))
 
 (defun find-project-directory-debug ()
@@ -132,10 +136,13 @@
     (setq current-dir-debug (find-project-directory-debug)))
   (unless current-dir-release
     (setq current-dir-release (find-project-directory-release)))
-  (compile (format "cmake --build \"%s\" --config %s --target %s %s"
+  (compile (format "cmake --build \"%s\" --config %s %s %s"
 		   (if release current-dir-release current-dir-debug)
 		   (if release "Release" "Debug")
-		   (if target-name target-name current-target-name)
+		   (if target-name (concat "--target " target-name)
+		     (if (not (string= current-target-name ""))
+			 (concat "--target " current-target-name)
+		       ""))
 		   (if clean "--clean-first" ""))))
 
 (defun switch-target ()
