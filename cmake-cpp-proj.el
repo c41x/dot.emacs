@@ -57,23 +57,6 @@
 (defun is-cmake-project ()
   (if (upward-check-file "CMakeLists.txt" ".") t nil))
 
-(defun find-inproject-directory-base (project-dir tail)
-  "returns corresponding directory in CMake project directory structure"
-  (let ((project-root (upward-check-file "CMakeLists.txt" "."))
-	(full-path (expand-file-name ".")))
-    (if project-root
-	(concat project-root project-dir (substring full-path (length project-root)) tail)
-      nil)))
-
-(defun find-inproject-executable-base (project-dir)
-  "returns path to executable in CMake directory structure"
-  (let ((inproject-dir (find-inproject-directory-base project-dir "")))
-    (concat inproject-dir "/" (file-name-nondirectory inproject-dir))))
-
-(defun find-executable-name ()
-  "returns executable name"
-  (file-name-nondirectory (expand-file-name ".")))
-
 (defmacro find-in-file-regex (file-name regex)
   "in-file search builder"
   `(let ((i 0)
@@ -105,8 +88,8 @@
     ;; for some reason popup-menu* does not work within let - hence global var
     (setq selected-target (popup-menu* all-targets))
     (if (< (length all-targets) 2)
-	""
-      selected-target)))
+	(cons selected-target t)
+      (cons selected-target nil))))
 
 (defun find-project-directory-debug ()
   (find-project-directory-base "project/debug"))
@@ -114,68 +97,75 @@
   (find-project-directory-base "project/release"))
 (defun find-project-directory ()
   (find-project-directory-base ""))
-(defun find-inproject-directory-release ()
-  (find-inproject-directory-base "/project/release" "/"))
-(defun find-inproject-directory-debug ()
-  (find-inproject-directory-base "/project/debug" "/"))
-(defun find-inproject-executable-debug ()
-  (find-inproject-executable-base "/project/debug"))
-(defun find-inproject-executable-release ()
-  (find-inproject-executable-base "/project/release"))
 
 (defvar current-target-name nil)
+(defvar current-target-all nil)
 (defvar current-dir-release nil)
 (defvar current-dir-debug nil)
 (defvar current-executable-debug nil)
 (defvar current-executable-release nil)
 
-(defun run-compile (release clean &optional target-name)
-  (unless current-target-name
-    (setq current-target-name (popup-get-target)))
-  (unless current-dir-debug
-    (setq current-dir-debug (find-project-directory-debug)))
-  (unless current-dir-release
-    (setq current-dir-release (find-project-directory-release)))
+(defun exec-name (file-name)
+  (if (string= system-type "windows-nt")
+      (format "%s.exe" file-name)
+    file-name))
+
+(defun refresh-target-name ()
+  (let ((popup-result (popup-get-target)))
+    (message (car popup-result))
+    (setq current-target-name (car popup-result))
+    (setq current-target-all (cdr popup-result))))
+(defun refresh-dir-release ()
+  (setq current-dir-release (find-project-directory-release)))
+(defun refresh-dir-debug ()
+  (setq current-dir-debug (find-project-directory-debug)))
+(defun refresh-executable-debug ()
+  (setq current-executable-debug
+	(search-file
+	 (exec-name current-target-name)
+	 current-dir-debug)))
+(defun refresh-executable-release ()
+  (setq current-executable-release
+	(search-file
+	 (exec-name current-target-name)
+	 current-dir-release)))
+
+(defmacro refresh-unset (flag refresh-function)
+  `(unless ,flag
+     (,refresh-function)))
+
+(defun run-compile (release clean)
+  (refresh-unset current-target-name refresh-target-name)
+  (refresh-unset current-dir-debug refresh-dir-debug)
+  (refresh-unset current-dir-release refresh-dir-release)
   (compile (format "cmake --build \"%s\" --config %s %s %s"
 		   (if release current-dir-release current-dir-debug)
 		   (if release "Release" "Debug")
-		   (if target-name (concat "--target " target-name)
-		     (if (not (string= current-target-name ""))
-			 (concat "--target " current-target-name)
-		       ""))
+		   (if current-target-all
+		       ""
+		     (concat "--target " current-target-name))
 		   (if clean "--clean-first" ""))))
+
+(defun run-exec (release)
+  (refresh-unset current-executable-debug refresh-executable-debug)
+  (refresh-unset current-executable-release refresh-executable-release)
+  (compile (concat (if release
+		       current-executable-release
+		     current-executable-debug)
+		   (exec-name current-target-name)) t))
+
+(defun run-debug ()
+  (refresh-unset current-executable-debug refresh-executable-debug)
+  (gdb (format "gdb -i=mi %s" (concat current-executable-debug
+				      (exec-name current-target-name)))))
 
 (defun switch-target ()
   (interactive)
-  (setq current-target-name (popup-get-target))
-  (setq current-dir-debug (find-project-directory-debug))
-  (setq current-dir-release (find-project-directory-release)))
+  (refresh-target-name)
+  (refresh-dir-debug)
+  (refresh-dir-release))
 
-;;;
-(defvar last-inproject-executable-debug nil)
-(defvar last-inproject-executable-release nil)
-
-(defun actualize-path-cache ()
-  (setq last-inproject-executable-debug (find-inproject-executable-debug))
-  (setq last-inproject-executable-release (find-inproject-executable-release)))
-
-(defmacro run-exec (dir fallback-dir)
-  `(let ((dir (,dir)))
-     (unless ,fallback-dir
-       (setq ,fallback-dir dir)
-       (actualize-path-cache))
-     (compile (format
-	       "%s"
-	       ,fallback-dir) t)))
-
-(defmacro run-debug (dir fallback-dir)
-  `(let ((dir (,dir)))
-     (unless ,fallback-dir
-       (setq ,fallback-dir dir)
-       (actualize-path-cache))
-     (gdb (format "gdb -i=mi %s" ,fallback-dir))))
-
-
+;;//- key bindings
 (global-set-key
  (kbd "<f7>")
  '(lambda ()
@@ -192,20 +182,19 @@
  (kbd "C-<f7>")
  '(lambda ()
     (interactive)
-    (run-compile nil nil "ALL_BUILD"))) ; compile full project
+    (run-compile nil t)))
 
 (global-set-key
  (kbd "C-S-<f7>")
  '(lambda ()
     (interactive)
-    (run-compile t nil "ALL_BUILD"))) ; compile full project
+    (run-compile t t)))
 
 (global-set-key
  (kbd "<f6>")
  '(lambda ()
     (interactive)
-    (run-exec find-inproject-executable-debug
-	      last-inproject-executable-debug)
+    (run-exec nil)
     (select-window (get-buffer-window "*compilation*"))
     (end-of-buffer)))
 
@@ -213,8 +202,7 @@
  (kbd "S-<f6>")
  '(lambda ()
     (interactive)
-    (run-exec find-inproject-executable-release
-	      last-inproject-executable-release)
+    (run-exec t)
     (select-window (get-buffer-window "*compilation*"))
     (end-of-buffer)))
 
@@ -223,8 +211,7 @@
  '(lambda ()
     (interactive)
     (frame-configuration-to-register 1)
-    (run-debug find-inproject-executable-debug
-	       last-inproject-executable-debug)
+    (run-debug)
     (setq gdb-many-windows t)))
 
 (global-set-key
@@ -239,7 +226,7 @@
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
 (global-set-key (kbd "C-' t") 'switch-target)
 
-;; flycheck for CMake project
+;;//- flycheck for CMake project
 (defun get-string-from-file (file-path)
   (with-temp-buffer
     (insert-file-contents file-path)
