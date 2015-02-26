@@ -45,6 +45,10 @@
 (set-face-attribute 'mode-line-progress-face nil
 		    :foreground "antique white")
 
+(make-face 'mode-line-bg-face)
+(set-face-attribute 'mode-line-bg-face nil
+		    :foreground "black")
+
 ;;(set-face-attribute 'log-view-message-face nil
 ;;		    :foreground "#aa7733"
 ;;		    :weight 'bold)
@@ -97,7 +101,7 @@
  '(dired-directory ((t (:foreground "#eeaa11"))))
  '(fringe ((t (:background "black" :foreground "#39ae1c"))))
  '(linum ((t (:background "black" :foreground "#343434"))))
- '(mode-line ((t (:background "#887766" :foreground "black" :box nil))))
+ '(mode-line ((t (:background "#225599" :foreground "#aaaaaa" :box nil))))
  '(mode-line-buffer-id ((t nil)))
  '(mode-line-emphasis ((t nil)))
  '(mode-line-highlight ((t nil)))
