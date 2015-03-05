@@ -516,6 +516,14 @@
 (global-set-key [(shift f3)] 'highlight-symbol-prev)
 (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
 
+;; highlight-symbol advice for ignoring numbers and symbols inside comments
+(defadvice highlight-symbol-get-symbol (after highlight-ignore-symbols activate)
+  (when (or (save-excursion
+	      (skip-chars-backward "0-9.A-Za-z")
+	      (looking-at "[0-9]+\\.?[ulULfF]*"))
+	    (nth 4 (syntax-ppss)))
+    (setq ad-return-value nil)))
+
 ;; recompiling stuff
 (defun recompile-scripts ()
   (interactive)
