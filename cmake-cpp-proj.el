@@ -14,19 +14,20 @@
 
 (defun dirs-contains-file (name dir)
   "Searches recursively for given file"
-  (let ((res nil))
-    (dolist (file (directory-files dir))
-      (when (string= name file)
-	(setq res (cons (file-name-as-directory dir) res)))
-      (when (and
-	     (file-directory-p (concat (file-name-as-directory dir) file))
-	     (not (or
-		   (string= file ".")
-		   (string= file ".."))))
-	(let ((subdir-result (dirs-contains-file name (concat (file-name-as-directory dir) file))))
-	  (when subdir-result
-	    (setq res (append subdir-result res))))))
-    res))
+  (when (file-exists-p dir)
+    (let ((res nil))
+      (dolist (file (directory-files dir))
+	(when (string= name file)
+	  (setq res (cons (file-name-as-directory dir) res)))
+	(when (and
+	       (file-directory-p (concat (file-name-as-directory dir) file))
+	       (not (or
+		     (string= file ".")
+		     (string= file ".."))))
+	  (let ((subdir-result (dirs-contains-file name (concat (file-name-as-directory dir) file))))
+	    (when subdir-result
+	      (setq res (append subdir-result res))))))
+      res)))
 
 (defun search-file (name dir)
   "find file in directory recursively, returns first found"
