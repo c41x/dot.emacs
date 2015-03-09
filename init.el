@@ -106,6 +106,22 @@
 (global-set-key (kbd "M-S-<up>") 'windmove-up)
 (global-set-key (kbd "M-S-<down>") 'windmove-down)
 
+;; moving frames around
+(defun move-frame-with-buffer (dir)
+  (let* ((c-buff (current-buffer))
+	 (c-win (selected-window))
+	 (o-win (windmove-find-other-window dir)))
+    (when o-win
+      (delete-window c-win)
+      (select-window o-win)
+      (unless (windmove-find-other-window 'up)
+	(split-window-vertically)
+	(windmove-down))
+      (set-window-buffer (selected-window) c-buff))))
+
+(global-set-key (kbd "C-; .") (lambda () (interactive) (move-frame-with-buffer 'right)))
+(global-set-key (kbd "C-; ,") (lambda () (interactive) (move-frame-with-buffer 'left)))
+
 (cua-mode 1) ; cua-mode (Ctrl+C,V,X,Z)
 (setq x-select-enable-clipboard t) ; allows to copy/paste text between emacs and other apps
 
