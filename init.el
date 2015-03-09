@@ -122,6 +122,9 @@
 (global-set-key (kbd "C-; .") (lambda () (interactive) (move-frame-with-buffer 'right)))
 (global-set-key (kbd "C-; ,") (lambda () (interactive) (move-frame-with-buffer 'left)))
 
+;; comment/uncomment
+(global-set-key (kbd "C-; c") 'comment-or-uncomment-region)
+
 (cua-mode 1) ; cua-mode (Ctrl+C,V,X,Z)
 (setq x-select-enable-clipboard t) ; allows to copy/paste text between emacs and other apps
 
