@@ -71,8 +71,8 @@
 
 (defun extract-targets-from-file (file-name)
   "searches for CMake targets in specified file"
-  (append (find-in-file-regex file-name "add_executable(\\(\\w+\\)")
-	  (find-in-file-regex file-name "add_library(\\(\\w+\\)")))
+  (append (find-in-file-regex file-name "add_executable(\\([A-Za-z_]*\\)")
+	  (find-in-file-regex file-name "add_library(\\([A-Za-z_]*\\)")))
 
 (defun find-all-targets ()
   "returns lists with all targets available in current CMake project"
