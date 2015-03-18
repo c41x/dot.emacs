@@ -113,7 +113,6 @@
 
 (defun refresh-target-name ()
   (let ((popup-result (popup-get-target)))
-    (message (car popup-result))
     (setq current-target-name (car popup-result))
     (setq current-target-all (cdr popup-result))))
 (defun refresh-dir-release ()
@@ -164,7 +163,9 @@
   (interactive)
   (refresh-target-name)
   (refresh-dir-debug)
-  (refresh-dir-release))
+  (refresh-dir-release)
+  (setq current-executable-debug nil)
+  (setq current-executable-release nil))
 
 ;;//- key bindings
 (global-set-key
