@@ -32,7 +32,9 @@
     flycheck
     key-chord
     skewer-mode
-    fuzzy))
+    fuzzy
+    geiser
+    ac-geiser))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -294,6 +296,14 @@
 (add-hook 'html-mode-hook 'skewer-html-mode)
 ;(require 'simple-httpd)
 ;(setq httpd-root "d:/repo/minigame2")
+
+;; Racket (run-racket)
+(require 'ac-geiser)
+(add-hooks 'ac-geiser-setup '(geiser-mode-hook
+			      geiser-repl-mode-hook))
+(eval-after-load "auto-complete"
+  '(add-to-list 'ac-modes 'geiser-repl-mode))
+
 
 ;; C++ coding style (indenting)
 (setq indent-tabs-mode t) ; no shitty spaces
