@@ -159,6 +159,11 @@
   (gdb (format "gdb -i=mi %s" (concat current-executable-debug
 				      (exec-name current-target-name)))))
 
+(defun enable-visual-line-mode ()
+  (select-window (get-buffer-window "*compilation*"))
+  (end-of-buffer)
+  (visual-line-mode t))
+
 (defun switch-target ()
   (interactive)
   (refresh-target-name)
@@ -172,25 +177,29 @@
  (kbd "<f7>")
  '(lambda ()
     (interactive)
-    (run-compile nil nil)))
+    (run-compile nil nil)
+    (enable-visual-line-mode)))
 
 (global-set-key
  (kbd "S-<f7>")
  '(lambda ()
     (interactive)
-    (run-compile t nil)))
+    (run-compile t nil)
+    (enable-visual-line-mode)))
 
 (global-set-key
  (kbd "C-<f7>")
  '(lambda ()
     (interactive)
-    (run-compile nil t)))
+    (run-compile nil t)
+    (enable-visual-line-mode)))
 
 (global-set-key
  (kbd "C-S-<f7>")
  '(lambda ()
     (interactive)
-    (run-compile t t)))
+    (run-compile t t)
+    (enable-visual-line-mode)))
 
 (global-set-key
  (kbd "<f6>")
