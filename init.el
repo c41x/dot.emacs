@@ -93,7 +93,7 @@
 (setq-default auto-save-default nil)
 
 ;; default make command: | or just change filename from mingw-make32 to make on windows 'cause these are 2 different exe-s...
-(setq-default compile-command "mingw32-make")
+;;(setq-default compile-command "mingw32-make")
 
 ;; keystrokes
 (global-unset-key (kbd "<C-z>")) ; disable Ctrl+z hide
