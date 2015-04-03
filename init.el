@@ -192,6 +192,7 @@
 (delq 'ac-source-yasnippet ac-sources)
 (setq ac-ignore-case t)
 (setq ac-use-fuzzy t)
+(setq popup-isearch-cursor-color "orange")
 
 ;; documentation tip
 (defun popup-doc ()
