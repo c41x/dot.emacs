@@ -72,7 +72,9 @@
   (let ((buffer-tags (get-buffer-tags)))
     (if buffer-tags
 	(goto-char (popup-menu* (mapcar 'popupize-item buffer-tags)
-				:cursor (get-buffer-tags-cursor buffer-tags)))
+				:cursor (get-buffer-tags-cursor buffer-tags)
+				:scroll-bar t
+				:isearch t))
       (message "no page breaks found"))))
 
 (provide 'tags)
