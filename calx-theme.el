@@ -108,6 +108,8 @@
  '(mode-line-inactive ((t (:inherit mode-line :background "#222222" :foreground "#857b6f" :box nil :weight light))))
  '(popup-face ((t (:background "AntiqueWhite3" :foreground "black"))))
  '(popup-menu-selection-face ((t (:background "chartreuse4" :foreground "white"))))
+ '(popup-isearch-match ((t (:background "orange red" :foreground "black"))))
+ '(popup-menu-mouse-face ((t (:background "firebrick" :foreground "black"))))
  '(show-paren-match ((t (:background "#44aaee" :foreground "#000000"))))
  '(show-paren-mismatch ((t (:background "#aa2211"))))
  '(sml/filename ((t (:inherit sml/global :foreground "lemon chiffon"))))
