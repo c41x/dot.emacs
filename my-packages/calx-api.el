@@ -1,8 +1,51 @@
+;; -*- lexical-binding: t -*-
 ;;; calx-api --- calx web api
 ;;; Commentary:
 ;;; Code:
 
 (require 'url)
+
+(defun calx--request (url &optional data callback-ok callback-fail)
+  (let ((url-request-method "POST")
+	(url-request-extra-headers
+	 '(("Content-Type" . "application/x-www-form-urlencoded")))
+	(url-request-data data))
+    (url-retrieve url (lambda (status)
+			(switch-to-buffer (current-buffer))
+			(goto-char (point-min))
+			(search-forward "\n\n")
+			(let ((errm (buffer-substring-no-properties
+				     (point)
+				     (point-max))))
+			  (cond ((or (string= "forbidden" errm))
+				 (message errm)
+				 (kill-buffer (current-buffer))
+				 (funcall callback-fail errm))
+				((or (string= "success" errm)
+				     (string= "logged out" errm)
+				     (string= "ok" errm))
+				 (message errm)
+				 (kill-buffer (current-buffer))
+				 (funcall callback-ok errm))
+				(t
+				 (delete-region (point-min) (point))
+				 (rename-buffer "* TODO *")
+				 (org-mode)
+				 (buffer-enable-undo)
+				 (funcall callback-ok errm))))))))
+
+(defun calx--request-login ()
+  (calx--request (concat calx--server-api-url "/api_login")
+		 (format "username=%s&password=%s"
+			 calx--server-api-username
+			 calx--server-api-password)
+		 (lambda (res)
+		   (calx--request (concat calx--server-api-url "/api_get")))))
+
+(calx--request-login)
+
+
+
 
 (defun calx--request-callback-new-buffer (status)
   (switch-to-buffer (current-buffer))
@@ -65,6 +108,7 @@
 		     (calx--request-callback-status status)
 		     (kill-buffer (current-buffer)))))
 
+;; TODO: custom keybind
 (add-hook 'org-mode-hook (lambda ()
 			   (local-set-key (kbd "C-x C-s") 'calx-set)
 			   (local-set-key (kbd "C-x k") 'calx-logout)))
