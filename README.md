@@ -1,6 +1,6 @@
 dot.emacs
 =========
 
-My Emacs configuration files for Windows
+My Emacs configuration files.
 
 ![Preview](/preview.png?raw=true "Preview")
