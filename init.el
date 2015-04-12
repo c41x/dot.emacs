@@ -61,7 +61,8 @@
 ;; no start screen
 (setq inhibit-startup-screen 1)
 
-;(server-start)
+(unless (string= system-type "windows-nt")
+  (server-start))
 (tool-bar-mode -1) ;; hide toolbar (icons)
 (tooltip-mode -1) ;; hide tooltips
 (scroll-bar-mode 0) ;; disable system scrollbars
