@@ -631,6 +631,10 @@
 ;; API
 (require 'calx-api)
 
+;; Hacker News Reader
+(add-to-list 'load-path "~/.emacs.d/hnr")
+(require 'hnr)
+
 ;; mode-line
 (defconst buffer-pos-indicator-length 25)
 
