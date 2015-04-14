@@ -61,7 +61,7 @@
  '(variable-pitch ((t (:family "Sans Serif"))))
  '(escape-glyph ((t (:foreground "#dc7e28"))))
  '(minibuffer-prompt ((t (:foreground "#dc7e28"))))
- '(highlight ((t (:foreground "#ffffff" :underline t))))
+ '(highlight ((t (:foreground "gold" :underline t))))
  '(region ((t (:background "#333333"))))
  '(shadow ((((class color grayscale) (min-colors 88) (background light)) (:foreground "grey50")) (((class color grayscale) (min-colors 88) (background dark)) (:foreground "grey70")) (((class color) (min-colors 8) (background light)) (:foreground "green")) (((class color) (min-colors 8) (background dark)) (:foreground "yellow"))))
  '(secondary-selection ((t (:foreground "#f6f3e8" :background "#333366"))))
