@@ -643,6 +643,10 @@
 (add-to-list 'load-path "~/.emacs.d/hnr")
 (require 'hnr)
 
+;; //- mode editing prototype -
+(key-chord-define-global "jf" 'ceh-do-it)
+(key-chord-define-global "fj" 'ceh-do-it)
+
 ;; mode-line
 (defconst buffer-pos-indicator-length 25)
 
