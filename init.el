@@ -645,6 +645,7 @@
 ;; //- mode editing prototype -
 (key-chord-define-global "jf" 'ceh-do-it)
 (key-chord-define-global "fj" 'ceh-do-it)
+(key-chord-mode t)
 
 ;; mode-line
 (defconst buffer-pos-indicator-length 25)
