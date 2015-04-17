@@ -71,6 +71,11 @@
 ;; F2 - toggle menu bar
 (global-set-key [(f2)] 'menu-bar-mode)
 
+;; F4 - isearch => F3 backward, F4 forawrd
+(global-set-key [(f4)] 'isearch-forward)
+(define-key isearch-mode-map [(f4)] 'isearch-repeat-forward)
+(define-key isearch-mode-map [(f3)] 'isearch-repeat-backward)
+
 ;; theme
 (load-theme 'calx t)
 
