@@ -34,7 +34,8 @@
     skewer-mode
     fuzzy
     geiser
-    ac-geiser))
+    ac-geiser
+    php-mode))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
