@@ -665,28 +665,32 @@
   (set-cursor-color "orange")
   (blink-cursor-mode 0)
   (moded--rk "<Do It>"
-	   ("f" (ido-find-file))
-	   ("g" (ido-switch-buffer))
-	   ("j" (smex))
-	   ("z" (undo))
-	   ("s" (save-buffer))
-	   ("x" (page-breaks-popup))
-	   ("o" (switch-to-buffer (other-buffer (current-buffer) 1)))
-	   ("m" (moded--rkl "<K - up, M - down, J - quit>" "j"
-			  ("k" (smooth-scroll -1 8 0.1))
-			  ("m" (smooth-scroll 1 8 0.1))))
-	   ("c" (moded--rk "<Comment>"
-			 ("e" (moded-comment-to-eol))
-			 ("a" (moded-comment-next-atom))))
-	   ("v" (moded--rk "<Version Control>"
-			 ("d" (call-interactively 'vc-dir))
-			 ("=" (vc-diff))
-			 ("c" (vc-diff))
-			 ("v" (call-interactively 'vc-next-action))
-			 ("u" (call-interactively 'vc-revert))))
-	   ("k" (moded--rk "<Kill>"
-			 ("k" (kill-buffer))
-			 ("w" (kill-buffer-and-window)))))
+	     ("f" (ido-find-file))
+	     ("g" (ido-switch-buffer))
+	     ("j" (smex))
+	     ("z" (undo))
+	     ("s" (save-buffer))
+	     ("x" (page-breaks-popup))
+	     ("o" (switch-to-buffer (other-buffer (current-buffer) 1)))
+	     ("m" (moded--rkl "<K - up, M - down, J - quit>" "j"
+			      ("k" (smooth-scroll -1 8 0.1))
+			      ("m" (smooth-scroll 1 8 0.1))))
+	     ("c" (moded--rk "<Comment>"
+			     ("e" (moded-comment-to-eol))
+			     ("a" (moded-comment-next-atom))))
+	     ("v" (moded--rk "<Version Control>"
+			     ("d" (call-interactively 'vc-dir))
+			     ("=" (vc-diff))
+			     ("c" (vc-diff))
+			     ("v" (call-interactively 'vc-next-action))
+			     ("u" (call-interactively 'vc-revert))))
+	     ("k" (moded--rk "<Kill>"
+			     ("k" (kill-buffer))
+			     ("w" (kill-buffer-and-window))))
+	     ("d" (moded--rk "<Compile>"
+			     ("d" (cm-compile-debug))
+			     ("r" (cm-compile-release))
+			     ("s" (cm-run-debug)))))
   (setq-default cursor-type 'hbar)
   (set-cursor-color "white")
   (blink-cursor-mode 1))
