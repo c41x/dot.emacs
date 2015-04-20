@@ -173,65 +173,57 @@
   (setq current-executable-release nil))
 
 ;;//- key bindings
-(global-set-key
- (kbd "<f7>")
- '(lambda ()
-    (interactive)
-    (run-compile nil nil)
-    (enable-visual-line-mode)))
+(defun cm-compile-debug ()
+  (interactive)
+  (run-compile nil nil)
+  (enable-visual-line-mode))
 
-(global-set-key
- (kbd "S-<f7>")
- '(lambda ()
-    (interactive)
-    (run-compile t nil)
-    (enable-visual-line-mode)))
+(defun cm-compile-release ()
+  (interactive)
+  (run-compile t nil)
+  (enable-visual-line-mode))
 
-(global-set-key
- (kbd "C-<f7>")
- '(lambda ()
-    (interactive)
-    (run-compile nil t)
-    (enable-visual-line-mode)))
+(defun cm-compile-debug-clean ()
+  (interactive)
+  (run-compile nil t)
+  (enable-visual-line-mode))
 
-(global-set-key
- (kbd "C-S-<f7>")
- '(lambda ()
-    (interactive)
-    (run-compile t t)
-    (enable-visual-line-mode)))
+(defun cm-compile-release-clean ()
+  (interactive)
+  (run-compile t t)
+  (enable-visual-line-mode))
 
-(global-set-key
- (kbd "<f6>")
- '(lambda ()
-    (interactive)
-    (run-exec nil)
-    (select-window (get-buffer-window "*compilation*"))
-    (end-of-buffer)))
+(defun cm-run-debug ()
+  (interactive)
+  (run-exec nil)
+  (select-window (get-buffer-window "*compilation*"))
+  (goto-char (point-max)))
 
-(global-set-key
- (kbd "S-<f6>")
- '(lambda ()
-    (interactive)
-    (run-exec t)
-    (select-window (get-buffer-window "*compilation*"))
-    (end-of-buffer)))
+(defun cm-run-release ()
+  (interactive)
+  (run-exec t)
+  (select-window (get-buffer-window "*compilation*"))
+  (goto-char (point-max)))
 
-(global-set-key
- (kbd "<f5>")
- '(lambda ()
-    (interactive)
-    (frame-configuration-to-register 1)
-    (run-debug)
-    (setq gdb-many-windows t)))
+(defun cm-debug ()
+  (interactive)
+  (frame-configuration-to-register 1)
+  (run-debug)
+  (setq gdb-many-windows t))
 
-(global-set-key
- (kbd "S-<f5>")
- '(lambda ()
-    (interactive)
-    (setq gdb-many-windows nil)
-    (jump-to-register 1)))
+(defun cm-restore-debug ()
+  (interactive)
+  (setq gdb-many-windows nil)
+  (jump-to-register 1))
 
+(global-set-key (kbd "<f7>") 'cm-compile-debug)
+(global-set-key (kbd "S-<f7>") 'cm-compile-release)
+(global-set-key (kbd "C-<f7>") 'cm-compile-debug-clean)
+(global-set-key (kbd "C-S-<f7>") 'cm-compile-release-clean)
+(global-set-key (kbd "<f6>") 'cm-run-debug)
+(global-set-key (kbd "S-<f6>") 'cm-run-release)
+(global-set-key (kbd "<f5>") 'cm-debug)
+(global-set-key (kbd "S-<f5>") 'cm-restore-debug)
 (global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
 (global-set-key (kbd "<left-margin> <mouse-1>") 'gud-break)
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
