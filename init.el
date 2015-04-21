@@ -672,9 +672,13 @@
 	     ("s" (save-buffer))
 	     ("x" (page-breaks-popup))
 	     ("o" (switch-to-buffer (other-buffer (current-buffer) 1)))
-	     ("m" (moded--rkl "<K - up, M - down, J - quit>" "j"
-			      ("k" (smooth-scroll -1 8 0.1))
-			      ("m" (smooth-scroll 1 8 0.1))))
+	     ("m" (moded--rkl "<Move : G - quit>" "g"
+			      ("l" (smooth-scroll -1 8 0.1))
+			      ("m" (smooth-scroll 1 8 0.1))
+			      ("j" (backward-word))
+			      ("k" (forward-word))
+			      ("d" (previous-line))
+			      ("f" (next-line))))
 	     ("c" (moded--rk "<Comment>"
 			     ("e" (moded-comment-to-eol))
 			     ("a" (moded-comment-next-atom))))
