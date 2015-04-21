@@ -694,7 +694,11 @@
 	     ("d" (moded--rk "<Compile>"
 			     ("d" (cm-compile-debug))
 			     ("r" (cm-compile-release))
-			     ("s" (cm-run-debug)))))
+			     ("s" (cm-run-debug))))
+	     ("w" (moded--rk "<Windows>"
+			     ("w" (delete-window))
+			     ("f" (split-window-horizontally))
+			     ("j" (split-window-vertically)))))
   (setq-default cursor-type 'hbar)
   (set-cursor-color "white")
   (blink-cursor-mode 1))
