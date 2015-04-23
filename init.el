@@ -664,41 +664,44 @@
   (setq-default cursor-type 'box)
   (set-cursor-color "orange")
   (blink-cursor-mode 0)
-  (moded--rk "<Do It>"
+  (moded--rk "> { f - find file | g - switch buffer | j - command | z - undo | s - save | x - tags | o - other buffer | m - move... | c - comment... | v - version control... | k - kill... | d - compile... | w - windows... }"
 	     ("f" (ido-find-file))
 	     ("g" (ido-switch-buffer))
 	     ("j" (smex))
 	     ("z" (undo))
 	     ("s" (save-buffer))
 	     ("x" (page-breaks-popup))
-	     ("o" (switch-to-buffer (other-buffer (current-buffer) 1)))
-	     ("m" (moded--rkl "<Move : G - quit>" "g"
+	     ("o" (switch-to-buffer (other-buffer)))
+	     ("m" (moded--rkl "> Move { g - quit | l - scroll up | m - scroll down | j - back word | k - fwd word | d - prv line | f - next line }" "g"
 			      ("l" (smooth-scroll -1 8 0.1))
 			      ("m" (smooth-scroll 1 8 0.1))
 			      ("j" (backward-word))
 			      ("k" (forward-word))
 			      ("d" (previous-line))
 			      ("f" (next-line))))
-	     ("c" (moded--rk "<Comment>"
+	     ("c" (moded--rk "> Comment { e - comment to end of line | a - comment next atom }"
 			     ("e" (moded-comment-to-eol))
 			     ("a" (moded-comment-next-atom))))
-	     ("v" (moded--rk "<Version Control>"
+	     ("v" (moded--rk "> Version Control { d - dir | c/= - diff | v - commit | u - revert | l - log | r - root... }"
 			     ("d" (call-interactively 'vc-dir))
 			     ("=" (vc-diff))
 			     ("c" (vc-diff))
 			     ("v" (call-interactively 'vc-next-action))
-			     ("u" (call-interactively 'vc-revert))))
-	     ("k" (moded--rk "<Kill>"
+			     ("u" (call-interactively 'vc-revert))
+			     ("l" (vc-print-log))
+			     ("r" (moded--rk "> Version Control > Root { l - log }"
+					     ("l" (vc-print-root-log))))))
+	     ("k" (moded--rk "> Kill { k - buffer | w - buffer and window }"
 			     ("k" (kill-buffer))
 			     ("w" (kill-buffer-and-window))))
-	     ("d" (moded--rk "<Compile>"
+	     ("d" (moded--rk "> Compile { d - debug | r - release | s - run debug }"
 			     ("d" (cm-compile-debug))
 			     ("r" (cm-compile-release))
 			     ("s" (cm-run-debug))))
-	     ("w" (moded--rk "<Windows>"
+	     ("w" (moded--rk "> Windows { w - delete window | f - split vertivally | j - split horizontally }"
 			     ("w" (delete-window))
-			     ("f" (split-window-horizontally))
-			     ("j" (split-window-vertically)))))
+			     ("j" (split-window-horizontally))
+			     ("f" (split-window-vertically)))))
   (setq-default cursor-type 'hbar)
   (set-cursor-color "white")
   (blink-cursor-mode 1))
