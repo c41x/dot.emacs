@@ -122,4 +122,22 @@
  '(font-lock-over-80-face ((t (:foreground "#ff2211"))))
  '(highlight-symbol-face ((t (:background "gray25")))))
 
+(unless (string= system-type "windows-nt")
+  (custom-theme-set-faces
+   'calx
+   '(default ((t (:inherit nil
+			   :background "#000000"
+			   :foreground "#b2af99"
+			   :inverse-video nil
+			   :box nil
+			   :strike-through nil
+			   :overline nil
+			   :underline nil
+			   :slant normal
+			   :weight bold
+			   :height 80
+			   :width normal
+			   :foundry "outline"
+			   :family "Liberation Mono"))))))
+
 (provide-theme 'calx)
