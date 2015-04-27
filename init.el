@@ -35,7 +35,8 @@
     fuzzy
     geiser
     ac-geiser
-    php-mode))
+    php-mode
+    s))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
