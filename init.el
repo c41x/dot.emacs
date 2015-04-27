@@ -743,6 +743,26 @@
 				 mode-line-end-spaces
 				 "%-"))
 
+;;//- GUID generator and utilities -
+(require 's)
+
+(defconst guid-command
+  (if (string= system-type "windows-nt")
+      "\"c:/Program Files/Microsoft SDKs/Windows/v6.0A/Bin/x64/uuidgen.exe\""
+    "uuidgen"))
+
+(defun generate-guid ()
+  (s-trim (shell-command-to-string guid-command)))
+
+(defun replace-guids ()
+  (interactive)
+  (while
+      (let* ((new-guid (generate-guid))
+	     (searching (re-search-forward "{[A-Za-z0-9]\\{8\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{12\\}}" nil t)))
+	(when (and searching (y-or-n-p "Replace with new GUID?"))
+	  (replace-match (concat "{" new-guid "}")))
+	searching)))
+
 ;; --------------------------------------------------------------------------------------------------
 ;; local custom settings
 (load "~/.emacs.d/local-config")
