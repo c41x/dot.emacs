@@ -705,7 +705,9 @@
 	     ("w" (moded--rk "> Do It > Windows"
 			     ("w" (delete-window))
 			     ("j" (split-window-horizontally))
-			     ("f" (split-window-vertically)))))
+			     ("f" (split-window-vertically))))
+	     ("i" (moded--rk "> Do It > Insert"
+			     ("g" (insert-guid)))))
   (setq-default cursor-type 'hbar)
   (set-cursor-color "white")
   (blink-cursor-mode 1))
@@ -753,6 +755,10 @@
 
 (defun generate-guid ()
   (s-trim (shell-command-to-string guid-command)))
+
+(defun insert-guid ()
+  (interactive)
+  (insert (generate-guid)))
 
 (defun replace-guids ()
   (interactive)
