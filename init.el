@@ -1,6 +1,4 @@
-;; --------------------------------------------------------------------------------------------------
-;; package management
-
+;;//- package management -//
 (require 'cl-lib)
 (require 'cl)
 (require 'package)
@@ -51,7 +49,7 @@
     (when (not (package-installed-p p))
       (package-install p))))
 
-;; --------------------------------------------------------------------------------------------------
+;;//- general settings/utilities -//
 ;; load paths
 (add-to-list 'load-path "~/.emacs.d/my-packages")
 
@@ -60,8 +58,44 @@
   "runs [function] for given [hooks]"
   (mapc (lambda (hook) (add-hook hook function)) hooks))
 
+;;//- mode-line -//
+(defconst buffer-pos-indicator-length 25)
+
+(defun buffer-pos ()
+  (/ (* buffer-pos-indicator-length (point)) (point-max)))
+(defun buffer-left ()
+  (- buffer-pos-indicator-length (/ (* buffer-pos-indicator-length (point)) (point-max))))
+
+(setq-default mode-line-format '("%e"
+				 mode-line-front-space
+				 mode-line-mule-info
+				 mode-line-client
+				 mode-line-modified
+				 mode-line-remote
+				 mode-line-frame-identification
+				 (:eval (propertize ": " 'face 'mode-line-bg-face))
+				 (:propertize (:eval mode-line-buffer-identification)  face mode-line-separator-face)
+				 (:eval (propertize " : " 'face 'mode-line-bg-face))
+				 (:eval (list
+					 (propertize (make-string (buffer-pos) 9632) 'face 'mode-line-progress-face)
+					 (propertize (make-string (buffer-left) 9632) 'face 'mode-line-bg-face)))
+				 (:eval (propertize " : " 'face 'mode-line-bg-face))
+				 (vc-mode vc-mode)
+				 (:eval (propertize " : " 'face 'mode-line-bg-face))
+				 mode-line-modes
+				 mode-line-misc-info
+				 mode-line-end-spaces
+				 "%-"))
+
+;;//- visual/UI -//
 ;; no start screen
 (setq inhibit-startup-screen 1)
+
+;; theme
+(load-theme 'calx t)
+
+;; show line numbers
+(global-linum-mode t)
 
 (unless (string= system-type "windows-nt")
   (server-start))
@@ -69,6 +103,8 @@
 (tooltip-mode -1) ;; hide tooltips
 (scroll-bar-mode 0) ;; disable system scrollbars
 (menu-bar-mode -1) ;; hide menu bar
+
+
 
 ;; F2 - toggle menu bar
 (global-set-key [(f2)] 'menu-bar-mode)
@@ -78,17 +114,11 @@
 (define-key isearch-mode-map [(f4)] 'isearch-repeat-forward)
 (define-key isearch-mode-map [(f3)] 'isearch-repeat-backward)
 
-;; theme
-(load-theme 'calx t)
-
 ;; highlight matching braces
 (show-paren-mode t)
 (setq show-paren-style 'parenthesis)
 ;; (setq show-paren-style 'expression)
 ;; (add-hook 'after-init-hook '(lambda ()(set-face-foreground 'show-paren-match nil))) ; keeps syntax color as foreground
-
-;; show line numbers
-(global-linum-mode t)
 
 ;; switches off word wrap
 (setq-default truncate-lines 0)
@@ -649,7 +679,7 @@
 (add-to-list 'load-path "~/.emacs.d/hnr")
 (require 'hnr)
 
-;;//- modal edit prototype -
+;;//- modal edit prototype -//
 (defmacro moded--rk (desc &rest keylists)
   `(pcase (key-description (vector (read-key ,desc)))
      .,keylists))
@@ -716,36 +746,7 @@
 (key-chord-define-global "fj" 'moded-do-it)
 (key-chord-mode t)
 
-;; mode-line
-(defconst buffer-pos-indicator-length 25)
-
-(defun buffer-pos ()
-  (/ (* buffer-pos-indicator-length (point)) (point-max)))
-(defun buffer-left ()
-  (- buffer-pos-indicator-length (/ (* buffer-pos-indicator-length (point)) (point-max))))
-
-(setq-default mode-line-format '("%e"
-				 mode-line-front-space
-				 mode-line-mule-info
-				 mode-line-client
-				 mode-line-modified
-				 mode-line-remote
-				 mode-line-frame-identification
-				 (:eval (propertize ": " 'face 'mode-line-bg-face))
-				 (:propertize (:eval mode-line-buffer-identification)  face mode-line-separator-face)
-				 (:eval (propertize " : " 'face 'mode-line-bg-face))
-				 (:eval (list
-					 (propertize (make-string (buffer-pos) 9632) 'face 'mode-line-progress-face)
-					 (propertize (make-string (buffer-left) 9632) 'face 'mode-line-bg-face)))
-				 (:eval (propertize " : " 'face 'mode-line-bg-face))
-				 (vc-mode vc-mode)
-				 (:eval (propertize " : " 'face 'mode-line-bg-face))
-				 mode-line-modes
-				 mode-line-misc-info
-				 mode-line-end-spaces
-				 "%-"))
-
-;;//- GUID generator and utilities -
+;;//- GUID generator and utilities -//
 (require 's)
 
 (defconst guid-command
@@ -769,8 +770,7 @@
 	  (replace-match (concat "{" new-guid "}")))
 	searching)))
 
-;; --------------------------------------------------------------------------------------------------
-;; local custom settings
+;;//- local custom settings -//
 (load "~/.emacs.d/local-config")
 
 ;; --------------------------------------------------------------------------------------------------
