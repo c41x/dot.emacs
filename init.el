@@ -1,4 +1,4 @@
-;;//- package management -//
+;;//- package management
 (require 'cl-lib)
 (require 'cl)
 (require 'package)
@@ -49,16 +49,7 @@
     (when (not (package-installed-p p))
       (package-install p))))
 
-;;//- general settings/utilities -//
-;; load paths
-(add-to-list 'load-path "~/.emacs.d/my-packages")
-
-;; add hooks helper
-(defun add-hooks (function hooks)
-  "runs [function] for given [hooks]"
-  (mapc (lambda (hook) (add-hook hook function)) hooks))
-
-;;//- mode-line -//
+;;//- mode-line
 (defconst buffer-pos-indicator-length 25)
 
 (defun buffer-pos ()
@@ -87,7 +78,7 @@
 				 mode-line-end-spaces
 				 "%-"))
 
-;;//- visual/UI -//
+;;//- visual/UI
 ;; no start screen
 (setq inhibit-startup-screen 1)
 
@@ -104,7 +95,44 @@
 (scroll-bar-mode 0) ;; disable system scrollbars
 (menu-bar-mode -1) ;; hide menu bar
 
+;; cursor type - horizontal bar '_'
+(setq-default cursor-type 'hbar)
 
+;; font lock decoration level: 1-3 | 2 is enough, 3 is too slow
+(setq-default font-lock-maximum-decoration 2)
+
+;; highlighting operators
+;; "\\([][|!.+=&/%*,<>(){};:^~-?]+\\)"
+(defvar operator-rex '(("\\([][|!.+=&/%*,<>(){};:^~?-]\\)" . font-lock-operator-face)))
+(defvar operator-rex-xml '(("\\(<>/=\\)" . font-lock-operator-face)))
+(font-lock-add-keywords 'c-mode operator-rex)
+(font-lock-add-keywords 'c++-mode operator-rex)
+(font-lock-add-keywords 'js-mode operator-rex)
+(font-lock-add-keywords 'js2-mode operator-rex)
+(font-lock-add-keywords 'csharp-mode operator-rex)
+(font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
+(font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
+(font-lock-add-keywords 'python-mode operator-rex)
+
+;; highlighting numbers
+;;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
+(defvar number-rex '(("\\<\\(\\([0-9.]+[lufLUe]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
+(font-lock-add-keywords 'c-mode number-rex)
+(font-lock-add-keywords 'c++-mode number-rex)
+(font-lock-add-keywords 'js-mode number-rex)
+(font-lock-add-keywords 'js2-mode number-rex)
+(font-lock-add-keywords 'csharp-mode number-rex)
+(font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
+(font-lock-add-keywords 'python-mode number-rex)
+
+;;//- general settings/utilities
+;; load paths
+(add-to-list 'load-path "~/.emacs.d/my-packages")
+
+;; add hooks helper
+(defun add-hooks (function hooks)
+  "runs [function] for given [hooks]"
+  (mapc (lambda (hook) (add-hook hook function)) hooks))
 
 ;; F2 - toggle menu bar
 (global-set-key [(f2)] 'menu-bar-mode)
@@ -123,15 +151,9 @@
 ;; switches off word wrap
 (setq-default truncate-lines 0)
 
-;; tell emacs to open .h files in C++ mode (c-mode by default)
-(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
-
 ;; no auto-save-backups, thanks
 (setq-default make-backup-files nil)
 (setq-default auto-save-default nil)
-
-;; default make command: | or just change filename from mingw-make32 to make on windows 'cause these are 2 different exe-s...
-;;(setq-default compile-command "mingw32-make")
 
 ;; keystrokes
 (global-unset-key (kbd "<C-z>")) ; disable Ctrl+z hide
@@ -185,10 +207,6 @@
 (global-set-key (kbd "<C-backspace>") 'backward-delete-word)
 (global-set-key (kbd "<C-delete>") 'forward-delete-word)
 
-;; automatic brackets {}()[]""'' pairing
-(require 'autopair)
-(autopair-global-mode)
-
 ;; open config file
 (defun cfg ()
   (interactive)
@@ -201,6 +219,37 @@
 ;; file name in title bar
 (setq frame-title-format "emacs | %b")
 
+;; macro start/end bound to F11/F12
+(global-set-key [(f11)] 'kmacro-start-macro-or-insert-counter)
+(global-set-key [(f12)] 'kmacro-end-or-call-macro)
+
+;; no shitty spaces
+(setq indent-tabs-mode t)
+
+;; auto indenting current line when pressing <enter>
+(electric-indent-mode t)
+
+;; shows current function name in modeline
+;; (which-function-mode)
+
+;; delete trailing whitespace on save
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+
+;; automatically reload files when changed
+(global-auto-revert-mode t)
+
+;; org mode annoying shortcuts
+(add-hook 'org-mode-hook (lambda ()
+			   (define-key org-mode-map (kbd "M-<right>") nil)
+			   (define-key org-mode-map (kbd "M-<left>") nil)
+			   (define-key org-mode-map (kbd "M-<up>") nil)
+			   (define-key org-mode-map (kbd "M-<down>") nil)))
+
+;;//- plugins
+;; automatic brackets {}()[]""'' pairing
+(require 'autopair)
+(autopair-global-mode)
+
 ;; yasnippet
 (require 'yasnippet)
 (setq yas-snippet-dirs "~/.emacs.d/yasnippet-snippets")
@@ -209,10 +258,6 @@
 (define-key yas-minor-mode-map (kbd "<tab>") nil) ;; disable tab (trigger YAS only with AC)
 (define-key yas-minor-mode-map (kbd "TAB") nil)
 (setq yas-fallback-behavior '(apply indent-for-tab-command)) ;; indent as fallback
-
-;; macro start/end bound to F11/F12
-(global-set-key [(f11)] 'kmacro-start-macro-or-insert-counter)
-(global-set-key [(f12)] 'kmacro-end-or-call-macro)
 
 ;; ido mode / smex for M-x
 (require 'ido)
@@ -231,7 +276,59 @@
 (setq ac-ignore-case t)
 (setq ac-use-fuzzy t)
 (setq popup-isearch-cursor-color "orange")
+(ac-flyspell-workaround) ; lag hack
+(flyspell-mode 0) ;; speedup AC
 
+;; helm
+(require 'helm-config)
+(set 'helm-idle-delay 0.0)
+(set 'helm-input-idle-delay 0.0)
+(global-set-key (kbd "C-x r b") 'helm-bookmarks)
+
+;; ace-jump mode for quick jumping around
+(require 'ace-jump-mode)
+(define-key global-map (kbd "S-SPC") 'ace-jump-mode)
+
+;; multiple cursors
+(require 'multiple-cursors)
+(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+(global-set-key (kbd "C->") 'mc/mark-next-like-this)
+(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+
+;; expand region
+(require 'expand-region)
+(global-unset-key (kbd "C-w"))
+(global-set-key (kbd "C-w") 'er/expand-region)
+
+;; pretty lambda
+(require 'pretty-lambdada)
+(pretty-lambda-for-modes)
+
+;; neotree
+(add-to-list 'load-path "~/.emacs.d/neotree")
+(require 'neotree)
+(global-set-key [f8] 'neotree-toggle)
+
+;; highlight-symbol mode
+(require 'highlight-symbol)
+(add-hooks 'highlight-symbol-mode
+	   '(emacs-lisp-mode-hook
+	     c-mode-hook
+	     c++-mode-hook
+	     csharp-mode-hook
+	     js-mode-hook
+	     js2-mode-hook
+	     python-mode-hook))
+(global-set-key [(control f3)] 'highlight-symbol-at-point)
+(global-set-key [f3] 'highlight-symbol-next)
+(global-set-key [(shift f3)] 'highlight-symbol-prev)
+(global-set-key [(meta f3)] 'highlight-symbol-query-replace)
+
+;; flycheck
+(require 'flycheck)
+
+;;//- general tweaks
 ;; documentation tip
 (defun popup-doc ()
   (interactive)
@@ -247,20 +344,6 @@
 
 (global-set-key (kbd "C-?") 'popup-doc)
 
-;; C/C++ autocomplete hooks
-(defun ac-ccc-mode-setup ()
-  (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
-		     ac-source-filename ; just press / and directory completion appears
-		     ac-source-files-in-current-dir ; from files in current directory
-		     ;;ac-source-semantic ; symantic autocomplete for C/C++
-		     ac-source-words-in-all-buffer ; all stuff from buffers
-		     ;;ac-source-yasnippet
-		     )))
-
-(ac-flyspell-workaround) ; lag hack
-(add-hook 'c-mode 'ac-ccc-mode-setup)
-(add-hook 'c++-mode 'ac-ccc-mode-setup)
-
 ;; control + space = autocomplete (and enable AC mode if not enabled)
 (global-unset-key (kbd "C-SPC"))
 (global-set-key (kbd "C-SPC")
@@ -270,9 +353,6 @@
 		     (message "enabling auto-complete-mode")
 		     (auto-complete-mode t))
 		   (auto-complete)))
-
-;; cursor type - horizontal bar '_'
-(setq-default cursor-type 'hbar)
 
 ;; simple smooth scrolling (sit-for is some kind of Sleep)
 ;; time is not accurate because lag may occur while scrolling... so tweak it experimenally
@@ -287,111 +367,6 @@
 (global-set-key (kbd "M-<up>") '(lambda () (interactive) (smooth-scroll -1 8 0.1)))
 (global-set-key (kbd "M-<down>") '(lambda () (interactive) (smooth-scroll 1 8 0.1)))
 
-;; helm
-(require 'helm-config)
-(set 'helm-idle-delay 0.0)
-(set 'helm-input-idle-delay 0.0)
-(global-set-key (kbd "C-x r b") 'helm-bookmarks)
-
-;; cmake-mode
-(require 'cmake-mode)
-(setq auto-mode-alist
-      (append '(("CMakeLists\\.txt\\'" . cmake-mode)
-		("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
-
-;; font lock decoration level: 1-3 | 2 is enough, 3 is too slow
-(setq-default font-lock-maximum-decoration 2)
-
-;; highlighting operators
-;; "\\([][|!.+=&/%*,<>(){};:^~-?]+\\)"
-(defvar operator-rex '(("\\([][|!.+=&/%*,<>(){};:^~?-]\\)" . font-lock-operator-face)))
-(defvar operator-rex-xml '(("\\(<>/=\\)" . font-lock-operator-face)))
-(font-lock-add-keywords 'c-mode operator-rex)
-(font-lock-add-keywords 'c++-mode operator-rex)
-(font-lock-add-keywords 'js-mode operator-rex)
-(font-lock-add-keywords 'js2-mode operator-rex)
-(font-lock-add-keywords 'csharp-mode operator-rex)
-(font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
-(font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
-(font-lock-add-keywords 'python-mode operator-rex)
-
-;; highlighting numbers
-;;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
-(defvar number-rex '(("\\<\\(\\([0-9.]+[lufLUe]?\\)\\|0[xX][0-9a-fA-F]+\\)\\>" . font-lock-number-face)))
-(font-lock-add-keywords 'c-mode number-rex)
-(font-lock-add-keywords 'c++-mode number-rex)
-(font-lock-add-keywords 'js-mode number-rex)
-(font-lock-add-keywords 'js2-mode number-rex)
-(font-lock-add-keywords 'csharp-mode number-rex)
-(font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
-(font-lock-add-keywords 'python-mode number-rex)
-
-;; js2 mode for .js files
-(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
-
-;; skewer
-(add-hook 'js2-mode-hook 'skewer-mode)
-(add-hook 'css-mode-hook 'skewer-css-mode)
-(add-hook 'html-mode-hook 'skewer-html-mode)
-;(require 'simple-httpd)
-;(setq httpd-root "d:/repo/minigame2")
-
-;; Racket (run-racket)
-(require 'ac-geiser)
-(add-hooks 'ac-geiser-setup '(geiser-mode-hook
-			      geiser-repl-mode-hook))
-(eval-after-load "auto-complete"
-  '(add-to-list 'ac-modes 'geiser-repl-mode))
-
-
-;; C++ coding style (indenting)
-(setq indent-tabs-mode t) ; no shitty spaces
-
-(defconst my-c-style
-  '((c-tab-always-indent . t)
-    (c-comment-only-line-offset . 4)
-    (c-hanging-braces-alist . ((substatement-open after)
-			       (brace-list-open)))
-    (c-hanging-colons-alist . ((member-init-intro before)
-			       (inher-intro)
-			       (case-label after)
-			       (label after)
-			       (access-label after)))
-    (c-cleanup-list . (scope-operator
-		       empty-defun-braces
-		       defun-close-semi))
-    (c-offsets-alist . ((arglist-close . c-lineup-arglist)
-			(substatement-open . 0)
-			(member-init-intro . ++)
-			(case-label . 4)
-			(block-open . 0)
-			(inclass . 4)
-			(innamespace . 0)
-			(comment-intro . 0)
-			(cpp-macro . 0)
-			(knr-argdecl-intro . -)))
-    (c-echo-syntactic-information-p . t))
-  "calx programming style")
-
-(c-add-style "CALX" my-c-style)
-
-(defun my-c-mode-common-hook ()
-  (c-set-style "CALX")
-  (setq indent-tabs-mode t)
-  (setq tab-width 4))
-
-(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
-
-;; csharp-mode inserts {} braces automatically (this totally breaks autopair)
-(add-hook 'csharp-mode-hook (lambda () (local-set-key (kbd "{") 'c-electric-brace)))
-
-;; auto indenting current line when pressing <enter>
-(electric-indent-mode t)
-
-;; ace-jump mode for quick jumping around
-(require 'ace-jump-mode)
-(define-key global-map (kbd "S-SPC") 'ace-jump-mode)
-
 ;; increment closest number
 (defun change-closest-number (increase-by)
   (interactive)
@@ -403,81 +378,6 @@
 
 (global-set-key (kbd "C-c +") (lambda () (interactive) (change-closest-number 1)))
 (global-set-key (kbd "C-c -") (lambda () (interactive) (change-closest-number -1)))
-
-;; speedup AC
-(flyspell-mode 0)
-
-;; shows current function name in modeline
-;; (which-function-mode)
-
-;; multiple cursors
-(require 'multiple-cursors)
-(global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-(global-set-key (kbd "C->") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-(global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-
-;; expand region
-(require 'expand-region)
-(global-unset-key (kbd "C-w"))
-(global-set-key (kbd "C-w") 'er/expand-region)
-
-;; CG/HLSL mode
-(require 'cg-mode)
-(add-to-list 'auto-mode-alist '("\\.fx\\'" . cg-mode))
-(add-to-list 'auto-mode-alist '("\\.cgfx\\'" . cg-mode))
-(add-to-list 'auto-mode-alist '("\\.shader\\'" . cg-mode))
-(add-to-list 'auto-mode-alist '("\\.compute\\'" . cg-mode))
-(add-to-list 'auto-mode-alist '("\\.cginc\\'" . cg-mode))
-(font-lock-add-keywords 'cg-mode operator-rex) ; highlight operators
-(font-lock-add-keywords 'cg-mode number-rex) ; highlight numbers
-(defvar preprocessor-rex '(("\\#[A-Za-z]+" . font-lock-preprocessor-face)))
-(font-lock-add-keywords 'cg-mode preprocessor-rex) ; highlight operators
-
-;; GLSL (regex)
-(font-lock-add-keywords 'glsl-mode operator-rex)
-(font-lock-add-keywords 'glsl-mode number-rex)
-(font-lock-add-keywords 'glsl-mode preprocessor-rex)
-
-;; shaderlab indenting
-(defconst my-shaderlab-style
-  '((c-tab-always-indent . t)
-    (c-comment-only-line-offset . 4)
-    (c-hanging-braces-alist . ((substatement-open after)
-			       (brace-list-open)))
-    (c-hanging-colons-alist . ((member-init-intro before)
-			       (inher-intro)
-			       (case-label after)
-			       (label after)
-			       (access-label after)))
-    (c-cleanup-list . (scope-operator
-		       empty-defun-braces
-		       defun-close-semi))
-    (c-offsets-alist . ((arglist-close . c-lineup-arglist)
-			(substatement-open . 0)
-			(case-label . 4)
-			(block-open . 0)
-			(inclass . 4)
-			(innamespace . 0)
-			(comment-intro . 0)
-			(cpp-macro . 0)
-			(statement-cont . 0)
-			(knr-argdecl-intro . -)))
-    (c-echo-syntactic-information-p . t))
-  "calx Unity ShaderLab style")
-
-(c-add-style "CALX-SL" my-shaderlab-style)
-(add-hook 'cg-mode-hook (lambda () (c-set-style "CALX-SL")))
-
-;; pretty lambda
-(require 'pretty-lambdada)
-(pretty-lambda-for-modes)
-
-;; delete trailing whitespace on save
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-
-;; automatically reload files when changed
-(global-auto-revert-mode t)
 
 ;; swapping windows / buffers
 (defun swap-windows ()
@@ -522,67 +422,6 @@
   (interactive)
   (highlight-lines-matching-regexp ".\\{81\\}" 'font-lock-over-80-face))
 
-;; neotree
-(add-to-list 'load-path "~/.emacs.d/neotree")
-(require 'neotree)
-(global-set-key [f8] 'neotree-toggle)
-
-;; google services integration (uses google command line tools - googlecl)
-(defun googlecl (command)
-  "calls google command - line tool with given arguments"
-  (interactive "sGoogle Command Line | Arguments: ")
-  (message (format "google %s" command))
-  (shell-command (format "google %s" command)))
-
-(defun google-calendar-add (descr)
-  "adds event to calendar"
-  (interactive "sDescription: ")
-  (googlecl (format "calendar add \"%s\" --reminder 1m" descr)))
-
-(defun google-calendar-today ()
-  "lists today's tasks"
-  (interactive)
-  (googlecl "calendar today"))
-
-
-(global-set-key (kbd "C-' a") 'google-calendar-add)
-(global-set-key (kbd "C-' t") 'google-calendar-today)
-
-;; gnus
-(setq gnus-select-method
-      '(nnimap "gmail"
-	       (nnimap-address "imap.gmail.com")
-	       (nnimap-server-port 993)
-	       (nnimap-stream ssl)))
-
-;; python
-;;
-;; on windows:
-;; install python pip
-;;
-;; in command line:
-;; python -m pip install virtualenv
-;; python -m pip install epc
-;; python -m pip install jedi
-;; M-x jedi:start-dedicated-server
-(add-hook 'python-mode-hook 'jedi:setup)
-(setq jedi:complete-on-dot t)
-
-;; highlight-symbol mode
-(require 'highlight-symbol)
-(add-hooks 'highlight-symbol-mode
-	   '(emacs-lisp-mode-hook
-	     c-mode-hook
-	     c++-mode-hook
-	     csharp-mode-hook
-	     js-mode-hook
-	     js2-mode-hook
-	     python-mode-hook))
-(global-set-key [(control f3)] 'highlight-symbol-at-point)
-(global-set-key [f3] 'highlight-symbol-next)
-(global-set-key [(shift f3)] 'highlight-symbol-prev)
-(global-set-key [(meta f3)] 'highlight-symbol-query-replace)
-
 ;; highlight-symbol advice for ignoring numbers and symbols inside comments
 (defadvice highlight-symbol-get-symbol (after highlight-ignore-symbols activate)
   (when (or (save-excursion
@@ -596,11 +435,106 @@
   (interactive)
   (byte-recompile-directory (expand-file-name "~/.emacs.d") 0))
 
-;; flycheck in LISP
-(add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
-(setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+;;//- C++
+;; tell emacs to open .h files in C++ mode (c-mode by default)
+(add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
 
-;; GLSL
+;; C/C++ autocomplete hooks
+(defun ac-ccc-mode-setup ()
+  (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
+		     ac-source-filename ; just press / and directory completion appears
+		     ac-source-files-in-current-dir ; from files in current directory
+		     ;;ac-source-semantic ; symantic autocomplete for C/C++
+		     ac-source-words-in-all-buffer ; all stuff from buffers
+		     ;;ac-source-yasnippet
+		     )))
+
+(add-hook 'c-mode 'ac-ccc-mode-setup)
+(add-hook 'c++-mode 'ac-ccc-mode-setup)
+
+;; C++ coding style (indenting)
+(defconst my-c-style
+  '((c-tab-always-indent . t)
+    (c-comment-only-line-offset . 4)
+    (c-hanging-braces-alist . ((substatement-open after)
+			       (brace-list-open)))
+    (c-hanging-colons-alist . ((member-init-intro before)
+			       (inher-intro)
+			       (case-label after)
+			       (label after)
+			       (access-label after)))
+    (c-cleanup-list . (scope-operator
+		       empty-defun-braces
+		       defun-close-semi))
+    (c-offsets-alist . ((arglist-close . c-lineup-arglist)
+			(substatement-open . 0)
+			(member-init-intro . ++)
+			(case-label . 4)
+			(block-open . 0)
+			(inclass . 4)
+			(innamespace . 0)
+			(comment-intro . 0)
+			(cpp-macro . 0)
+			(knr-argdecl-intro . -)))
+    (c-echo-syntactic-information-p . t))
+  "calx programming style")
+
+(c-add-style "CALX" my-c-style)
+
+(defun my-c-mode-common-hook ()
+  (c-set-style "CALX")
+  (setq indent-tabs-mode t)
+  (setq tab-width 4))
+
+(add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
+
+;;//- CMake
+;; cmake-mode
+(require 'cmake-mode)
+(setq auto-mode-alist
+      (append '(("CMakeLists\\.txt\\'" . cmake-mode)
+		("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
+
+;;//- JavaScript
+;; js2 mode for .js files
+(add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
+
+;; skewer
+(add-hook 'js2-mode-hook 'skewer-mode)
+(add-hook 'css-mode-hook 'skewer-css-mode)
+(add-hook 'html-mode-hook 'skewer-html-mode)
+
+;;//- Racket
+;; Racket (run-racket)
+(require 'ac-geiser)
+(add-hooks 'ac-geiser-setup '(geiser-mode-hook
+			      geiser-repl-mode-hook))
+(eval-after-load "auto-complete"
+  '(add-to-list 'ac-modes 'geiser-repl-mode))
+
+;;//- C#
+;; csharp-mode inserts {} braces automatically (this totally breaks autopair)
+(add-hook 'csharp-mode-hook (lambda () (local-set-key (kbd "{") 'c-electric-brace)))
+
+;;//- Cg/HLSL/GLSL/ShaderLab
+;; CG/HLSL mode
+(require 'cg-mode)
+(add-to-list 'auto-mode-alist '("\\.fx\\'" . cg-mode))
+(add-to-list 'auto-mode-alist '("\\.cgfx\\'" . cg-mode))
+(add-to-list 'auto-mode-alist '("\\.shader\\'" . cg-mode))
+(add-to-list 'auto-mode-alist '("\\.compute\\'" . cg-mode))
+(add-to-list 'auto-mode-alist '("\\.cginc\\'" . cg-mode))
+(font-lock-add-keywords 'cg-mode operator-rex) ; highlight operators
+(font-lock-add-keywords 'cg-mode number-rex) ; highlight numbers
+(defvar preprocessor-rex '(("\\#[A-Za-z]+" . font-lock-preprocessor-face)))
+(font-lock-add-keywords 'cg-mode preprocessor-rex) ; highlight operators
+
+;; GLSL (regex)
+(font-lock-add-keywords 'glsl-mode operator-rex)
+(font-lock-add-keywords 'glsl-mode number-rex)
+(font-lock-add-keywords 'glsl-mode preprocessor-rex)
+
+;; GLSL file extensions
 (add-to-list 'auto-mode-alist '("\\.vert\\'" . glsl-mode))
 (add-to-list 'auto-mode-alist '("\\.tesc\\'" . glsl-mode))
 (add-to-list 'auto-mode-alist '("\\.tese\\'" . glsl-mode))
@@ -608,8 +542,7 @@
 (add-to-list 'auto-mode-alist '("\\.frag\\'" . glsl-mode))
 (add-to-list 'auto-mode-alist '("\\.comp\\'" . glsl-mode))
 
-;; flycheck
-(require 'flycheck)
+;; define flycheck checker
 (flycheck-define-checker glsl-checker
   "A GLSL syntax checker using glslangValidator."
   :command ("glslangValidator" source)
@@ -634,18 +567,82 @@
 	 line-end))
   :modes (glsl-mode))
 
+;; add checker hook
 (add-hook 'glsl-mode-hook (lambda ()
 			    (flycheck-mode)
 			    (flycheck-select-checker 'glsl-checker)))
 
-;; org mode
-(add-hook 'org-mode-hook (lambda ()
-			   (define-key org-mode-map (kbd "M-<right>") nil)
-			   (define-key org-mode-map (kbd "M-<left>") nil)
-			   (define-key org-mode-map (kbd "M-<up>") nil)
-			   (define-key org-mode-map (kbd "M-<down>") nil)))
+;; shaderlab indenting
+(defconst my-shaderlab-style
+  '((c-tab-always-indent . t)
+    (c-comment-only-line-offset . 4)
+    (c-hanging-braces-alist . ((substatement-open after)
+			       (brace-list-open)))
+    (c-hanging-colons-alist . ((member-init-intro before)
+			       (inher-intro)
+			       (case-label after)
+			       (label after)
+			       (access-label after)))
+    (c-cleanup-list . (scope-operator
+		       empty-defun-braces
+		       defun-close-semi))
+    (c-offsets-alist . ((arglist-close . c-lineup-arglist)
+			(substatement-open . 0)
+			(case-label . 4)
+			(block-open . 0)
+			(inclass . 4)
+			(innamespace . 0)
+			(comment-intro . 0)
+			(cpp-macro . 0)
+			(statement-cont . 0)
+			(knr-argdecl-intro . -)))
+    (c-echo-syntactic-information-p . t))
+  "calx Unity ShaderLab style")
 
-;; --------------------------------------------------------------------------------------------------
+(c-add-style "CALX-SL" my-shaderlab-style)
+(add-hook 'cg-mode-hook (lambda () (c-set-style "CALX-SL")))
+
+;;//- Python
+;; python
+;;
+;; on windows:
+;; install python pip
+;;
+;; in command line:
+;; python -m pip install virtualenv
+;; python -m pip install epc
+;; python -m pip install jedi
+;; M-x jedi:start-dedicated-server
+(add-hook 'python-mode-hook 'jedi:setup)
+(setq jedi:complete-on-dot t)
+
+;;//- Emacs Lisp
+;; flycheck in LISP
+(add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
+(setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+
+;;//- Google integration
+;; google services integration (uses google command line tools - googlecl)
+(defun googlecl (command)
+  "calls google command - line tool with given arguments"
+  (interactive "sGoogle Command Line | Arguments: ")
+  (message (format "google %s" command))
+  (shell-command (format "google %s" command)))
+
+(defun google-calendar-add (descr)
+  "adds event to calendar"
+  (interactive "sDescription: ")
+  (googlecl (format "calendar add \"%s\" --reminder 1m" descr)))
+
+(defun google-calendar-today ()
+  "lists today's tasks"
+  (interactive)
+  (googlecl "calendar today"))
+
+(global-set-key (kbd "C-' a") 'google-calendar-add)
+(global-set-key (kbd "C-' t") 'google-calendar-today)
+
+;;//- My plugins
 ;; page breaks / tags utility
 (require 'tags)
 (add-hooks (lambda ()
@@ -657,7 +654,6 @@
 (global-set-key (kbd "M-[") 'prev-page-break)
 (global-set-key (kbd "C-; x") 'page-breaks-popup)
 
-;; --------------------------------------------------------------------------------------------------
 ;; CMake project utils
 (require 'cmake-cpp-proj)
 
@@ -679,7 +675,31 @@
 (add-to-list 'load-path "~/.emacs.d/hnr")
 (require 'hnr)
 
-;;//- modal edit prototype -//
+;;//- GUID generator and utilities
+(require 's)
+
+(defconst guid-command
+  (if (string= system-type "windows-nt")
+      "\"c:/Program Files/Microsoft SDKs/Windows/v6.0A/Bin/x64/uuidgen.exe\""
+    "uuidgen"))
+
+(defun generate-guid ()
+  (s-trim (shell-command-to-string guid-command)))
+
+(defun insert-guid ()
+  (interactive)
+  (insert (generate-guid)))
+
+(defun replace-guids ()
+  (interactive)
+  (while
+      (let* ((new-guid (generate-guid))
+	     (searching (re-search-forward "{[A-Za-z0-9]\\{8\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{12\\}}" nil t)))
+	(when (and searching (y-or-n-p "Replace with new GUID?"))
+	  (replace-match (concat "{" new-guid "}")))
+	searching)))
+
+;;//- modal edit prototype
 (defmacro moded--rk (desc &rest keylists)
   `(pcase (key-description (vector (read-key ,desc)))
      .,keylists))
@@ -746,31 +766,7 @@
 (key-chord-define-global "fj" 'moded-do-it)
 (key-chord-mode t)
 
-;;//- GUID generator and utilities -//
-(require 's)
-
-(defconst guid-command
-  (if (string= system-type "windows-nt")
-      "\"c:/Program Files/Microsoft SDKs/Windows/v6.0A/Bin/x64/uuidgen.exe\""
-    "uuidgen"))
-
-(defun generate-guid ()
-  (s-trim (shell-command-to-string guid-command)))
-
-(defun insert-guid ()
-  (interactive)
-  (insert (generate-guid)))
-
-(defun replace-guids ()
-  (interactive)
-  (while
-      (let* ((new-guid (generate-guid))
-	     (searching (re-search-forward "{[A-Za-z0-9]\\{8\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{12\\}}" nil t)))
-	(when (and searching (y-or-n-p "Replace with new GUID?"))
-	  (replace-match (concat "{" new-guid "}")))
-	searching)))
-
-;;//- local custom settings -//
+;;//- local custom settings
 (load "~/.emacs.d/local-config")
 
 ;; --------------------------------------------------------------------------------------------------
