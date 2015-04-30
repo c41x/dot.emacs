@@ -19,7 +19,7 @@
 (defun page-break-navigate (dir)
   (if (eq dir 1)
       (forward-line)
-    (forward-line))
+    (forward-line -1))
   (unless (re-search-forward re-page-break-or-todo nil t dir)
     (message "label not found!")
     (if page-break-wrap-search
