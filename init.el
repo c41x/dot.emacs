@@ -239,11 +239,21 @@
 (global-auto-revert-mode t)
 
 ;; org mode annoying shortcuts
-(add-hook 'org-mode-hook (lambda ()
-			   (define-key org-mode-map (kbd "M-<right>") nil)
-			   (define-key org-mode-map (kbd "M-<left>") nil)
-			   (define-key org-mode-map (kbd "M-<up>") nil)
-			   (define-key org-mode-map (kbd "M-<down>") nil)))
+(defun nuke-org-keybinds (binds)
+  (dolist (bind binds)
+    (define-key org-mode-map (kbd bind) nil)))
+(add-hook 'org-mode-hook
+	  (lambda ()
+	    (nuke-org-keybinds '("M-<right>"
+				 "M-<left>"
+				 "S-<left>"
+				 "S-<right>"
+				 "M-<up>"
+				 "M-<down>"
+				 "S-<down>"
+				 "S-<up>"
+				 "C-S-<down>"
+				 "C-S-<up>"))))
 
 ;;//- plugins
 ;; automatic brackets {}()[]""'' pairing
