@@ -787,13 +787,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(ansi-color-names-vector ["#212526" "#ff4b4b" "#b4fa70" "#fce94f" "#729fcf" "#ad7fa8" "#8cc4ff" "#eeeeec"])
- '(cua-mode t nil (cua-base))
- '(custom-safe-themes (quote ("12d9cd1e2bdcaf8f18c6e9bb56336f7a62c39ed034f8eb5d17ef66ec4fef03de" default)))
  '(highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1")))
  '(highlight-symbol-idle-delay 0.5)
  '(highlight-symbol-ignore-list (quote ("\\`[0-9]+f?F?[ulUL]*\\'")))
- '(query-replace-show-replacement t)
- '(sml/active-background-color "green4"))
+ '(query-replace-show-replacement t))
 
 (put 'downcase-region 'disabled nil)
