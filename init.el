@@ -113,6 +113,9 @@
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
 (font-lock-add-keywords 'python-mode operator-rex)
+(setq highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1")))
+(setq highlight-symbol-idle-delay 0.5)
+;;(setq highlight-symbol-ignore-list (quote ("\\`[0-9]+f?F?[ulUL]*\\'")))
 
 ;; highlighting numbers
 ;;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
@@ -254,6 +257,8 @@
 				 "S-<up>"
 				 "C-S-<down>"
 				 "C-S-<up>"))))
+
+(setq query-replace-show-replacement t)
 
 ;;//- plugins
 ;; automatic brackets {}()[]""'' pairing
@@ -778,18 +783,3 @@
 
 ;;//- local custom settings
 (load "~/.emacs.d/local-config")
-
-;; --------------------------------------------------------------------------------------------------
-;; settings made by customize
-
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1")))
- '(highlight-symbol-idle-delay 0.5)
- '(highlight-symbol-ignore-list (quote ("\\`[0-9]+f?F?[ulUL]*\\'")))
- '(query-replace-show-replacement t))
-
-(put 'downcase-region 'disabled nil)
