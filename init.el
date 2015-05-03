@@ -777,6 +777,11 @@
   (set-cursor-color "white")
   (blink-cursor-mode 1))
 
+(defadvice keyboard-quit (before collapse-region activate)
+  (setq-default cursor-type 'hbar)
+  (set-face-attribute 'cursor nil :background "white")
+  (blink-cursor-mode 1))
+
 (key-chord-define-global "jf" 'moded-do-it)
 (key-chord-define-global "fj" 'moded-do-it)
 (key-chord-mode t)
