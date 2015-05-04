@@ -727,9 +727,7 @@
 
 (defun moded-do-it ()
   (interactive)
-  (setq-default cursor-type 'box)
-  (set-cursor-color "orange")
-  (blink-cursor-mode 0)
+  (set-face-attribute 'mode-line nil :background "firebrick")
   (moded--rk "> Do It"
 	     ("f" (ido-find-file))
 	     ("g" (ido-switch-buffer))
@@ -773,14 +771,7 @@
 			     ("f" (split-window-vertically))))
 	     ("i" (moded--rk "> Do It > Insert"
 			     ("g" (insert-guid)))))
-  (setq-default cursor-type 'hbar)
-  (set-cursor-color "white")
-  (blink-cursor-mode 1))
-
-(defadvice keyboard-quit (before collapse-region activate)
-  (setq-default cursor-type 'hbar)
-  (set-face-attribute 'cursor nil :background "white")
-  (blink-cursor-mode 1))
+  (set-face-attribute 'mode-line nil :background "#225599"))
 
 (key-chord-define-global "jf" 'moded-do-it)
 (key-chord-define-global "fj" 'moded-do-it)
