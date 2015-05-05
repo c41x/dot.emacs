@@ -770,7 +770,12 @@
 			     ("j" (split-window-horizontally))
 			     ("f" (split-window-vertically))))
 	     ("i" (moded--rk "> Do It > Insert"
-			     ("g" (insert-guid)))))
+			     ("g" (insert-guid))))
+	     ("b" (moded--rkl "> Do It > Buffer" "b"
+			      ("j" (windmove-left))
+			      ("k" (windmove-down))
+			      ("l" (windmove-right))
+			      ("i" (windmove-up)))))
   (set-face-attribute 'mode-line nil :background "#225599"))
 
 (key-chord-define-global "jf" 'moded-do-it)
