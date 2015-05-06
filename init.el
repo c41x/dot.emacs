@@ -725,10 +725,10 @@
 			  (pcase rkey .,keylists)
 			  rkey)))))
 
-(defun moded-do-it ()
+(defun moded-do ()
   (interactive)
   (set-face-attribute 'mode-line nil :background "firebrick")
-  (moded--rk "> Do It"
+  (moded--rk ">"
 	     ("f" (ido-find-file))
 	     ("g" (ido-switch-buffer))
 	     ("j" (smex))
@@ -736,7 +736,7 @@
 	     ("s" (save-buffer))
 	     ("x" (page-breaks-popup))
 	     ("o" (switch-to-buffer (other-buffer)))
-	     ("m" (moded--rkl "> Do It > Move"
+	     ("m" (moded--rkl "> Move"
 			      "g"
 			      ("l" (smooth-scroll -1 8 0.1))
 			      ("m" (smooth-scroll 1 8 0.1))
@@ -746,40 +746,40 @@
 			      ("f" (next-line))
 			      ("e" (backward-paragraph))
 			      ("i" (forward-paragraph))))
-	     ("c" (moded--rk "> Do It > Comment"
+	     ("c" (moded--rk "> Comment"
 			     ("e" (moded-comment-to-eol))
 			     ("a" (moded-comment-next-atom))))
-	     ("v" (moded--rk "> Do It > Version Control"
+	     ("v" (moded--rk "> Version Control"
 			     ("d" (call-interactively 'vc-dir))
 			     ("=" (vc-diff))
 			     ("c" (vc-diff))
 			     ("v" (call-interactively 'vc-next-action))
 			     ("u" (call-interactively 'vc-revert))
 			     ("l" (vc-print-log))
-			     ("r" (moded--rk "> Do It > Version Control > Root"
+			     ("r" (moded--rk "> Version Control > Root"
 					     ("l" (vc-print-root-log))))))
-	     ("k" (moded--rk "> Do It > Kill"
+	     ("k" (moded--rk "> Kill"
 			     ("k" (kill-buffer))
 			     ("w" (kill-buffer-and-window))))
-	     ("d" (moded--rk "> Do It > Compile"
+	     ("d" (moded--rk "> Compile"
 			     ("d" (cm-compile-debug))
 			     ("r" (cm-compile-release))
 			     ("s" (cm-run-debug))))
-	     ("w" (moded--rk "> Do It > Windows"
+	     ("w" (moded--rk "> Windows"
 			     ("w" (delete-window))
 			     ("j" (split-window-horizontally))
 			     ("f" (split-window-vertically))))
-	     ("i" (moded--rk "> Do It > Insert"
+	     ("i" (moded--rk "> Insert"
 			     ("g" (insert-guid))))
-	     ("b" (moded--rkl "> Do It > Buffer" "b"
+	     ("b" (moded--rkl "> Buffer" "b"
 			      ("j" (windmove-left))
 			      ("k" (windmove-down))
 			      ("l" (windmove-right))
 			      ("i" (windmove-up)))))
   (set-face-attribute 'mode-line nil :background "#225599"))
 
-(key-chord-define-global "jf" 'moded-do-it)
-(key-chord-define-global "fj" 'moded-do-it)
+(key-chord-define-global "jf" 'moded-do)
+(key-chord-define-global "fj" 'moded-do)
 (key-chord-mode t)
 
 ;;//- local custom settings
