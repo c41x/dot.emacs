@@ -747,6 +747,11 @@
 			      ("e" (backward-paragraph))
 			      ("i" (forward-paragraph))))
 	     ("c" (moded--rk "> Comment"
+			     ("c" (comment-or-uncomment-region (region-beginning) (region-end)))
+			     ("n" (moded--rk "> Comment > Next >"
+					     ("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
+					     ("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
+			     ("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
 			     ("e" (moded-comment-to-eol))
 			     ("a" (moded-comment-next-atom))))
 	     ("v" (moded--rk "> Version Control"
