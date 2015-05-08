@@ -789,3 +789,8 @@
 
 ;;//- local custom settings
 (load "~/.emacs.d/local-config")
+
+;; TODO: clean up moded (do not call fx)
+;; TODO: moded in arg mode / calx api
+;; TODO: moded in VC
+;; TODO: moded abort bug
