@@ -450,6 +450,11 @@
   (interactive)
   (byte-recompile-directory (expand-file-name "~/.emacs.d") 0))
 
+
+(defun vs-compile-debug ()
+  (interactive)
+  (compile "MSBuild.exe \"d:\\repo\\perfo\\apps\\myApps\\perfoPro\\perfoPro.sln\" /property:Configuration=Release"))
+
 ;;//- C++
 ;; tell emacs to open .h files in C++ mode (c-mode by default)
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
