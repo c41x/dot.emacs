@@ -172,6 +172,53 @@
   (setq current-executable-debug nil)
   (setq current-executable-release nil))
 
+;;//- Visual Studio project support
+(defun find-file-upwards (match)
+  (let ((i 0)
+	(ret nil)
+	(dir "."))
+    (while (and (< i 5) (not ret))
+      (setq ret (directory-files dir nil match))
+      (unless ret (setq dir (expand-file-name ".." dir)))
+      (setq i (+ i 1)))
+    (cons dir (car ret))))
+
+(defvar vs-solution "")
+(defvar vs-binary-debug "")
+(defvar vs-binary-release "")
+
+(defun vs-init ()
+  (interactive)
+  (let ((f (find-file-upwards ".sln")))
+    (setq vs-solution (concat (car f) "/" (cdr f)))
+    (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
+    (setq vs-binary-debug (concat (car f) "/bin/" (file-name-base (cdr f)) "_debug.exe"))))
+
+(defun vs--compile (configuration)
+  (if (string= "" vs-solution)
+      (vs-init))
+  (compile (concat "MSBuild.exe \"" vs-solution "\" /property:Configuration=" configuration)))
+
+(defun vs-compile-debug ()
+  (interactive)
+  (vs-compile "Debug")
+  (enable-visual-line-mode))
+
+(defun vs-compile-release ()
+  (interactive)
+  (vs-compile "Release")
+  (enable-visual-line-mode))
+
+(defun vs-run-debug ()
+  (interactive)
+  (compile vs-binary-debug t)
+  (enable-visual-line-mode))
+
+(defun vs-run-release ()
+  (interactive)
+  (compile vs-binary-release t)
+  (enable-visual-line-mode))
+
 ;;//- key bindings
 (defun cm-compile-debug ()
   (interactive)
