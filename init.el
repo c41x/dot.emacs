@@ -794,3 +794,4 @@
 ;; TODO: moded in arg mode / calx api
 ;; TODO: moded in VC
 ;; TODO: moded abort bug
+;; TODO: modeline for projects (sidplay target, configuration etc.)
