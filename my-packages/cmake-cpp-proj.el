@@ -181,7 +181,7 @@
       (setq ret (directory-files dir nil match))
       (unless ret (setq dir (expand-file-name ".." dir)))
       (setq i (+ i 1)))
-    (cons dir (car ret))))
+    (if ret (cons dir (car ret)) ret)))
 
 (defvar vs-solution "")
 (defvar vs-binary-debug "")
@@ -190,9 +190,14 @@
 (defun vs-init ()
   (interactive)
   (let ((f (find-file-upwards ".sln")))
-    (setq vs-solution (concat (car f) "/" (cdr f)))
-    (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
-    (setq vs-binary-debug (concat (car f) "/bin/" (file-name-base (cdr f)) "_debug.exe"))))
+    (when f
+      (setq vs-solution (concat (car f) "/" (cdr f)))
+      (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
+      (setq vs-binary-debug (concat (car f) "/bin/" (file-name-base (cdr f)) "_debug.exe"))
+      (global-set-key (kbd "<f7>") 'vs-compile-debug)
+      (global-set-key (kbd "S-<f7>") 'vs-compile-release)
+      (global-set-key (kbd "<f6>") 'vs-run-debug)
+      (global-set-key (kbd "S-<f6>") 'vs-run-release))))
 
 (defun vs--compile (configuration)
   (if (string= "" vs-solution)
@@ -201,12 +206,12 @@
 
 (defun vs-compile-debug ()
   (interactive)
-  (vs-compile "Debug")
+  (vs--compile "Debug")
   (enable-visual-line-mode))
 
 (defun vs-compile-release ()
   (interactive)
-  (vs-compile "Release")
+  (vs--compile "Release")
   (enable-visual-line-mode))
 
 (defun vs-run-debug ()
