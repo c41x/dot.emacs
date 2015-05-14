@@ -202,7 +202,7 @@
 (defun vs--compile (configuration)
   (if (string= "" vs-solution)
       (vs-init))
-  (compile (concat "MSBuild.exe \"" vs-solution "\" /property:Configuration=" configuration)))
+  (compile (concat "MSBuild.exe \"" vs-solution "\" /nologo /verbosity:m /property:Configuration=" configuration)))
 
 (defun vs-compile-debug ()
   (interactive)
