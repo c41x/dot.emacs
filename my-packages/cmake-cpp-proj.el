@@ -115,7 +115,6 @@
   (let ((popup-result (popup-get-target)))
     (setq current-target-name (car popup-result))
     (setq current-target-all (cdr popup-result))
-    (message (concat " target:" current-target-name))
     (setq mode-line-project (concat " CMake:" current-target-name))))
 (defun refresh-dir-release ()
   (setq current-dir-release (find-project-directory-release)))
