@@ -65,13 +65,14 @@
 				 mode-line-remote
 				 mode-line-frame-identification
 				 (:eval (propertize ": " 'face 'mode-line-bg-face))
-				 (:propertize (:eval mode-line-buffer-identification)  face mode-line-separator-face)
+				 (:propertize (:eval mode-line-buffer-identification) face mode-line-separator-face)
 				 (:eval (propertize " : " 'face 'mode-line-bg-face))
 				 (:eval (list
 					 (propertize (make-string (buffer-pos) 9632) 'face 'mode-line-progress-face)
 					 (propertize (make-string (buffer-left) 9632) 'face 'mode-line-bg-face)))
 				 (:eval (propertize " : " 'face 'mode-line-bg-face))
 				 (vc-mode vc-mode)
+				 (if (boundp mode-line-project) mode-line-project)
 				 (:eval (propertize " : " 'face 'mode-line-bg-face))
 				 mode-line-modes
 				 mode-line-misc-info
