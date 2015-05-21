@@ -451,6 +451,31 @@
   (interactive)
   (byte-recompile-directory (expand-file-name "~/.emacs.d") 0))
 
+;; recent buffer toggling
+(defvar toggle-buffer-i -1)
+(defvar toggle-buffer-list '())
+
+(defun toggle-buffer-n (next)
+  (when (< toggle-buffer-i 0)
+    (setq toggle-buffer-list (buffer-list))
+    (setq toggle-buffer-i 0))
+  (if next
+      (setq toggle-buffer-i (min (+ 1 toggle-buffer-i) (length toggle-buffer-list)))
+    (setq toggle-buffer-i (max 0 (- toggle-buffer-i 1))))
+  (switch-to-buffer (nth toggle-buffer-i toggle-buffer-list)))
+
+(defun toggle-buffer-next ()
+  (interactive)
+  (toggle-buffer-n t))
+
+(defun toggle-buffer-previous ()
+  (interactive)
+  (toggle-buffer-n nil))
+
+(defun toggle-buffer-finish ()
+  (interactive)
+  (setq toggle-buffer-i -1))
+
 ;;//- C++
 ;; tell emacs to open .h files in C++ mode (c-mode by default)
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
@@ -781,7 +806,10 @@
 			      ("j" (windmove-left))
 			      ("k" (windmove-down))
 			      ("l" (windmove-right))
-			      ("i" (windmove-up)))))
+			      ("i" (windmove-up))))
+	     ("z" (toggle-buffer-finish) (moded--rkl "> Toggle buffer" "g"
+						     ("j" (toggle-buffer-next))
+						     ("f" (toggle-buffer-previous)))))
   (set-face-attribute 'mode-line nil :background "#225599"))
 
 (key-chord-define-global "jf" 'moded-do)
@@ -795,4 +823,6 @@
 ;; TODO: moded in arg mode / calx api
 ;; TODO: moded in VC
 ;; TODO: moded abort bug
-;; TODO: modeline for projects (sidplay target, configuration etc.)
+;; TODO: toggling buffers
+;; TODO: moded escape any key
+;; TODO: release / debug modes
