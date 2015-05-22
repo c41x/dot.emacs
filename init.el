@@ -459,9 +459,13 @@
   (when (< toggle-buffer-i 0)
     (setq toggle-buffer-list (buffer-list))
     (setq toggle-buffer-i 0))
-  (if next
-      (setq toggle-buffer-i (min (+ 1 toggle-buffer-i) (length toggle-buffer-list)))
-    (setq toggle-buffer-i (max 0 (- toggle-buffer-i 1))))
+  (while (progn
+	   (if next
+	       (setq toggle-buffer-i (min (+ 1 toggle-buffer-i) (length toggle-buffer-list)))
+	     (setq toggle-buffer-i (max 0 (- toggle-buffer-i 1))))
+	   (message (buffer-name (nth toggle-buffer-i toggle-buffer-list)))
+	   (= (aref (buffer-name (nth toggle-buffer-i toggle-buffer-list)) 0)
+	      ?\s))) ;; buffers with space as first char are special buffers
   (switch-to-buffer (nth toggle-buffer-i toggle-buffer-list)))
 
 (defun toggle-buffer-next ()
@@ -751,6 +755,10 @@
 			  (pcase rkey .,keylists)
 			  rkey)))))
 
+(defmacro moded--rklk (desc key &rest expr)
+  `(while (string= ,key (key-description (vector (read-key ,desc))))
+    .,expr))
+
 (defun moded-do ()
   (interactive)
   (set-face-attribute 'mode-line nil :background "firebrick")
@@ -807,9 +815,8 @@
 			      ("k" (windmove-down))
 			      ("l" (windmove-right))
 			      ("i" (windmove-up))))
-	     ("z" (toggle-buffer-finish) (moded--rkl "> Toggle buffer" "g"
-						     ("j" (toggle-buffer-next))
-						     ("f" (toggle-buffer-previous)))))
+	     ("l" (toggle-buffer-finish) (toggle-buffer-next)
+	      (moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next))))
   (set-face-attribute 'mode-line nil :background "#225599"))
 
 (key-chord-define-global "jf" 'moded-do)
