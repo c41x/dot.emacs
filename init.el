@@ -53,9 +53,9 @@
 (defconst buffer-pos-indicator-length 25)
 
 (defun buffer-pos ()
-  (/ (* buffer-pos-indicator-length (point)) (point-max)))
+  (/ (* buffer-pos-indicator-length (line-number-at-pos)) (total-lines)))
 (defun buffer-left ()
-  (- buffer-pos-indicator-length (/ (* buffer-pos-indicator-length (point)) (point-max))))
+  (- buffer-pos-indicator-length (/ (* buffer-pos-indicator-length (line-number-at-pos)) (total-lines))))
 
 (setq-default mode-line-format '("%e"
 				 mode-line-front-space
@@ -260,6 +260,12 @@
 				 "C-S-<up>"))))
 
 (setq query-replace-show-replacement t)
+
+;; returns total lines count in current buffer
+(defun total-lines ()
+  (save-excursion
+    (goto-char (point-max))
+    (line-number-at-pos)))
 
 ;;//- plugins
 ;; automatic brackets {}()[]""'' pairing
