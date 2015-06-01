@@ -794,8 +794,8 @@
 					     ("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
 					     ("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
 			     ("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
-			     ("e" (moded-comment-to-eol))
-			     ("a" (moded-comment-next-atom))))
+			     ("e" (ceh-comment-to-eol))
+			     ("a" (ceh-comment-next-atom))))
 	     ("v" (moded--rk "> Version Control"
 			     ("d" (call-interactively 'vc-dir))
 			     ("=" (vc-diff))
@@ -844,3 +844,4 @@
 ;; TODO: toggling buffers
 ;; TODO: moded escape any key
 ;; TODO: release / debug modes
+;; TODO: CMake project - fix searching for executable
