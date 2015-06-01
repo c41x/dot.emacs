@@ -72,7 +72,9 @@
 					 (propertize (make-string (buffer-left) 9632) 'face 'mode-line-bg-face)))
 				 (:eval (propertize " : " 'face 'mode-line-bg-face))
 				 (vc-mode vc-mode)
-				 (if (boundp mode-line-project) mode-line-project)
+				 " "
+				 (if (boundp mode-line-project) (:eval (propertize (concat " " mode-line-project " ") 'face 'mode-line-2)))
+				 " "
 				 (:eval (propertize " : " 'face 'mode-line-bg-face))
 				 mode-line-modes
 				 mode-line-misc-info

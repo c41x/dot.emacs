@@ -115,7 +115,7 @@
   (let ((popup-result (popup-get-target)))
     (setq current-target-name (car popup-result))
     (setq current-target-all (cdr popup-result))
-    (setq mode-line-project (concat " CMake:" current-target-name))))
+    (setq mode-line-project (concat "CMake:" current-target-name))))
 (defun refresh-dir-release ()
   (setq current-dir-release (find-project-directory-release)))
 (defun refresh-dir-debug ()
@@ -185,8 +185,13 @@
     (if ret (cons dir (car ret)) ret)))
 
 (defvar vs-solution "")
+(defvar vs-solution-name "")
 (defvar vs-binary-debug "")
 (defvar vs-binary-release "")
+(defvar vs-release nil) ;; current active target type
+
+(defun vs--refresh-mode-line ()
+  (setq mode-line-project (concat "VS:" vs-solution-name (if vs-release " / Release" " / Debug"))))
 
 (defun vs-init ()
   (interactive)
@@ -195,11 +200,12 @@
       (setq vs-solution (concat (car f) "/" (cdr f)))
       (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
       (setq vs-binary-debug (concat (car f) "/bin/" (file-name-base (cdr f)) "_debug.exe"))
-      (global-set-key (kbd "<f7>") 'vs-compile-debug)
-      (global-set-key (kbd "S-<f7>") 'vs-compile-release)
-      (global-set-key (kbd "<f6>") 'vs-run-debug)
-      (global-set-key (kbd "S-<f6>") 'vs-run-release)
-      (setq mode-line-project (concat " VisualStudio:" (cdr f))))))
+      (setq vs-solution-name (cdr f))
+      (global-set-key (kbd "<f7>") 'vs-compile)
+      ;;(global-set-key (kbd "S-<f7>") 'vs-compile-release)
+      (global-set-key (kbd "<f6>") 'vs-run)
+      ;;(global-set-key (kbd "S-<f6>") 'vs-run-release)
+      (vs--refresh-mode-line))))
 
 (defun vs--compile (configuration)
   (if (string= "" vs-solution)
@@ -216,6 +222,11 @@
   (vs--compile "Release")
   (enable-visual-line-mode))
 
+(defun vs-compile ()
+  (interactive)
+  (vs--compile (if vs-release "Release" "Debug"))
+  (enable-visual-line-mode))
+
 (defun vs-run-debug ()
   (interactive)
   (compile vs-binary-debug t)
@@ -225,6 +236,18 @@
   (interactive)
   (compile vs-binary-release t)
   (enable-visual-line-mode))
+
+(defun vs-run ()
+  (interactive)
+  (compile (if vs-release vs-binary-release vs-binary-debug) t)
+  (enable-visual-line-mode))
+
+(defun vs-switch-target ()
+  (interactive)
+  (if (string= "debug" (popup-menu* '("debug" "release") :scroll-bar t :isearch t))
+      (setq vs-release nil)
+    (setq vs-release t))
+  (vs--refresh-mode-line))
 
 ;;//- key bindings
 (defun cm-compile-debug ()
