@@ -824,7 +824,10 @@
 			      ("l" (windmove-right))
 			      ("i" (windmove-up))))
 	     ("l" (toggle-buffer-finish) (toggle-buffer-next)
-	      (moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next))))
+	      (moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next)))
+	     ("p" (moded--rk "> Project"
+			     ("i" (vs-init))
+			     ("t" (vs-switch-target)))))
   (set-face-attribute 'mode-line nil :background "#225599"))
 
 (key-chord-define-global "jf" 'moded-do)
