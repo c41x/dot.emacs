@@ -36,6 +36,10 @@
     (t :inverse-video t))
   "Face to match page breaks (custom)." :group 'basic-faces)
 
+(defface mode-line-2
+  '((((class color)) :background "#222222" :foreground "#cc5522" :box nil))
+  "Alternate mode line face." :group 'basic-faces)
+
 (make-face 'mode-line-separator-face)
 (set-face-attribute 'mode-line-separator-face nil
 		    :foreground "antique white"
@@ -102,6 +106,7 @@
  '(fringe ((t (:background "black" :foreground "#39ae1c"))))
  '(linum ((t (:background "black" :foreground "#343434"))))
  '(mode-line ((t (:background "#225599" :foreground "#aaaaaa" :box nil))))
+ '(mode-line-2 ((t (:background "#222222" :foreground "#cc5522" :box nil))))
  '(mode-line-buffer-id ((t nil)))
  '(mode-line-emphasis ((t nil)))
  '(mode-line-highlight ((t nil)))
