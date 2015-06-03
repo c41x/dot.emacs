@@ -240,6 +240,7 @@
 
 ;; file name in title bar
 (setq frame-title-format "emacs | %b")
+(setq icon-title-format frame-title-format)
 
 ;; macro start/end bound to F11/F12
 (global-set-key [(f11)] 'kmacro-start-macro-or-insert-counter)
