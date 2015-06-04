@@ -105,17 +105,25 @@
 (defvar current-dir-debug nil)
 (defvar current-executable-debug nil)
 (defvar current-executable-release nil)
+(defvar current-target-release nil)
 
 (defun exec-name (file-name)
   (if (string= system-type "windows-nt")
       (format "%s.exe" file-name)
     file-name))
 
+(defun refresh-mode-line ()
+  (setq mode-line-project (concat "CMake:" current-target-name " / "
+				  (if current-target-release "Release" "Debug")))
+  (setq frame-title-format mode-line-project)
+  (setq icon-title-format mode-line-project))
+
 (defun refresh-target-name ()
   (let ((popup-result (popup-get-target)))
     (setq current-target-name (car popup-result))
     (setq current-target-all (cdr popup-result))
-    (setq mode-line-project (concat " CMake:" current-target-name))))
+    (refresh-mode-line)))
+
 (defun refresh-dir-release ()
   (setq current-dir-release (find-project-directory-release)))
 (defun refresh-dir-debug ()
@@ -171,7 +179,15 @@
   (refresh-dir-debug)
   (refresh-dir-release)
   (setq current-executable-debug nil)
-  (setq current-executable-release nil))
+  (setq current-executable-release nil)
+  current-target-name)
+
+(defun switch-configuration ()
+  (interactive)
+  (if (string= "debug" (popup-menu* '("debug" "release") :scroll-bar t :isearch t))
+      (setq current-target-release nil)
+    (setq current-target-release t))
+  (refresh-mode-line))
 
 ;;//- Visual Studio project support
 (defun find-file-upwards (match)
@@ -185,8 +201,19 @@
     (if ret (cons dir (car ret)) ret)))
 
 (defvar vs-solution "")
+(defvar vs-solution-name "")
 (defvar vs-binary-debug "")
 (defvar vs-binary-release "")
+(defvar vs-release nil) ;; current active target type
+
+(defun vs-active ()
+  (interactive)
+  (not (string= "" vs-solution)))
+
+(defun vs--refresh-mode-line ()
+  (setq mode-line-project (concat "VS:" vs-solution-name (if vs-release " / Release" " / Debug")))
+  (setq frame-title-format mode-line-project)
+  (setq icon-title-format mode-line-project))
 
 (defun vs-init ()
   (interactive)
@@ -195,11 +222,12 @@
       (setq vs-solution (concat (car f) "/" (cdr f)))
       (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
       (setq vs-binary-debug (concat (car f) "/bin/" (file-name-base (cdr f)) "_debug.exe"))
-      (global-set-key (kbd "<f7>") 'vs-compile-debug)
-      (global-set-key (kbd "S-<f7>") 'vs-compile-release)
-      (global-set-key (kbd "<f6>") 'vs-run-debug)
-      (global-set-key (kbd "S-<f6>") 'vs-run-release)
-      (setq mode-line-project (concat " VisualStudio:" (cdr f))))))
+      (setq vs-solution-name (cdr f))
+      (global-set-key (kbd "<f7>") 'vs-compile)
+      ;;(global-set-key (kbd "S-<f7>") 'vs-compile-release)
+      (global-set-key (kbd "<f6>") 'vs-run)
+      ;;(global-set-key (kbd "S-<f6>") 'vs-run-release)
+      (vs--refresh-mode-line))))
 
 (defun vs--compile (configuration)
   (if (string= "" vs-solution)
@@ -216,6 +244,11 @@
   (vs--compile "Release")
   (enable-visual-line-mode))
 
+(defun vs-compile ()
+  (interactive)
+  (vs--compile (if vs-release "Release" "Debug"))
+  (enable-visual-line-mode))
+
 (defun vs-run-debug ()
   (interactive)
   (compile vs-binary-debug t)
@@ -226,7 +259,36 @@
   (compile vs-binary-release t)
   (enable-visual-line-mode))
 
+(defun vs-run ()
+  (interactive)
+  (compile (if vs-release vs-binary-release vs-binary-debug) t)
+  (enable-visual-line-mode))
+
+(defun vs-switch-configuration ()
+  (interactive)
+  (if (string= "debug" (popup-menu* '("debug" "release") :scroll-bar t :isearch t))
+      (setq vs-release nil)
+    (setq vs-release t))
+  (vs--refresh-mode-line))
+
 ;;//- key bindings
+(defun cm-compile ()
+  (interactive)
+  (run-compile current-target-release nil)
+  (enable-visual-line-mode))
+
+(defun cm-run ()
+  (interactive)
+  (run-exec current-target-release)
+  (select-window (get-buffer-window "*compilation*"))
+  (goto-char (point-max)))
+
+(defun cm-compile-clean ()
+  (interactive)
+  (run-compile current-target-release t)
+  (enable-visual-line-mode))
+
+
 (defun cm-compile-debug ()
   (interactive)
   (run-compile nil nil)
@@ -270,12 +332,12 @@
   (setq gdb-many-windows nil)
   (jump-to-register 1))
 
-(global-set-key (kbd "<f7>") 'cm-compile-debug)
-(global-set-key (kbd "S-<f7>") 'cm-compile-release)
-(global-set-key (kbd "C-<f7>") 'cm-compile-debug-clean)
-(global-set-key (kbd "C-S-<f7>") 'cm-compile-release-clean)
-(global-set-key (kbd "<f6>") 'cm-run-debug)
-(global-set-key (kbd "S-<f6>") 'cm-run-release)
+(global-set-key (kbd "<f7>") 'cm-compile)
+;;(global-set-key (kbd "S-<f7>") 'cm-compile-release)
+(global-set-key (kbd "C-<f7>") 'cm-compile-clean)
+;;(global-set-key (kbd "C-S-<f7>") 'cm-compile-release-clean)
+(global-set-key (kbd "<f6>") 'cm-run)
+;;(global-set-key (kbd "S-<f6>") 'cm-run-release)
 (global-set-key (kbd "<f5>") 'cm-debug)
 (global-set-key (kbd "S-<f5>") 'cm-restore-debug)
 (global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
