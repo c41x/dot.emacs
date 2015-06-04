@@ -52,10 +52,24 @@
 ;;//- mode-line
 (defconst buffer-pos-indicator-length 25)
 
-(defun buffer-pos ()
-  (/ (* buffer-pos-indicator-length (line-number-at-pos)) (total-lines)))
-(defun buffer-left ()
-  (- buffer-pos-indicator-length (/ (* buffer-pos-indicator-length (line-number-at-pos)) (total-lines))))
+(defun buffer-all-visible ()
+  (>= (+ 1 (- (line-number-at-pos (window-end))
+	      (line-number-at-pos (window-start))))
+      (total-lines)))
+
+(defun buffer-ind-l ()
+  (floor (max 0.0 (- (* (/ (float (line-number-at-pos (window-start)))
+			   (float (total-lines)))
+			buffer-pos-indicator-length) 1.0))))
+
+(defun buffer-ind-b ()
+  (ceiling (+ 1.0 (* (/ (float (- (line-number-at-pos (window-end))
+				  (line-number-at-pos (window-start))))
+			(float (total-lines)))
+		     buffer-pos-indicator-length))))
+
+(defun buffer-ind-r ()
+  (- buffer-pos-indicator-length (+ (buffer-ind-l) (buffer-ind-b))))
 
 (setq-default mode-line-format '("%e"
 				 mode-line-front-space
@@ -66,13 +80,17 @@
 				 mode-line-frame-identification
 				 (:eval (propertize ": " 'face 'mode-line-bg-face))
 				 (:propertize (:eval mode-line-buffer-identification) face mode-line-separator-face)
-				 (:eval (propertize " : " 'face 'mode-line-bg-face))
-				 (:eval (list
-					 (propertize (make-string (buffer-pos) 9632) 'face 'mode-line-progress-face)
-					 (propertize (make-string (buffer-left) 9632) 'face 'mode-line-bg-face)))
-				 (:eval (propertize " : " 'face 'mode-line-bg-face))
+				 (:eval (if (not (buffer-all-visible))
+					    (list
+					     (propertize " : " 'face 'mode-line-bg-face)
+					     (propertize (make-string (buffer-ind-l) 9632) 'face 'mode-line-bg-face)
+					     (propertize (make-string (buffer-ind-b) 9632) 'face 'mode-line-progress-face)
+					     (propertize (make-string (buffer-ind-r) 9632) 'face 'mode-line-bg-face)
+					     (propertize " : " 'face 'mode-line-bg-face))))
 				 (vc-mode vc-mode)
-				 (if (boundp mode-line-project) mode-line-project)
+				 " "
+				 (:eval (if (boundp 'mode-line-project) (propertize (concat " " mode-line-project " ") 'face 'mode-line-2)))
+				 " "
 				 (:eval (propertize " : " 'face 'mode-line-bg-face))
 				 mode-line-modes
 				 mode-line-misc-info
@@ -222,6 +240,7 @@
 
 ;; file name in title bar
 (setq frame-title-format "emacs | %b")
+(setq icon-title-format frame-title-format)
 
 ;; macro start/end bound to F11/F12
 (global-set-key [(f11)] 'kmacro-start-macro-or-insert-counter)
@@ -822,7 +841,10 @@
 			      ("l" (windmove-right))
 			      ("i" (windmove-up))))
 	     ("l" (toggle-buffer-finish) (toggle-buffer-next)
-	      (moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next))))
+	      (moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next)))
+	     ("p" (moded--rk "> Project"
+			     ("i" (vs-init))
+			     ("t" (vs-switch-target)))))
   (set-face-attribute 'mode-line nil :background "#225599"))
 
 (key-chord-define-global "jf" 'moded-do)
