@@ -843,8 +843,9 @@
 	     ("l" (toggle-buffer-finish) (toggle-buffer-next)
 	      (moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next)))
 	     ("p" (moded--rk "> Project"
-			     ("i" (vs-init))
-			     ("t" (vs-switch-target)))))
+			     ("i" (or (switch-target) (vs-init)))
+			     ("t" (switch-target))
+			     ("c" (if (vs-active) (vs-switch-configuration) (switch-configuration))))))
   (set-face-attribute 'mode-line nil :background "#225599"))
 
 (key-chord-define-global "jf" 'moded-do)
