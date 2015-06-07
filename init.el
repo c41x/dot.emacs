@@ -861,5 +861,4 @@
 ;; TODO: moded abort bug
 ;; TODO: toggling buffers
 ;; TODO: moded escape any key
-;; TODO: release / debug modes
 ;; TODO: CMake project - fix searching for executable
