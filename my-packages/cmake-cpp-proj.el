@@ -14,7 +14,7 @@
 
 (defun dirs-contains-file (name dir)
   "Searches recursively for given file"
-  (when (file-exists-p dir)
+  (when (and dir (file-exists-p dir))
     (let ((res nil))
       (dolist (file (directory-files dir))
 	(when (string= name file)
