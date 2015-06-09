@@ -853,7 +853,7 @@
 (key-chord-mode t)
 
 ;;//- local custom settings
-(load "~/.emacs.d/local-config")
+(load "~/.emacs.d/local-config" t)
 
 ;; TODO: clean up moded (do not call fx)
 ;; TODO: moded in arg mode / calx api
@@ -862,3 +862,4 @@
 ;; TODO: toggling buffers
 ;; TODO: moded escape any key
 ;; TODO: CMake project - fix searching for executable
+;; TODO: ability to work without ceh/hnr? download?
