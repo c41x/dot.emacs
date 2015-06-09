@@ -87,10 +87,11 @@
   (interactive)
   (let ((all-targets (find-all-targets)))
     ;; for some reason popup-menu* does not work within let - hence global var
-    (setq selected-target (popup-menu* all-targets :scroll-bar t :isearch t))
-    (if (< (length all-targets) 2)
-	(cons selected-target t)
-      (cons selected-target nil))))
+    (when (> (length all-targets) 0)
+      (setq selected-target (popup-menu* all-targets :scroll-bar t :isearch t))
+      (if (< (length all-targets) 2)
+	  (cons selected-target t)
+	(cons selected-target nil)))))
 
 (defun find-project-directory-debug ()
   (find-project-directory-base "project/debug"))
