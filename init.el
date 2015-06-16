@@ -862,4 +862,5 @@
 ;; TODO: toggling buffers
 ;; TODO: moded escape any key
 ;; TODO: CMake project - fix searching for executable
-;; TODO: ability to work without ceh/hnr? download?
+;; TODO: remove middle mouse button paste
+;; TODO: fj correction on fail
