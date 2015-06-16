@@ -786,6 +786,11 @@
 
 (defun moded-do ()
   (interactive)
+  (save-excursion ;; error correction
+    (backward-word)
+    (when (or (ceh--f-peek "jf")
+	      (ceh--f-peek "fj"))
+      (undo)))
   (set-face-attribute 'mode-line nil :background "firebrick")
   (moded--rk ">"
 	     ("f" (ido-find-file))
