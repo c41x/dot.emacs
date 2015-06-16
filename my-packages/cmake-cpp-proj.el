@@ -148,6 +148,7 @@
   (refresh-unset current-target-name refresh-target-name)
   (refresh-unset current-dir-debug refresh-dir-debug)
   (refresh-unset current-dir-release refresh-dir-release)
+  (save-some-buffers t)
   (compile (format "cmake --build \"%s\" --config %s %s %s"
 		   (if release current-dir-release current-dir-debug)
 		   (if release "Release" "Debug")
@@ -159,6 +160,7 @@
 (defun run-exec (release)
   (refresh-unset current-executable-debug refresh-executable-debug)
   (refresh-unset current-executable-release refresh-executable-release)
+  (save-some-buffers t)
   (compile (concat (if release
 		       current-executable-release
 		     current-executable-debug)
@@ -233,6 +235,7 @@
 (defun vs--compile (configuration)
   (if (string= "" vs-solution)
       (vs-init))
+  (save-some-buffers t)
   (compile (concat "MSBuild.exe \"" vs-solution "\" /nologo /verbosity:m /property:Configuration=" configuration)))
 
 (defun vs-compile-debug ()
@@ -252,16 +255,19 @@
 
 (defun vs-run-debug ()
   (interactive)
+  (save-some-buffers t)
   (compile vs-binary-debug t)
   (enable-visual-line-mode))
 
 (defun vs-run-release ()
   (interactive)
+  (save-some-buffers t)
   (compile vs-binary-release t)
   (enable-visual-line-mode))
 
 (defun vs-run ()
   (interactive)
+  (save-some-buffers t)
   (compile (if vs-release vs-binary-release vs-binary-debug) t)
   (enable-visual-line-mode))
 
