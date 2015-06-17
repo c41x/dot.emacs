@@ -788,8 +788,8 @@
   (interactive)
   (save-excursion ;; error correction
     (backward-word)
-    (when (or (ceh--f-peek "jf")
-	      (ceh--f-peek "fj"))
+    (when (or (looking-at "jf")
+	      (looking-at "fj"))
       (undo)))
   (set-face-attribute 'mode-line nil :background "firebrick")
   (moded--rk ">"
@@ -868,4 +868,4 @@
 ;; TODO: moded escape any key
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: remove middle mouse button paste
-;; TODO: fj correction on fail
+;; TODO: better fj correction on fail?
