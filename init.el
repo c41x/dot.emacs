@@ -286,6 +286,9 @@
     (goto-char (point-max))
     (line-number-at-pos)))
 
+;; no pasting for MMB
+(global-unset-key (kbd "<mouse-2>"))
+
 ;;//- plugins
 ;; automatic brackets {}()[]""'' pairing
 (require 'autopair)
