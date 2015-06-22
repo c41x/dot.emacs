@@ -78,7 +78,10 @@
 				 mode-line-modified
 				 mode-line-remote
 				 mode-line-frame-identification
-				 (:eval (propertize ": " 'face 'mode-line-bg-face))
+				 (:eval (if (buffer-modified-p)
+					    (propertize (make-string 1 9632) 'face 'font-lock-number-face)
+					  (propertize (make-string 1 9632) 'face 'mode-line-bg-face)))
+				 (:eval (propertize " : " 'face 'mode-line-bg-face))
 				 (:propertize (:eval mode-line-buffer-identification) face mode-line-separator-face)
 				 (:eval (if (not (buffer-all-visible))
 					    (list
@@ -931,5 +934,4 @@
 ;; TODO: toggling buffers
 ;; TODO: moded escape any key
 ;; TODO: CMake project - fix searching for executable
-;; TODO: remove middle mouse button paste
 ;; TODO: better fj correction on fail?
