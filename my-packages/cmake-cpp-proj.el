@@ -218,9 +218,9 @@
   (setq frame-title-format mode-line-project)
   (setq icon-title-format mode-line-project))
 
-(defun vs-init ()
+(defun vs-init (&rest path-to-sln)
   (interactive)
-  (let ((f (find-file-upwards ".sln")))
+  (let ((f (or path-to-sln (find-file-upwards ".sln"))))
     (when f
       (setq vs-solution (concat (car f) "/" (cdr f)))
       (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
@@ -278,6 +278,13 @@
     (setq vs-release t))
   (vs--refresh-mode-line))
 
+;; TODO: flexible
+(defun vs-search ()
+  (interactive)
+  (when (ido-find-file)
+    (vs-init (cons (file-name-directory (buffer-file-name)) (file-name-nondirectory (buffer-file-name))))
+    (kill-buffer)))
+
 ;;//- key bindings
 (defun cm-compile ()
   (interactive)
@@ -294,7 +301,6 @@
   (interactive)
   (run-compile current-target-release t)
   (enable-visual-line-mode))
-
 
 (defun cm-compile-debug ()
   (interactive)
