@@ -81,20 +81,21 @@
 				 (:eval (if (buffer-modified-p)
 					    (propertize (make-string 1 9632) 'face 'font-lock-number-face)
 					  (propertize (make-string 1 9632) 'face 'mode-line-bg-face)))
-				 (:eval (propertize " : " 'face 'mode-line-bg-face))
+				 " ";;(:eval (propertize " : " 'face 'mode-line-bg-face))
 				 (:propertize (:eval mode-line-buffer-identification) face mode-line-separator-face)
 				 (:eval (if (not (buffer-all-visible))
 					    (list
-					     (propertize " : " 'face 'mode-line-bg-face)
+					     " ";;(propertize " : " 'face 'mode-line-bg-face)
 					     (propertize (make-string (buffer-ind-l) 9632) 'face 'mode-line-bg-face)
 					     (propertize (make-string (buffer-ind-b) 9632) 'face 'mode-line-progress-face)
 					     (propertize (make-string (buffer-ind-r) 9632) 'face 'mode-line-bg-face)
-					     (propertize " : " 'face 'mode-line-bg-face))))
+					     " ";;(propertize " : " 'face 'mode-line-bg-face)
+					     )))
 				 (vc-mode vc-mode)
 				 " "
 				 (:eval (if (boundp 'mode-line-project) (propertize (concat " " mode-line-project " ") 'face 'mode-line-2)))
 				 " "
-				 (:eval (propertize " : " 'face 'mode-line-bg-face))
+				 " ";;(:eval (propertize " : " 'face 'mode-line-bg-face))
 				 mode-line-modes
 				 mode-line-misc-info
 				 mode-line-end-spaces
