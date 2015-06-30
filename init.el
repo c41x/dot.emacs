@@ -916,7 +916,7 @@
 	     ("l" (toggle-buffer-finish) (toggle-buffer-next)
 	      (moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next)))
 	     ("p" (moded--rk "> Project"
-			     ("i" (or (switch-target) (vs-init)))
+			     ("i" (or (switch-target) (vs-init) (vs-search)))
 			     ("t" (switch-target))
 			     ("c" (if (vs-active) (vs-switch-configuration) (switch-configuration))))))
   (set-face-attribute 'mode-line nil :background "#225599"))
