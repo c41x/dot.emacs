@@ -936,3 +936,5 @@
 ;; TODO: moded escape any key
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: better fj correction on fail?
+;; TODO: better support for visual studio projects (parsing solution file?)
+;; TODO: manual project file
