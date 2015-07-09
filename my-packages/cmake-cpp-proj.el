@@ -203,10 +203,10 @@
       (setq i (+ i 1)))
     (if ret (cons dir (car ret)) ret)))
 
-(defvar vs-solution "c:/repo/guliwer/vc2013/guliwer.sln")
-(defvar vs-solution-name "guliwer.sln")
-(defvar vs-binary-debug "c:/repo/guliwer/vc2013/x64/Debug/guliwer.exe")
-(defvar vs-binary-release "c:/repo/guliwer/vc2013/x64/Release/guliwer.exe")
+(defvar vs-solution "")
+(defvar vs-solution-name "")
+(defvar vs-binary-debug "")
+(defvar vs-binary-release "")
 (defvar vs-release nil) ;; current active target type
 
 (defun vs-active ()
@@ -387,11 +387,6 @@
 ;; 	      (setq flycheck-idle-change-delay 10.0)
 ;; 	      (flycheck-mode)
 ;; 	      (flycheck-select-checker 'c/c++-gcc))))
-
-(vs--refresh-mode-line)
-(global-set-key (kbd "<f7>") 'vs-compile)
-(global-set-key (kbd "<f6>") 'vs-run)
-
 
 (provide 'cmake-cpp-proj)
 ;;; cmake-cpp-proj.el ends here
