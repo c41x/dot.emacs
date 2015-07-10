@@ -937,4 +937,5 @@
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: better fj correction on fail?
 ;; TODO: better support for visual studio projects (parsing solution file?)
-;; TODO: manual project file
+;; TODO: manual project file (elisp code?)
+;; TODO: fix glsl checker on Windows 8.0
