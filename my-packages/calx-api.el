@@ -43,6 +43,7 @@
 				 (org-mode)
 				 (buffer-enable-undo)
 				 (use-local-map (make-composed-keymap calx--keymap org-mode-map))
+				 (add-hook 'moded-save-hook 'calx-set)
 				 (and callback-ok (funcall callback-ok errm)))))))))
 
 (defun calx--request-login (callback)
@@ -63,10 +64,11 @@
 
 (defun calx-set ()
   (interactive)
-  (calx--request (concat calx--server-api-url "/api_set")
-		 (concat "text=" (url-hexify-string (buffer-string)))
-		 nil
-		 (lambda (res) (calx--request-login (lambda (res) (calx-set))))))
+  (when (string= (buffer-name) "* TODO *")
+    (calx--request (concat calx--server-api-url "/api_set")
+		   (concat "text=" (url-hexify-string (buffer-string)))
+		   nil
+		   (lambda (res) (calx--request-login (lambda (res) (calx-set)))))))
 
 (defun calx ()
   (interactive)
