@@ -293,6 +293,7 @@
 ;; no pasting for MMB
 (global-unset-key (kbd "<mouse-2>"))
 
+;; TODO: property list
 ;; ;; box api (in progress)
 ;; (defun mbox:hide-overlay (ov)
 ;;   (when (overlay-get ov 'is-box)
@@ -572,6 +573,9 @@
 (defun toggle-buffer-finish ()
   (interactive)
   (setq toggle-buffer-i -1))
+
+;; my hooks
+(defvar-local moded-save-hook nil)
 
 ;;//- C++
 ;; tell emacs to open .h files in C++ mode (c-mode by default)
@@ -865,7 +869,7 @@
 	     ("g" (ido-switch-buffer))
 	     ("j" (smex))
 	     ("z" (undo))
-	     ("s" (save-buffer))
+	     ("s" (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer)))
 	     ("x" (page-breaks-popup))
 	     ("o" (switch-to-buffer (other-buffer)))
 	     ("m" (moded--rkl "> Move"
