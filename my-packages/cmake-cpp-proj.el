@@ -221,16 +221,24 @@
 (defun vs-init (&rest path-to-sln)
   (interactive)
   (let ((f (or path-to-sln (find-file-upwards ".sln"))))
-    (when f
-      (setq vs-solution (concat (car f) "/" (cdr f)))
-      (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
-      (setq vs-binary-debug (concat (car f) "/bin/" (file-name-base (cdr f)) "_debug.exe"))
-      (setq vs-solution-name (cdr f))
-      (global-set-key (kbd "<f7>") 'vs-compile)
-      ;;(global-set-key (kbd "S-<f7>") 'vs-compile-release)
-      (global-set-key (kbd "<f6>") 'vs-run)
-      ;;(global-set-key (kbd "S-<f6>") 'vs-run-release)
-      (vs--refresh-mode-line))))
+    (if f
+	(progn
+	  (setq vs-solution (concat (car f) "/" (cdr f)))
+	  (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
+	  (setq vs-binary-debug (concat (car f) "/bin/" (file-name-base (cdr f)) "_debug.exe"))
+	  (setq vs-solution-name (cdr f))
+	  (global-set-key (kbd "<f7>") 'vs-compile)
+	  ;;(global-set-key (kbd "S-<f7>") 'vs-compile-release)
+	  (global-set-key (kbd "<f6>") 'vs-run)
+	  ;;(global-set-key (kbd "S-<f6>") 'vs-run-release)
+	  (vs--refresh-mode-line))
+      ;; load project file
+      (let ((prj (find-file-upwards ".ep")))
+	(when prj
+	  (load (concat (car prj) "/" (cdr prj)))
+	  (vs--refresh-mode-line)
+	  (global-set-key (kbd "<f7>") 'vs-compile)
+	  (global-set-key (kbd "<f6>") 'vs-run))))))
 
 (defun vs--compile (configuration)
   (if (string= "" vs-solution)
@@ -387,6 +395,13 @@
 ;; 	      (setq flycheck-idle-change-delay 10.0)
 ;; 	      (flycheck-mode)
 ;; 	      (flycheck-select-checker 'c/c++-gcc))))
+
+;; example Visual Studio project file:
+;; (setq vs-solution "c:/repo/pro/vc2013/pro.sln")
+;; (setq vs-solution-name "pro.sln")
+;; (setq vs-binary-debug "c:/repo/pro/vc2013/x64/Debug/pro.exe")
+;; (setq vs-binary-release "c:/repo/pro/vc2013/x64/Release/pro.exe")
+;; (setq vs-release nil)
 
 (provide 'cmake-cpp-proj)
 ;;; cmake-cpp-proj.el ends here
