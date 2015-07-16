@@ -44,6 +44,7 @@
 				 (buffer-enable-undo)
 				 (use-local-map (make-composed-keymap calx--keymap org-mode-map))
 				 (add-hook 'moded-save-hook 'calx-set)
+				 (add-hook 'moded-kill-hook 'calx-logout)
 				 (and callback-ok (funcall callback-ok errm)))))))))
 
 (defun calx--request-login (callback)
