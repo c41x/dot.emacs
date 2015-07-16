@@ -576,6 +576,7 @@
 
 ;; my hooks
 (defvar-local moded-save-hook nil)
+(defvar-local moded-kill-hook nil)
 
 ;;//- C++
 ;; tell emacs to open .h files in C++ mode (c-mode by default)
@@ -900,7 +901,7 @@
 			     ("r" (moded--rk "> Version Control > Root"
 					     ("l" (vc-print-root-log))))))
 	     ("k" (moded--rk "> Kill"
-			     ("k" (kill-buffer))
+			     ("k" (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer)))
 			     ("w" (kill-buffer-and-window))))
 	     ("d" (moded--rk "> Compile"
 			     ("d" (cm-compile-debug))
@@ -933,13 +934,10 @@
 (load "~/.emacs.d/local-config" t)
 
 ;; TODO: clean up moded (do not call fx)
-;; TODO: moded in arg mode / calx api
 ;; TODO: moded in VC
 ;; TODO: moded abort bug
 ;; TODO: toggling buffers
 ;; TODO: moded escape any key
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: better fj correction on fail?
-;; TODO: better support for visual studio projects (parsing solution file?)
-;; TODO: manual project file (elisp code?)
-;; TODO: fix glsl checker on Windows 8.0
+;; TODO: seems like popup.el is broken under windows8...
