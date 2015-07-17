@@ -797,8 +797,8 @@
 (global-set-key (kbd "M-[") 'prev-page-break)
 (global-set-key (kbd "C-; x") 'page-breaks-popup)
 
-;; CMake project utils
-(require 'cmake-cpp-proj)
+;; C++ project utils
+(require 'cpp-proj)
 
 ;; CEH
 (add-to-list 'load-path "~/.emacs.d/ceh")
@@ -938,6 +938,7 @@
 ;; TODO: moded abort bug
 ;; TODO: toggling buffers
 ;; TODO: moded escape any key
-;; TODO: CMake project - fix searching for executable
 ;; TODO: better fj correction on fail?
 ;; TODO: seems like popup.el is broken under windows8...
+;; TODO: CMake project - fix searching for executable
+;; TODO: uniform c++ project
