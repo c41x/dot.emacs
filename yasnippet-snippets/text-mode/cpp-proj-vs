@@ -1,0 +1,10 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: visual studio project
+# key: cpp-proj-vs
+# binding: direct-keybinding
+# --
+(setq vs-solution "c:/repo/pro/vc2013/pro.sln")
+(setq vs-solution-name "pro.sln")
+(setq vs-binary-debug "c:/repo/pro/vc2013/x64/Debug/pro.exe")
+(setq vs-binary-release "c:/repo/pro/vc2013/x64/Release/pro.exe")
+(setq vs-release nil)
