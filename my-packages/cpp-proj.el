@@ -1,4 +1,4 @@
-;;; cmake-cpp-proj --- CMake C++ project support
+;;; cpp-proj --- CMake / Visual Studio C++ project support
 ;;; Commentary:
 ;;; Code:
 
@@ -403,5 +403,5 @@
 ;; (setq vs-binary-release "c:/repo/pro/vc2013/x64/Release/pro.exe")
 ;; (setq vs-release nil)
 
-(provide 'cmake-cpp-proj)
-;;; cmake-cpp-proj.el ends here
+(provide 'cpp-proj)
+;;; cpp-proj.el ends here
