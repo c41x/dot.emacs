@@ -265,7 +265,7 @@
 ;; automatically reload files when changed
 (global-auto-revert-mode t)
 
-;; org mode annoying shortcuts
+;; org mode annoying shortcuts, disable line numbers (linum-mode)
 (defun nuke-org-keybinds (binds)
   (dolist (bind binds)
     (define-key org-mode-map (kbd bind) nil)))
@@ -280,7 +280,8 @@
 				 "S-<down>"
 				 "S-<up>"
 				 "C-S-<down>"
-				 "C-S-<up>"))))
+				 "C-S-<up>"))
+	    (linum-mode -1)))
 
 (setq query-replace-show-replacement t)
 
@@ -942,3 +943,4 @@
 ;; TODO: seems like popup.el is broken under windows8...
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: uniform c++ project
+;; TODO: unload c++ project
