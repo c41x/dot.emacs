@@ -387,14 +387,15 @@
 	(extract-includes-from-file (concat proj-dir "CMakeLists.txt") proj-dir)
       nil)))
 
-;;(add-hook 'c++-mode-hook
-;;          (lambda ()
-;; 	    (when (is-cmake-project)
-;; 	      (setq flycheck-c/c++-gcc-executable "mingw32-gcc")
-;; 	      (setq flycheck-gcc-include-path (get-current-project-include-list))
-;; 	      (setq flycheck-idle-change-delay 10.0)
-;; 	      (flycheck-mode)
-;; 	      (flycheck-select-checker 'c/c++-gcc))))
+(when (not (string= system-type "windows-nt"))
+  (add-hook 'c++-mode-hook
+	    (lambda ()
+	      (when (is-cmake-project)
+		(setq flycheck-c/c++-gcc-executable (if (string= system-type "windows-nt") "mingw32-gcc" "gcc"))
+		(setq flycheck-gcc-include-path (get-current-project-include-list))
+		(setq flycheck-idle-change-delay 5.0)
+		(flycheck-mode)
+		(flycheck-select-checker 'c/c++-gcc)))))
 
 ;; example Visual Studio project file:
 ;; (setq vs-solution "c:/repo/pro/vc2013/pro.sln")
