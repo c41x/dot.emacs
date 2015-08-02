@@ -243,7 +243,8 @@
 (global-set-key (kbd "C-M-r") 'cua-rotate-rectangle)
 
 ;; file name in title bar
-(setq frame-title-format "emacs | %b")
+(defvar default-frame-title-format "emacs | %b")
+(setq frame-title-format default-frame-title-format)
 (setq icon-title-format frame-title-format)
 
 ;; macro start/end bound to F11/F12
@@ -924,7 +925,8 @@
 	     ("p" (moded--rk "> Project"
 			     ("i" (or (switch-target) (vs-init) (vs-search)))
 			     ("t" (switch-target))
-			     ("c" (if (vs-active) (vs-switch-configuration) (switch-configuration))))))
+			     ("c" (if (vs-active) (vs-switch-configuration) (switch-configuration)))
+			     ("u" (unload-project)))))
   (set-face-attribute 'mode-line nil :background "#225599"))
 
 (key-chord-define-global "jf" 'moded-do)
@@ -943,4 +945,3 @@
 ;; TODO: seems like popup.el is broken under windows8...
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: uniform c++ project
-;; TODO: unload c++ project
