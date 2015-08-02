@@ -192,6 +192,23 @@
     (setq current-target-release t))
   (refresh-mode-line))
 
+(defun unload-project ()
+  (setq current-target-name nil)
+  (setq current-target-all nil)
+  (setq current-dir-release nil)
+  (setq current-dir-debug nil)
+  (setq current-executable-debug nil)
+  (setq current-executable-release nil)
+  (setq current-target-release nil)
+  (setq vs-solution "")
+  (setq vs-solution-name "")
+  (setq vs-binary-debug "")
+  (setq vs-binary-release "")
+  (setq vs-release nil)
+  (makunbound 'mode-line-project)
+  (setq frame-title-format default-frame-title-format)
+  (setq icon-title-format frame-title-format))
+
 ;;//- Visual Studio project support
 (defun find-file-upwards (match)
   (let ((i 0)
