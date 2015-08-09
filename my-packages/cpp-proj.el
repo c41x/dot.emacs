@@ -411,6 +411,7 @@
 		(setq flycheck-c/c++-gcc-executable (if (string= system-type "windows-nt") "mingw32-gcc" "gcc"))
 		(setq flycheck-gcc-include-path (get-current-project-include-list))
 		(setq flycheck-idle-change-delay 5.0)
+		(setq flycheck-gcc-args '("-std=c++1y" "-msse" "-msse2" "-msse3"))
 		(flycheck-mode)
 		(flycheck-select-checker 'c/c++-gcc)))))
 
