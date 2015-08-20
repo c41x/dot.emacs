@@ -422,5 +422,7 @@
 ;; (setq vs-binary-release "c:/repo/pro/vc2013/x64/Release/pro.exe")
 ;; (setq vs-release nil)
 
+;;//TODO: CMake OPTION support
+
 (provide 'cpp-proj)
 ;;; cpp-proj.el ends here
