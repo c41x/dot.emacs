@@ -41,7 +41,7 @@
 				 (delete-region (point-min) (point))
 				 (rename-buffer "* TODO *")
 				 (org-mode)
-				 (goto-char (beginning-of-buffer))
+				 (goto-char (point-min))
 				 (buffer-enable-undo)
 				 (use-local-map (make-composed-keymap calx--keymap org-mode-map))
 				 (add-hook 'moded-save-hook 'calx-set)
