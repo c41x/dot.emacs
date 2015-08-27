@@ -520,6 +520,13 @@
 (defvar-local moded-save-hook nil)
 (defvar-local moded-kill-hook nil)
 
+;; do not ask for kill compile process
+(defadvice yes-or-no-p (around compilation-ignore-message activate)
+  "Advice for `compile' to not ask for kill existing compilation."
+  (if (string-match "A compilation process is running; kill it\\?" prompt)
+      (setq ad-return-value nil)
+    ad-do-it))
+
 ;;//- C++
 ;; tell emacs to open .h files in C++ mode (c-mode by default)
 (add-to-list 'auto-mode-alist '("\\.h\\'" . c++-mode))
