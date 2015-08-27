@@ -844,7 +844,8 @@
 					     ("l" (vc-print-root-log))))))
 	     ("k" (moded--rk "> Kill"
 			     ("k" (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer)))
-			     ("w" (kill-buffer-and-window))))
+			     ("w" (kill-buffer-and-window))
+			     ("c" (kill-compilation))))
 	     ("d" (moded--rk "> Compile"
 			     ("d" (cm-compile-debug))
 			     ("r" (cm-compile-release))
