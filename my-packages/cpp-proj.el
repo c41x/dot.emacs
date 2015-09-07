@@ -398,6 +398,15 @@
 		      1))))
     matches))
 
+(defun extract-options-from-file (file-name)
+  "Extracts CMake Options from given file"
+  (let ((i 0) (matches '()) (file-buffer (get-string-from-file file-name)))
+    (save-match-data
+      (while (string-match "option(\\([^ ]*\\) " file-buffer i)
+	(setq i (match-end 1))
+	(add-to-list 'matches (match-string-no-properties 1 file-buffer))))
+    matches))
+
 (defun get-current-project-include-list ()
   (let ((proj-dir (find-project-directory)))
     (if proj-dir
@@ -422,7 +431,14 @@
 ;; (setq vs-binary-release "c:/repo/pro/vc2013/x64/Release/pro.exe")
 ;; (setq vs-release nil)
 
-;;//TODO: CMake OPTION support
+;;// TODO: CMake OPTION support
+;;// TODO: Project generation:
+;; - scan for project type, if not found -> manual config (like above), finish
+;; - display project type to confirm init
+;; - if VS project, scan for solution and executable paths, finish, or if manual config is needed - display dialog
+;; - create build directory for cmake oos build
+;; - ask for options
+;; - run cmake generator (asking which one (Unix Makefiles, VSxx, etc.))
 
 (provide 'cpp-proj)
 ;;; cpp-proj.el ends here
