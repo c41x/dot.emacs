@@ -157,6 +157,11 @@
 		     (concat "--target " current-target-name))
 		   (if clean "--clean-first" ""))))
 
+(defun cmake-install ()
+  (interactive)
+  (let ((current-target-name "install"))
+    (run-compile t nil)))
+
 (defun run-exec (release)
   (refresh-unset current-executable-debug refresh-executable-debug)
   (refresh-unset current-executable-release refresh-executable-release)
