@@ -895,7 +895,8 @@
 			     ("i" (or (switch-target) (vs-init) (vs-search)))
 			     ("t" (switch-target))
 			     ("c" (if (vs-active) (vs-switch-configuration) (switch-configuration)))
-			     ("u" (unload-project)))))
+			     ("u" (unload-project))
+			     ("l" (cmake-install)))))
   (set-face-attribute 'mode-line nil :background "#225599"))
 
 (key-chord-define-global "jf" 'moded-do)
