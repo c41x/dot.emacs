@@ -788,6 +788,10 @@
 (add-to-list 'load-path "~/.emacs.d/hnr")
 (require 'hnr)
 
+;; boxy
+(add-to-list 'load-path "~/.emacs.d/boxy")
+(require 'boxy)
+
 ;;//- GUID generator and utilities
 (require 's)
 
