@@ -852,7 +852,8 @@
 		      " j - command"
 		      " z - undo"
 		      " s - save"
-		      " o - switch to other buffer")
+		      " o - switch to other buffer"
+		      " x - page breaks navigation")
 		 '(("p" . (lambda () (boxy-close) (boxy-centered 40 '(" i - initialize"
 								 " t - switch target"
 								 " c - configuration (Debug/Release)"
@@ -928,7 +929,8 @@
 		   ("j" . (lambda () (boxy-close) (smex)))
 		   ("z" . (lambda () (boxy-close) (undo)))
 		   ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
-		   ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer)))))))
+		   ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
+		   ("x" . (lambda () (boxy-close) (page-breaks-popup))))))
 
 ;; (defun moded-do ()
 ;;   (interactive)
