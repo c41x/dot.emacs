@@ -831,13 +831,16 @@
   `(while (string= ,key (key-description (vector (read-key ,desc))))
     .,expr))
 
-(defun moded-do ()
-  (interactive)
-  (save-excursion ;; error correction
+(defun moded--error-correct ()
+  (save-excursion
     (backward-word)
     (when (or (looking-at "jf")
 	      (looking-at "fj"))
-      (undo)))
+      (undo))))
+
+(defun moded-do ()
+  (interactive)
+  (moded--error-correct)
   (boxy-centered 40 '(" p - [project ...]"
 		      " v - [version control ...]"
 		      " k - [kill ...]"
