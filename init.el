@@ -838,174 +838,178 @@
 	      (looking-at "fj"))
       (undo))))
 
-(defun moded-do ()
-  (interactive)
-  (moded--error-correct)
-  (boxy-centered 40 '(" p - [project ...]"
-		      " v - [version control ...]"
-		      " k - [kill ...]"
-		      " d - [compile ...]"
-		      " w - [windows ...]"
-		      " i - [insert ...]"
-		      " b - [buffer ...]"
-		      " m - > move ..."
-		      " c - > comment ..."
-		      " f - find file"
-		      " g - switch buffer"
-		      " j - command"
-		      " z - undo"
-		      " s - save"
-		      " o - switch to other buffer"
-		      " x - page breaks navigation")
-		 '(("p" . (lambda () (boxy-close) (boxy-centered 40 '(" i - initialize"
-								 " t - switch target"
-								 " c - configuration (Debug/Release)"
-								 " u - unload project"
-								 " l - install project (CMake only)")
-							    '(("i" . (lambda () (boxy-close) (or (switch-target) (vs-init) (vs-search))))
-							      ("t" . (lambda () (boxy-close) (switch-target)))
-							      ("c" . (lambda () (boxy-close) (if (vs-active) (vs-switch-configuration) (switch-configuration))))
-							      ("u" . (lambda () (boxy-close) (unload-project)))
-							      ("l" . (lambda () (boxy-close) (cmake-install)))))))
-		   ("v" . (lambda () (boxy-close) (boxy-centered 40 '(" r - [root ...]"
-								 " d - directory status"
-								 " c - diff current file (=)"
-								 " v - commit current file"
-								 " u - revert current file"
-								 " l - print log")
-							    '(("r" . (lambda () (boxy-close) (boxy-centered 40 '(" l - log")
-												       '(("l" . (lambda () (boxy-close) (vc-print-root-log)))))))
-							      ("d" . (lambda () (boxy-close) (call-interactively 'vc-dir)))
-							      ("=" . (lambda () (boxy-close) (vc-diff)))
-							      ("c" . (lambda () (boxy-close) (vc-diff)))
-							      ("v" . (lambda () (boxy-close) (call-interactively 'vc-next-action)))
-							      ("u" . (lambda () (boxy-close) (call-interactively 'vc-revert)))
-							      ("l" . (lambda () (boxy-close) (call-interactively 'vc-print-log)))))))
-		   ("k" . (lambda () (boxy-close) (boxy-centered 40 '(" k - kill current buffer"
-								 " w - kill buffer and window"
-								 " c - kill compilation process")
-							    '(("k" . (lambda () (boxy-close) (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer))))
-							      ("w" . (lambda () (boxy-close) (kill-buffer-and-window)))
-							      ("c" . (lambda () (boxy-close) (kill-compilation)))))))
-		   ("d" . (lambda () (boxy-close) (boxy-centered 40 '(" d - compile (debug)"
-								 " r - compile (release)"
-								 " s - run (debug)")
-							    '(("d" . (lambda () (boxy-close) (cm-compile-debug)))
-							      ("r" . (lambda () (boxy-close) (cm-compile-release)))
-							      ("s" . (lambda () (boxy-close) (cm-run-debug)))))))
-		   ("w" . (lambda () (boxy-close) (boxy-centered 40 '(" w - delete window"
-								 " j - split horizontally"
-								 " f - split vertically")
-							    '(("w" . (lambda () (boxy-close) (delete-window)))
-							      ("j" . (lambda () (boxy-close) (split-window-horizontally)))
-							      ("f" . (lambda () (boxy-close) (split-window-vertically)))))))
-		   ("i" . (lambda () (boxy-close) (boxy-centered 40 '(" g - insert GUID")
-							    '(("g" . (lambda () (boxy-close) (insert-guid)))))))
-		   ("b" . (lambda () (boxy-close) (boxy-centered 40 '(" j - windmove left"
-								 " k - windmove down"
-								 " l - windmove right"
-								 " i - windmove up")
-							    '(("j" . (lambda () (boxy-close) (windmove-left)))
-							      ("k" . (lambda () (boxy-close) (windmove-down)))
-							      ("l" . (lambda () (boxy-close) (windmove-right)))
-							      ("i" . (lambda () (boxy-close) (windmove-up)))))))
-		   ("m" . (lambda () (boxy-close) (moded--rkl "> Move"
-							 "g"
-							 ("l" (smooth-scroll -1 8 0.1))
-							 ("m" (smooth-scroll 1 8 0.1))
-							 ("j" (backward-word))
-							 ("k" (forward-word))
-							 ("d" (previous-line))
-							 ("f" (next-line))
-							 ("e" (backward-paragraph))
-							 ("i" (forward-paragraph)))))
-		   ("c" . (lambda () (boxy-close) (moded--rk "> Comment"
-							("c" (comment-or-uncomment-region (region-beginning) (region-end)))
-							("n" (moded--rk "> Comment > Next >"
-									("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
-									("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
-							("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
-							("e" (ceh-comment-to-eol))
-							("a" (ceh-comment-next-atom)))))
-		   ("f" . (lambda () (boxy-close) (ido-find-file)))
-		   ("g" . (lambda () (boxy-close) (ido-switch-buffer)))
-		   ("j" . (lambda () (boxy-close) (smex)))
-		   ("z" . (lambda () (boxy-close) (undo)))
-		   ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
-		   ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
-		   ("x" . (lambda () (boxy-close) (page-breaks-popup))))))
+(defvar moded-boxy t)
 
-;; (defun moded-do ()
-;;   (interactive)
-;;   (save-excursion ;; error correction
-;;     (backward-word)
-;;     (when (or (looking-at "jf")
-;; 	      (looking-at "fj"))
-;;       (undo)))
-;;   (set-face-attribute 'mode-line nil :background "firebrick")
-;;   (moded--rk ">"
-;; 	     ("f" (ido-find-file))
-;; 	     ("g" (ido-switch-buffer))
-;; 	     ("j" (smex))
-;; 	     ("z" (undo))
-;; 	     ("s" (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer)))
-;; 	     ("x" (page-breaks-popup))
-;; 	     ("o" (switch-to-buffer (other-buffer)))
-;; 	     ("m" (moded--rkl "> Move"
-;; 			      "g"
-;; 			      ("l" (smooth-scroll -1 8 0.1))
-;; 			      ("m" (smooth-scroll 1 8 0.1))
-;; 			      ("j" (backward-word))
-;; 			      ("k" (forward-word))
-;; 			      ("d" (previous-line))
-;; 			      ("f" (next-line))
-;; 			      ("e" (backward-paragraph))
-;; 			      ("i" (forward-paragraph))))
-;; 	     ("c" (moded--rk "> Comment"
-;; 			     ("c" (comment-or-uncomment-region (region-beginning) (region-end)))
-;; 			     ("n" (moded--rk "> Comment > Next >"
-;; 					     ("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
-;; 					     ("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
-;; 			     ("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
-;; 			     ("e" (ceh-comment-to-eol))
-;; 			     ("a" (ceh-comment-next-atom))))
-;; 	     ("v" (moded--rk "> Version Control"
-;; 			     ("d" (call-interactively 'vc-dir))
-;; 			     ("=" (vc-diff))
-;; 			     ("c" (vc-diff))
-;; 			     ("v" (call-interactively 'vc-next-action))
-;; 			     ("u" (call-interactively 'vc-revert))
-;; 			     ("l" (vc-print-log))
-;; 			     ("r" (moded--rk "> Version Control > Root"
-;; 					     ("l" (vc-print-root-log))))))
-;; 	     ("k" (moded--rk "> Kill"
-;; 			     ("k" (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer)))
-;; 			     ("w" (kill-buffer-and-window))
-;; 			     ("c" (kill-compilation))))
-;; 	     ("d" (moded--rk "> Compile"
-;; 			     ("d" (cm-compile-debug))
-;; 			     ("r" (cm-compile-release))
-;; 			     ("s" (cm-run-debug))))
-;; 	     ("w" (moded--rk "> Windows"
-;; 			     ("w" (delete-window))
-;; 			     ("j" (split-window-horizontally))
-;; 			     ("f" (split-window-vertically))))
-;; 	     ("i" (moded--rk "> Insert"
-;; 			     ("g" (insert-guid))))
-;; 	     ("b" (moded--rkl "> Buffer" "b"
-;; 			      ("j" (windmove-left))
-;; 			      ("k" (windmove-down))
-;; 			      ("l" (windmove-right))
-;; 			      ("i" (windmove-up))))
-;; 	     ("l" (toggle-buffer-finish) (toggle-buffer-next)
-;; 	      (moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next)))
-;; 	     ("p" (moded--rk "> Project"
-;; 			     ("i" (or (switch-target) (vs-init) (vs-search)))
-;; 			     ("t" (switch-target))
-;; 			     ("c" (if (vs-active) (vs-switch-configuration) (switch-configuration)))
-;; 			     ("u" (unload-project))
-;; 			     ("l" (cmake-install)))))
-;;  (set-face-attribute 'mode-line nil :background "#225599"))
+(if moded-boxy
+    (defun moded-do ()
+      (interactive)
+      (moded--error-correct)
+      (boxy-centered 40 '(" p - [project ...]"
+			  " v - [version control ...]"
+			  " k - [kill ...]"
+			  " d - [compile ...]"
+			  " w - [windows ...]"
+			  " i - [insert ...]"
+			  " b - [buffer ...]"
+			  " m - > move ..."
+			  " c - > comment ..."
+			  " f - find file"
+			  " g - switch buffer"
+			  " j - command"
+			  " z - undo"
+			  " s - save"
+			  " o - switch to other buffer"
+			  " x - page breaks navigation")
+		     '(("p" . (lambda () (boxy-close) (boxy-centered 40 '(" i - initialize"
+								     " t - switch target"
+								     " c - configuration (Debug/Release)"
+								     " u - unload project"
+								     " l - install project (CMake only)")
+								'(("i" . (lambda () (boxy-close) (or (switch-target) (vs-init) (vs-search))))
+								  ("t" . (lambda () (boxy-close) (switch-target)))
+								  ("c" . (lambda () (boxy-close) (if (vs-active) (vs-switch-configuration) (switch-configuration))))
+								  ("u" . (lambda () (boxy-close) (unload-project)))
+								  ("l" . (lambda () (boxy-close) (cmake-install)))))))
+		       ("v" . (lambda () (boxy-close) (boxy-centered 40 '(" r - [root ...]"
+								     " d - directory status"
+								     " c - diff current file (=)"
+								     " v - commit current file"
+								     " u - revert current file"
+								     " l - print log")
+								'(("r" . (lambda () (boxy-close) (boxy-centered 40 '(" l - log")
+													   '(("l" . (lambda () (boxy-close) (vc-print-root-log)))))))
+								  ("d" . (lambda () (boxy-close) (call-interactively 'vc-dir)))
+								  ("=" . (lambda () (boxy-close) (vc-diff)))
+								  ("c" . (lambda () (boxy-close) (vc-diff)))
+								  ("v" . (lambda () (boxy-close) (call-interactively 'vc-next-action)))
+								  ("u" . (lambda () (boxy-close) (call-interactively 'vc-revert)))
+								  ("l" . (lambda () (boxy-close) (call-interactively 'vc-print-log)))))))
+		       ("k" . (lambda () (boxy-close) (boxy-centered 40 '(" k - kill current buffer"
+								     " w - kill buffer and window"
+								     " c - kill compilation process")
+								'(("k" . (lambda () (boxy-close) (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer))))
+								  ("w" . (lambda () (boxy-close) (kill-buffer-and-window)))
+								  ("c" . (lambda () (boxy-close) (kill-compilation)))))))
+		       ("d" . (lambda () (boxy-close) (boxy-centered 40 '(" d - compile (debug)"
+								     " r - compile (release)"
+								     " s - run (debug)")
+								'(("d" . (lambda () (boxy-close) (cm-compile-debug)))
+								  ("r" . (lambda () (boxy-close) (cm-compile-release)))
+								  ("s" . (lambda () (boxy-close) (cm-run-debug)))))))
+		       ("w" . (lambda () (boxy-close) (boxy-centered 40 '(" w - delete window"
+								     " j - split horizontally"
+								     " f - split vertically")
+								'(("w" . (lambda () (boxy-close) (delete-window)))
+								  ("j" . (lambda () (boxy-close) (split-window-horizontally)))
+								  ("f" . (lambda () (boxy-close) (split-window-vertically)))))))
+		       ("i" . (lambda () (boxy-close) (boxy-centered 40 '(" g - insert GUID")
+								'(("g" . (lambda () (boxy-close) (insert-guid)))))))
+		       ("b" . (lambda () (boxy-close) (boxy-centered 40 '(" j - windmove left"
+								     " k - windmove down"
+								     " l - windmove right"
+								     " i - windmove up")
+								'(("j" . (lambda () (boxy-close) (windmove-left)))
+								  ("k" . (lambda () (boxy-close) (windmove-down)))
+								  ("l" . (lambda () (boxy-close) (windmove-right)))
+								  ("i" . (lambda () (boxy-close) (windmove-up)))))))
+		       ("m" . (lambda () (boxy-close) (moded--rkl "> Move"
+							     "g"
+							     ("l" (smooth-scroll -1 8 0.1))
+							     ("m" (smooth-scroll 1 8 0.1))
+							     ("j" (backward-word))
+							     ("k" (forward-word))
+							     ("d" (previous-line))
+							     ("f" (next-line))
+							     ("e" (backward-paragraph))
+							     ("i" (forward-paragraph)))))
+		       ("c" . (lambda () (boxy-close) (moded--rk "> Comment"
+							    ("c" (comment-or-uncomment-region (region-beginning) (region-end)))
+							    ("n" (moded--rk "> Comment > Next >"
+									    ("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
+									    ("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
+							    ("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
+							    ("e" (ceh-comment-to-eol))
+							    ("a" (ceh-comment-next-atom)))))
+		       ("f" . (lambda () (boxy-close) (ido-find-file)))
+		       ("g" . (lambda () (boxy-close) (ido-switch-buffer)))
+		       ("j" . (lambda () (boxy-close) (smex)))
+		       ("z" . (lambda () (boxy-close) (undo)))
+		       ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
+		       ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
+		       ("x" . (lambda () (boxy-close) (page-breaks-popup))))))
+
+  ;; old moded
+  (defun moded-do ()
+    (interactive)
+    (save-excursion ;; error correction
+      (backward-word)
+      (when (or (looking-at "jf")
+		(looking-at "fj"))
+	(undo)))
+    (set-face-attribute 'mode-line nil :background "firebrick")
+    (moded--rk ">"
+	       ("f" (ido-find-file))
+	       ("g" (ido-switch-buffer))
+	       ("j" (smex))
+	       ("z" (undo))
+	       ("s" (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer)))
+	       ("x" (page-breaks-popup))
+	       ("o" (switch-to-buffer (other-buffer)))
+	       ("m" (moded--rkl "> Move"
+				"g"
+				("l" (smooth-scroll -1 8 0.1))
+				("m" (smooth-scroll 1 8 0.1))
+				("j" (backward-word))
+				("k" (forward-word))
+				("d" (previous-line))
+				("f" (next-line))
+				("e" (backward-paragraph))
+				("i" (forward-paragraph))))
+	       ("c" (moded--rk "> Comment"
+			       ("c" (comment-or-uncomment-region (region-beginning) (region-end)))
+			       ("n" (moded--rk "> Comment > Next >"
+					       ("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
+					       ("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
+			       ("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
+			       ("e" (ceh-comment-to-eol))
+			       ("a" (ceh-comment-next-atom))))
+	       ("v" (moded--rk "> Version Control"
+			       ("d" (call-interactively 'vc-dir))
+			       ("=" (vc-diff))
+			       ("c" (vc-diff))
+			       ("v" (call-interactively 'vc-next-action))
+			       ("u" (call-interactively 'vc-revert))
+			       ("l" (vc-print-log))
+			       ("r" (moded--rk "> Version Control > Root"
+					       ("l" (vc-print-root-log))))))
+	       ("k" (moded--rk "> Kill"
+			       ("k" (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer)))
+			       ("w" (kill-buffer-and-window))
+			       ("c" (kill-compilation))))
+	       ("d" (moded--rk "> Compile"
+			       ("d" (cm-compile-debug))
+			       ("r" (cm-compile-release))
+			       ("s" (cm-run-debug))))
+	       ("w" (moded--rk "> Windows"
+			       ("w" (delete-window))
+			       ("j" (split-window-horizontally))
+			       ("f" (split-window-vertically))))
+	       ("i" (moded--rk "> Insert"
+			       ("g" (insert-guid))))
+	       ("b" (moded--rkl "> Buffer" "b"
+				("j" (windmove-left))
+				("k" (windmove-down))
+				("l" (windmove-right))
+				("i" (windmove-up))))
+	       ("l" (toggle-buffer-finish) (toggle-buffer-next)
+		(moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next)))
+	       ("p" (moded--rk "> Project"
+			       ("i" (or (switch-target) (vs-init) (vs-search)))
+			       ("t" (switch-target))
+			       ("c" (if (vs-active) (vs-switch-configuration) (switch-configuration)))
+			       ("u" (unload-project))
+			       ("l" (cmake-install)))))
+    (set-face-attribute 'mode-line nil :background "#225599")))
 
 (key-chord-define-global "jf" 'moded-do)
 (key-chord-define-global "fj" 'moded-do)
