@@ -941,11 +941,7 @@
   ;; old moded
   (defun moded-do ()
     (interactive)
-    (save-excursion ;; error correction
-      (backward-word)
-      (when (or (looking-at "jf")
-		(looking-at "fj"))
-	(undo)))
+    (moded--error-correct)
     (set-face-attribute 'mode-line nil :background "firebrick")
     (moded--rk ">"
 	       ("f" (ido-find-file))
