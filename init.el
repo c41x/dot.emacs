@@ -1023,3 +1023,4 @@
 ;; TODO: seems like popup.el is broken under windows8...
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: uniform c++ project
+;; TODO: fix highlight-symbol.el under windows8
