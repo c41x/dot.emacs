@@ -139,9 +139,6 @@
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
 (font-lock-add-keywords 'python-mode operator-rex)
-(setq highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1")))
-(setq highlight-symbol-idle-delay 0.5)
-;;(setq highlight-symbol-ignore-list (quote ("\\`[0-9]+f?F?[ulUL]*\\'")))
 
 ;; highlighting numbers
 ;;"\\<\\(\\([+-]?[0-9.]+[lufLU]*\\)\\|0[xX][0-9a-fA-F]+\\)\\>"
@@ -379,6 +376,9 @@
 (global-set-key [f3] 'highlight-symbol-next)
 (global-set-key [(shift f3)] 'highlight-symbol-prev)
 (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
+(setq highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1")))
+(setq highlight-symbol-idle-delay 0.5)
+;;(setq highlight-symbol-ignore-list (quote ("\\`[0-9]+f?F?[ulUL]*\\'")))
 
 ;; flycheck
 (require 'flycheck)
