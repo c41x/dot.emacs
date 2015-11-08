@@ -495,13 +495,13 @@
   (interactive)
   (highlight-lines-matching-regexp ".\\{81\\}" 'font-lock-over-80-face))
 
-;; highlight-symbol advice for ignoring numbers and symbols inside comments
-(defadvice highlight-symbol-get-symbol (after highlight-ignore-symbols activate)
-  (when (or (save-excursion
-	      (skip-chars-backward "0-9.A-Za-z")
-	      (looking-at "[0-9]+\\.?[ulULfF]*"))
-	    (nth 4 (syntax-ppss)))
-    (setq ad-return-value nil)))
+;; ;; highlight-symbol advice for ignoring numbers and symbols inside comments
+;; (defadvice highlight-symbol-get-symbol (after highlight-ignore-symbols activate)
+;;   (when (or (save-excursion
+;; 	      (skip-chars-backward "0-9.A-Za-z")
+;; 	      (looking-at "[0-9]+\\.?[ulULfF]*"))
+;; 	    (nth 4 (syntax-ppss)))
+;;     (setq ad-return-value nil)))
 
 ;; recompiling stuff
 (defun recompile-scripts ()
