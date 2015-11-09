@@ -378,7 +378,7 @@
 (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
 (setq highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1")))
 (setq highlight-symbol-idle-delay 0.5)
-;;(setq highlight-symbol-ignore-list (quote ("\\`[0-9]+f?F?[ulUL]*\\'")))
+(setq highlight-symbol-ignore-list (quote ("\\`[0-9]+f?F?[ulUL]*\\'")))
 
 ;; flycheck
 (require 'flycheck)
