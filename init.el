@@ -111,6 +111,9 @@
 ;; theme
 (load-theme 'calx t)
 
+;; set frame size
+(add-hook 'after-init-hook (lambda () (set-frame-size (selected-frame) 120 80)))
+
 ;; show line numbers
 (global-linum-mode t)
 
