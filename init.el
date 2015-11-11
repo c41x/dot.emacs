@@ -298,6 +298,9 @@
 ;; no pasting for MMB
 (global-unset-key (kbd "<mouse-2>"))
 
+;; scratch buffer text
+(setq initial-scratch-message (concat ";; Emacs .c41x" (make-string 20 ?\n)))
+
 ;; TODO: property list ?
 
 ;;//- plugins
