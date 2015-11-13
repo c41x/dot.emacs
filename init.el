@@ -924,8 +924,8 @@
 							     ("m" (smooth-scroll 1 8 0.1))
 							     ("j" (backward-word))
 							     ("k" (forward-word))
-							     ("d" (previous-line))
-							     ("f" (next-line))
+							     ("d" (forward-line -1))
+							     ("f" (forward-line 1))
 							     ("e" (backward-paragraph))
 							     ("i" (forward-paragraph)))))
 		       ("c" . (lambda () (boxy-close) (moded--rk "> Comment"
@@ -963,8 +963,8 @@
 				("m" (smooth-scroll 1 8 0.1))
 				("j" (backward-word))
 				("k" (forward-word))
-				("d" (previous-line))
-				("f" (next-line))
+				("d" (forward-line -1))
+				("f" (forward-line 1))
 				("e" (backward-paragraph))
 				("i" (forward-paragraph))))
 	       ("c" (moded--rk "> Comment"
