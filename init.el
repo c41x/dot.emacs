@@ -37,7 +37,8 @@
     s
     company
     company-irony
-    irony))
+    irony
+    neotree))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -364,8 +365,6 @@
 (pretty-lambda-for-modes)
 
 ;; neotree
-(add-to-list 'load-path "~/.emacs.d/neotree")
-(require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
 
 ;; highlight-symbol mode
@@ -1030,3 +1029,17 @@
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: uniform c++ project
 ;; TODO: fix highlight-symbol.el under windows8
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (yasnippet smex skewer-mode s pretty-lambdada php-mode multiple-cursors lua-mode key-chord jedi highlight-symbol helm glsl-mode fuzzy flycheck expand-region csharp-mode company-irony cmake-mode autopair ace-jump-mode ac-geiser))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
