@@ -113,7 +113,7 @@
 (load-theme 'calx t)
 
 ;; set frame size
-(add-hook 'after-init-hook (lambda () (set-frame-size (selected-frame) 120 80)))
+(add-hook 'after-init-hook (lambda () (set-frame-size (selected-frame) 120 70)))
 
 ;; show line numbers
 (global-linum-mode t)
@@ -141,6 +141,7 @@
 (font-lock-add-keywords 'js2-mode operator-rex)
 (font-lock-add-keywords 'csharp-mode operator-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
+(font-lock-add-keywords 'lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
 (font-lock-add-keywords 'python-mode operator-rex)
 
@@ -153,6 +154,7 @@
 (font-lock-add-keywords 'js2-mode number-rex)
 (font-lock-add-keywords 'csharp-mode number-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
+(font-lock-add-keywords 'lisp-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'python-mode number-rex)
 
 ;;//- general settings/utilities
@@ -371,6 +373,7 @@
 (require 'highlight-symbol)
 (add-hooks 'highlight-symbol-mode
 	   '(emacs-lisp-mode-hook
+	     lisp-mode-hook
 	     c-mode-hook
 	     c++-mode-hook
 	     csharp-mode-hook
@@ -767,7 +770,7 @@
 	     (highlight-page-breaks)
 	     (highlight-todos))
 	   '(cg-mode-hook c-mode-hook c++-mode-hook js-mode-hook js2-mode-hook csharp-mode-hook
-			  emacs-lisp-mode-hook))
+			  emacs-lisp-mode-hook lisp-mode-hook))
 (global-set-key (kbd "M-]") 'next-page-break)
 (global-set-key (kbd "M-[") 'prev-page-break)
 (global-set-key (kbd "C-; x") 'page-breaks-popup)
