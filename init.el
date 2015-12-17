@@ -140,7 +140,7 @@
 (font-lock-add-keywords 'js-mode operator-rex)
 (font-lock-add-keywords 'js2-mode operator-rex)
 (font-lock-add-keywords 'csharp-mode operator-rex)
-(font-lock-add-keywords 'maxscript-mode '(("\\([=()#.,]\\)" . font-lock-operator-face)))
+(font-lock-add-keywords 'maxscript-mode '(("\\([=()#.,+]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
