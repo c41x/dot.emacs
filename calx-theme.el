@@ -139,10 +139,10 @@
 			   :overline nil
 			   :underline nil
 			   :slant normal
-			   :weight bold
-			   :height 80
+			   :weight normal
+			   :height 98
 			   :width normal
-			   :foundry "outline"
+			   :foundry "unknown"
 			   :family "Liberation Mono"))))))
 
 (provide-theme 'calx)
