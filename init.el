@@ -141,6 +141,7 @@
 (font-lock-add-keywords 'js-mode operator-rex)
 (font-lock-add-keywords 'js2-mode operator-rex)
 (font-lock-add-keywords 'csharp-mode operator-rex)
+(font-lock-add-keywords 'maxscript-mode '(("\\([=()#.,+]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
@@ -154,6 +155,7 @@
 (font-lock-add-keywords 'js-mode number-rex)
 (font-lock-add-keywords 'js2-mode number-rex)
 (font-lock-add-keywords 'csharp-mode number-rex)
+(font-lock-add-keywords 'maxscript-mode number-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'lisp-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'python-mode number-rex)
@@ -750,6 +752,10 @@
 ;; flycheck in LISP
 (add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
 (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
+
+;;//- MaxScript
+(require 'maxscript-mode)
+(add-to-list 'auto-mode-alist '("\\.ms$" . maxscript-mode))
 
 ;;//- Google integration
 ;; google services integration (uses google command line tools - googlecl)
