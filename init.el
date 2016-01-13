@@ -38,7 +38,8 @@
     company
     company-irony
     irony
-    neotree))
+    neotree
+    omnisharp))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -638,6 +639,14 @@
 ;;//- C#
 ;; csharp-mode inserts {} braces automatically (this totally breaks autopair)
 (add-hook 'csharp-mode-hook (lambda () (local-set-key (kbd "{") 'c-electric-brace)))
+(add-hook 'csharp-mode-hook (lambda ()
+			      (local-set-key (kbd "C-SPC")
+					      '(lambda ()
+						 (interactive)
+						 (omnisharp-auto-complete)))
+			      (omnisharp-mode)))
+(add-hook 'csharp-mode-hook 'flycheck-mode)
+(setq omnisharp-server-executable-path "c:/apps/OmniSharp/OmniSharp.exe")
 
 ;;//- Cg/HLSL/GLSL/ShaderLab
 ;; CG/HLSL mode

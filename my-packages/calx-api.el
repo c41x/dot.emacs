@@ -5,7 +5,7 @@
 
 (require 'url)
 
-;; shold define (defvar calx--server-api-url "http://xyz.com/")
+;; shold define (defvar calx--server-api-url "http://xyz.com") ;; URL WITH NO TAILING BACKSLASH!
 (defvar calx--server-api-url "unknown")
 (defvar calx--server-api-username "unknown")
 (defvar calx--server-api-password "unknown")
