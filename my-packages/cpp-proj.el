@@ -429,6 +429,49 @@
 		(flycheck-mode)
 		(flycheck-select-checker 'c/c++-gcc)))))
 
+;;//- CMake project generator
+(defun generate-project ()
+  (interactive)
+  (if (is-cmake-project)
+      (let* ((root (find-project-directory))
+	     (configuration (if root
+				(popup-menu* '("Debug"
+					       "Release"
+					       "RelWithDebInfo"
+					       "MinSizeRel") :scroll-bar t :isearch t) nil))
+	     (generator (if configuration
+			    (popup-menu* '("MinGW Makefiles"
+					   "Unix Makefiles"
+					   "MSYS Makefiles"
+					   "NMake Makefiles"
+					   "Ninja"
+					   "Visual Studio 10 2010"
+					   "Visual Studio 11 2012"
+					   "Visual Studio 12 2013"
+					   "Visual Studio 13 2015"
+					   "CodeBlocks"
+					   "Eclipse CDT4"
+					   "KDevelop3") :scroll-bar t :isearch t) nil))
+	     (project-dir (if generator
+			      (cond
+			       ((string= configuration "Debug")
+				(concat root "project/debug"))
+			       ((string= configuration "Release")
+				(concat root "project/release"))
+			       ((string= configuration "RelWithDebInfo")
+				(concat root "project/relWithDebInfo"))
+			       ((string= configuration "MinSizeRel")
+				(concat root "project/minSizeRel"))
+			       (t nil)) nil))
+	     (already-generated (and project-dir (file-exists-p project-dir))))
+	;;(if already-generated
+	;; (message "CMake project with choosen configuration already exists")
+	(message (format "Generating project for: %s | %s | %s" project-dir generator configuration))
+	(mkdir project-dir t)
+	(compile (format "cd \"%s\" && cmake -DCMAKE_BUILD_TYPE=%s -G\"%s\" ../.."
+			 project-dir configuration generator)))
+    (message "Not a CMake project")))
+
 ;; example Visual Studio project file:
 ;; (setq vs-solution "c:/repo/pro/vc2013/pro.sln")
 ;; (setq vs-solution-name "pro.sln")
