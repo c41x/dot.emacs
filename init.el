@@ -451,6 +451,9 @@
 (global-set-key (kbd "M-<up>") '(lambda () (interactive) (smooth-scroll -1 8 0.1)))
 (global-set-key (kbd "M-<down>") '(lambda () (interactive) (smooth-scroll 1 8 0.1)))
 
+;; this fixes hang-ups in windows 8 when opening/searching for files
+(setq w32-get-true-file-attributes nil)
+
 ;; increment closest number
 (defun change-closest-number (increase-by)
   (interactive)
