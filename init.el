@@ -304,6 +304,9 @@
 ;; no pasting for MMB
 (global-unset-key (kbd "<mouse-2>"))
 
+;; Shift + Space -> move cursor right
+(global-set-key (kbd "S-SPC") 'right-char)
+
 ;; scratch buffer text
 (setq initial-scratch-message (concat ";; Emacs .c41x" (make-string 20 ?\n)))
 
@@ -351,7 +354,7 @@
 
 ;; ace-jump mode for quick jumping around
 (require 'ace-jump-mode)
-(define-key global-map (kbd "S-SPC") 'ace-jump-mode)
+(define-key global-map (kbd "C-.") 'ace-jump-mode)
 
 ;; multiple cursors
 (require 'multiple-cursors)
