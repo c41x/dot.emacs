@@ -448,9 +448,9 @@
 					   "Visual Studio 10 2010"
 					   "Visual Studio 11 2012"
 					   "Visual Studio 12 2013"
-					   "Visual Studio 13 2015"
-					   "CodeBlocks"
-					   "Eclipse CDT4"
+					   "Visual Studio 14 2015 Win64"
+					   "CodeBlocks - MinGW Makefiles"
+					   "Eclipse CDT4 - MinGW Makefiles"
 					   "KDevelop3") :scroll-bar t :isearch t) nil))
 	     (project-dir (if generator
 			      (cond
