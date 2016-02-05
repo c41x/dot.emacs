@@ -304,8 +304,13 @@
 ;; no pasting for MMB
 (global-unset-key (kbd "<mouse-2>"))
 
-;; Shift + Space -> move cursor right
-(global-set-key (kbd "S-SPC") 'right-char)
+;; Shift + Space -> move cursor right skipping all whitespace
+(defun move ()
+  (interactive)
+  (if (looking-at-p "[ \t\r\n]")
+      (skip-chars-forward " \t\r\n")
+    (right-char)))
+(global-set-key (kbd "S-SPC") 'move)
 
 ;; scratch buffer text
 (setq initial-scratch-message (concat ";; Emacs .c41x" (make-string 20 ?\n)))
