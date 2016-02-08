@@ -309,8 +309,27 @@
   (interactive)
   (if (looking-at-p "[ \t\r\n]")
       (skip-chars-forward " \t\r\n")
-    (right-char)))
+    (forward-char 1)))
 (global-set-key (kbd "S-SPC") 'move)
+
+;; Shift + Backspace -> hungry delete
+(defun hungry-delete ()
+  (interactive)
+  (save-excursion
+    (let* ((begin (point))
+	   (end (progn
+		  (when (= (skip-chars-backward " \r\n\t") 0)
+		    (forward-char -1))
+		  (point))))
+      (delete-region begin end))))
+(global-set-key (kbd "S-<backspace>") 'hungry-delete)
+
+;; Shift + Ctrol + Space -> move back
+(defun move-back ()
+  (interactive)
+  (when (= (skip-chars-backward " \r\n\t") 0)
+    (forward-char -1)))
+(global-set-key (kbd "M-SPC") 'move-back)
 
 ;; scratch buffer text
 (setq initial-scratch-message (concat ";; Emacs .c41x" (make-string 20 ?\n)))
