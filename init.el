@@ -410,7 +410,7 @@
 	     js-mode-hook
 	     js2-mode-hook
 	     python-mode-hook))
-(global-set-key [(control f3)] 'highlight-symbol-at-point)
+(global-set-key [(control f3)] 'highlight-symbol)
 (global-set-key [f3] 'highlight-symbol-next)
 (global-set-key [(shift f3)] 'highlight-symbol-prev)
 (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
@@ -1079,4 +1079,3 @@
 ;; TODO: seems like popup.el is broken under windows8...
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: uniform c++ project
-;; TODO: fix highlight-symbol.el under windows8
