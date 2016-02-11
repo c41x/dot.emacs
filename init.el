@@ -1074,8 +1074,5 @@
 ;; TODO: moded in VC
 ;; TODO: moded abort bug
 ;; TODO: toggling buffers
-;; TODO: moded escape any key
-;; TODO: better fj correction on fail?
-;; TODO: seems like popup.el is broken under windows8...
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: uniform c++ project

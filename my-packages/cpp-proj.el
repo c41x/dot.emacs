@@ -487,7 +487,6 @@
 ;; - create build directory for cmake oos build
 ;; - ask for options
 ;; - run cmake generator (asking which one (Unix Makefiles, VSxx, etc.))
-;; // TODO: install target
 
 (provide 'cpp-proj)
 ;;; cpp-proj.el ends here
