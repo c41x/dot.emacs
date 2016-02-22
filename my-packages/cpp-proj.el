@@ -157,6 +157,10 @@
 		     (concat "--target " current-target-name))
 		   (if clean "--clean-first" ""))))
 
+(defun cmake-regenerate (release)
+  (save-some-buffers t)
+  (compile (format "cmake %s" (if release current-dir-release current-dir-debug))))
+
 (defun cmake-install ()
   (interactive)
   (let ((current-target-name "install"))
@@ -356,6 +360,18 @@
   (run-exec t)
   (select-window (get-buffer-window "*compilation*"))
   (goto-char (point-max)))
+
+(defun cm-regenerate-debug ()
+  (interactive)
+  (cmake-regenerate nil))
+
+(defun cm-regenerate-release ()
+  (interactive)
+  (cmake-regenerate t))
+
+(defun cm-regenerate ()
+  (interactive)
+  (cmake-regenerate current-target-release))
 
 (defun cm-debug ()
   (interactive)

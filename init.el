@@ -920,13 +920,15 @@
 								     " c - configuration (Debug/Release)"
 								     " u - unload project"
 								     " l - install project (CMake only)"
-								     " g - generate CMake project")
+								     " g - generate CMake project"
+								     " r - regenerate CMake project")
 								'(("i" . (lambda () (boxy-close) (or (switch-target) (vs-init) (vs-search))))
 								  ("t" . (lambda () (boxy-close) (switch-target)))
 								  ("c" . (lambda () (boxy-close) (if (vs-active) (vs-switch-configuration) (switch-configuration))))
 								  ("u" . (lambda () (boxy-close) (unload-project)))
 								  ("l" . (lambda () (boxy-close) (cmake-install)))
-								  ("g" . (lambda () (boxy-close) (generate-project)))))))
+								  ("g" . (lambda () (boxy-close) (generate-project)))
+								  ("r" . (lambda () (boxy-close) (cm-regenerate)))))))
 		       ("v" . (lambda () (boxy-close) (boxy-centered 40 '(" r - [root ...]"
 								     " d - directory status"
 								     " c - diff current file (=)"
