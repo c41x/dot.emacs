@@ -225,7 +225,6 @@
 (cua-mode 1) ; cua-mode (Ctrl+C,V,X,Z)
 (setq select-enable-clipboard t) ; allows to copy/paste text between emacs and other apps
 (setq x-select-enable-clipboard t)
-(setq interprogram-paste-function 'x-cut-buffer-or-selection-value)
 
 ;; yank-pop - more CUA - friendly
 (global-unset-key (kbd "M-y"))
