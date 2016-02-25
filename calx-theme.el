@@ -59,7 +59,7 @@
 
 (custom-theme-set-faces
  'calx
- '(default ((t (:inherit nil :background "#000000" :foreground "#b2af99" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight bold :height 83 :width normal :foundry "outline" :family "Liberation Mono"))))
+ '(default ((t (:inherit nil :background "#000000" :foreground "#b2af99" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "outline" :family "Liberation Mono"))))
  '(cursor ((t (:background "white"))))
  '(fixed-pitch ((t (:family "Monospace"))))
  '(variable-pitch ((t (:family "Sans Serif"))))
@@ -127,7 +127,8 @@
  '(font-lock-over-80-face ((t (:foreground "#ff2211"))))
  '(highlight-symbol-face ((t (:background "gray25")))))
 
-(unless (string= system-type "windows-nt")
+(when (string= system-type "windows-nt")
+  (message "setting up font (non windows OS)")
   (custom-theme-set-faces
    'calx
    '(default ((t (:inherit nil
@@ -139,8 +140,7 @@
 			   :overline nil
 			   :underline nil
 			   :slant normal
-			   :weight normal
-			   :height 98
+			   :weight bold :height 83
 			   :width normal
 			   :foundry "unknown"
 			   :family "Liberation Mono"))))))
