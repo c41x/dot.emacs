@@ -39,7 +39,8 @@
     company-irony
     irony
     neotree
-    omnisharp))
+    omnisharp
+    ggtags))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -604,8 +605,15 @@
 		     ;;ac-source-yasnippet
 		     )))
 
-(add-hook 'c-mode 'ac-ccc-mode-setup)
-(add-hook 'c++-mode 'ac-ccc-mode-setup)
+(add-hook 'c-mode-hook 'ac-ccc-mode-setup)
+(add-hook 'c++-mode-hook 'ac-ccc-mode-setup)
+
+;; GNU global tags
+(require 'ggtags)
+(defun ggtags-enable ()
+  (ggtags-mode 1))
+(add-hook 'c-mode-hook 'ggtags-enable)
+(add-hook 'c++-mode-hook 'ggtags-enable)
 
 ;; C++ coding style (indenting)
 (defconst my-c-style
