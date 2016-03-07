@@ -687,6 +687,7 @@
 					      '(lambda ()
 						 (interactive)
 						 (omnisharp-auto-complete)))
+			      (auto-complete-mode t)
 			      (omnisharp-mode)))
 (add-hook 'csharp-mode-hook 'flycheck-mode)
 (setq omnisharp-server-executable-path "c:/apps/OmniSharp/OmniSharp.exe")
