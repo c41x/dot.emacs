@@ -618,6 +618,7 @@
   (ggtags-mode 1))
 (add-hook 'c-mode-hook 'ggtags-enable)
 (add-hook 'c++-mode-hook 'ggtags-enable)
+(define-key ggtags-mode-map (kbd "M-]") nil) ;; unbind keybing conflict
 
 ;; C++ coding style (indenting)
 (defconst my-c-style
