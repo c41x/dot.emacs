@@ -9,7 +9,14 @@
 (defvar calx--server-api-url "unknown")
 (defvar calx--server-api-username "unknown")
 (defvar calx--server-api-password "unknown")
+(defvar calx--server-backup nil) ;; do perform backup?
+(defvar calx--server-backup-path "")
 (defvar calx--keymap (make-sparse-keymap))
+
+(defun calx--perform-backup ()
+  (write-region (point-min)
+		(point-max)
+		(concat calx--server-backup-path "/TODO-" (format-time-string "%Y%m%d-%H%M%S"))))
 
 (when calx--keymap
   (define-key calx--keymap (kbd "C-x C-s") 'calx-set)
@@ -46,7 +53,9 @@
 				 (use-local-map (make-composed-keymap calx--keymap org-mode-map))
 				 (add-hook 'moded-save-hook 'calx-set)
 				 (add-hook 'moded-kill-hook 'calx-logout)
-				 (and callback-ok (funcall callback-ok errm)))))))))
+				 (and callback-ok (funcall callback-ok errm))
+				 (when calx--server-backup
+				   (calx--perform-backup)))))))))
 
 (defun calx--request-login (callback)
   (calx--request (concat calx--server-api-url "/api_login")
