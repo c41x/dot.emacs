@@ -127,22 +127,4 @@
  '(font-lock-over-80-face ((t (:foreground "#ff2211"))))
  '(highlight-symbol-face ((t (:background "gray25")))))
 
-(when (string= system-type "windows-nt")
-  (message "setting up font (non windows OS)")
-  (custom-theme-set-faces
-   'calx
-   '(default ((t (:inherit nil
-			   :background "#000000"
-			   :foreground "#b2af99"
-			   :inverse-video nil
-			   :box nil
-			   :strike-through nil
-			   :overline nil
-			   :underline nil
-			   :slant normal
-			   :weight bold :height 83
-			   :width normal
-			   :foundry "unknown"
-			   :family "Liberation Mono"))))))
-
 (provide-theme 'calx)
