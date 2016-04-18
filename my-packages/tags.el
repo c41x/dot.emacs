@@ -7,6 +7,8 @@
 (defconst re-todo ".?TODO\\:.")
 (defconst re-page-break-or-todo "\\(.?//-.\\)\\|\\(.?TODO\\:.\\)")
 
+(require 'popup)
+
 (defun highlight-page-breaks ()
   (interactive)
   (highlight-lines-matching-regexp re-page-break 'font-lock-page-break-face))
@@ -78,4 +80,4 @@
       (message "no page breaks found"))))
 
 (provide 'tags)
-;;; taga.el ends here
+;;; tags.el ends here
