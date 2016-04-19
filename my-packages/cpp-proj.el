@@ -375,7 +375,7 @@
 
 (defun cm-debug ()
   (interactive)
-  (frame-configuration-to-register 1)
+  (frameset-to-register 1)
   (run-debug)
   (setq gdb-many-windows t))
 
