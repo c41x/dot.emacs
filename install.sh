@@ -7,3 +7,4 @@ git clone https://github.com/c41x/hnr.el.git
 mv hnr.el .emacs.d/hnr
 git clone https://github.com/c41x/boxy.el.git
 mv boxy.el .emacs.d/boxy
+rm -f install.sh
