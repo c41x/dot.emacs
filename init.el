@@ -40,7 +40,8 @@
     irony
     neotree
     omnisharp
-    ggtags))
+    ggtags
+    zeal-at-point))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -927,7 +928,8 @@
 			  " z - undo"
 			  " s - save"
 			  " o - switch to other buffer"
-			  " x - page breaks navigation")
+			  " x - page breaks navigation"
+			  " ? - Zeal at point")
 		     '(("p" . (lambda () (boxy-close) (boxy-centered 40 '(" i - initialize"
 								     " t - switch target"
 								     " c - configuration (Debug/Release)"
@@ -1008,7 +1010,8 @@
 		       ("z" . (lambda () (boxy-close) (undo)))
 		       ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
 		       ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
-		       ("x" . (lambda () (boxy-close) (page-breaks-popup))))))
+		       ("x" . (lambda () (boxy-close) (page-breaks-popup)))
+		       ("?" . (lambda () (boxy-close) (zeal-at-point))))))
 
   ;; old moded
   (defun moded-do ()
