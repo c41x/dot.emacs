@@ -419,7 +419,7 @@
 (global-set-key [f3] 'highlight-symbol-next)
 (global-set-key [(shift f3)] 'highlight-symbol-prev)
 (global-set-key [(meta f3)] 'highlight-symbol-query-replace)
-(setq highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1")))
+(setq highlight-symbol-colors (quote ("yellow green" "firebrick" "cornflower blue" "MediumPurple1" "MistyRose" "turquoise" "IndianRed")))
 (setq highlight-symbol-idle-delay 0.5)
 (setq highlight-symbol-ignore-list (quote ("\\`[0-9]+f?F?[ulUL]*\\'")))
 
