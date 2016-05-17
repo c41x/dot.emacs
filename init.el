@@ -34,6 +34,7 @@
     geiser
     ac-geiser
     php-mode
+    web-mode
     s
     company
     company-irony
@@ -802,6 +803,39 @@
 ;;//- MaxScript
 (require 'maxscript-mode)
 (add-to-list 'auto-mode-alist '("\\.ms$" . maxscript-mode))
+
+;;//- PHP
+(require 'php-mode)
+(require 'web-mode)
+(defun setup-php ()
+  (web-mode)
+  (make-local-variable 'web-mode-code-indent-offset)
+  (make-local-variable 'web-mode-markup-indent-offset)
+  (make-local-variable 'web-mode-css-indent-offset)
+  (setq web-mode-code-indent-offset 4)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-markup-indent-offset 2)
+  (flycheck-select-checker my-php)
+  (flycheck-mode t)
+  (setq web-mode-ac-sources-alist
+	'(("css" . (ac-source-words-in-buffer ac-source-css-property))
+	  ("html" . (ac-source-words-in-buffer ac-source-abbrev))
+	  ("php" . (ac-source-words-in-buffer
+		    ac-source-words-in-same-mode-buffers
+		    ac-source-dictionary)))))
+(add-to-list 'auto-mode-alist '("\\.php$" . setup-php))
+
+;; checker for PHP (copied from flycheck)
+(flycheck-define-checker my-php
+  "A PHP syntax checker using the PHP command line interpreter.
+
+See URL `http://php.net/manual/en/features.commandline.php'."
+  :command ("php" "-l" "-d" "error_reporting=E_ALL" "-d" "display_errors=1"
+            "-d" "log_errors=0" source)
+  :error-patterns
+  ((error line-start (or "Parse" "Fatal" "syntax") " error" (any ":" ",") " "
+          (message) " in " (file-name) " on line " line line-end))
+  :modes (php-mode php+-mode web-mode))
 
 ;;//- Google integration
 ;; google services integration (uses google command line tools - googlecl)
