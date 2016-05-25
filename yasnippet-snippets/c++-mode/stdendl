@@ -1,0 +1,6 @@
+# -*- mode: snippet; require-final-newline: nil -*-
+# name: stdendl
+# key: se
+# binding: direct-keybinding
+# --
+<< std::endl;$0
