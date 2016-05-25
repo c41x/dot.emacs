@@ -882,7 +882,8 @@ See URL `http://php.net/manual/en/features.commandline.php'."
 	     c++-mode-hook
 	     js-mode-hook
 	     js2-mode-hook
-	     csharp-mode-hook))
+	     csharp-mode-hook
+	     web-mode-hook))
 
 ;; API
 (require 'calx-api)
@@ -1124,7 +1125,6 @@ See URL `http://php.net/manual/en/features.commandline.php'."
 ;;//- local custom settings
 (load "~/.emacs.d/local-config" t)
 
-;; TODO: clean up moded (do not call fx)
 ;; TODO: moded in VC
 ;; TODO: moded abort bug
 ;; TODO: toggling buffers
