@@ -23,6 +23,8 @@
     js2-mode
     lua-mode
     helm
+    helm-git-grep
+    helm-ls-git
     smex
     popup
     highlight-symbol
@@ -380,7 +382,6 @@
 (require 'helm-config)
 (set 'helm-idle-delay 0.0)
 (set 'helm-input-idle-delay 0.0)
-(global-set-key (kbd "C-x r b") 'helm-bookmarks)
 
 ;; ace-jump mode for quick jumping around
 (require 'ace-jump-mode)
@@ -955,6 +956,7 @@ See URL `http://php.net/manual/en/features.commandline.php'."
 			  " w - [windows ...]"
 			  " i - [insert ...]"
 			  " b - [buffer ...]"
+			  " h - [helm ...]"
 			  " m - > move ..."
 			  " c - > comment ..."
 			  " f - find file"
@@ -1046,6 +1048,12 @@ See URL `http://php.net/manual/en/features.commandline.php'."
 		       ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
 		       ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
 		       ("x" . (lambda () (boxy-close) (page-breaks-popup)))
+		       ("h" . (lambda () (boxy-close) (boxy-centered 40 '(" g - Git"
+								     " b - bookmarks"
+								     " f - Grep find in Git")
+								'(("g" . (lambda () (boxy-close) (helm-ls-git-ls)))
+								  ("b" . (lambda () (boxy-close) (helm-bookmarks)))
+								  ("f" . (lambda () (boxy-close) (helm-git-grep)))))))
 		       ("?" . (lambda () (boxy-close) (zeal-at-point))))))
 
   ;; old moded
