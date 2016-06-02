@@ -382,6 +382,8 @@
 (require 'helm-config)
 (set 'helm-idle-delay 0.0)
 (set 'helm-input-idle-delay 0.0)
+(when (eq system-type 'windows-nt)
+    (defun helm-git-submodule-grep-process ()))
 
 ;; ace-jump mode for quick jumping around
 (require 'ace-jump-mode)
