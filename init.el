@@ -383,7 +383,14 @@
 (set 'helm-idle-delay 0.0)
 (set 'helm-input-idle-delay 0.0)
 (when (eq system-type 'windows-nt)
-    (defun helm-git-submodule-grep-process ()))
+  (defun helm-git-submodule-grep-process ()))
+
+;; force helm to use bottom of the screen and to not break window layout
+(add-to-list 'display-buffer-alist
+	     `(,(rx bos "*helm" (* not-newline) "*" eos)
+	       (display-buffer-in-side-window)
+	       (inhibit-same-window . nil)
+	       (window-height . 0.4)))
 
 ;; ace-jump mode for quick jumping around
 (require 'ace-jump-mode)
