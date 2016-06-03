@@ -342,6 +342,21 @@
 ;; scratch buffer text
 (setq initial-scratch-message (concat ";; Emacs .c41x" (make-string 20 ?\n)))
 
+;; buffer switcher via popup.el
+(defun list-visible-buffers ()
+  (remove-if (lambda (e)
+	       (string= " " (substring (buffer-name e) 0 1)))
+	     (buffer-list)))
+
+(defun popupize-buffer (element)
+  (popup-make-item (buffer-name element) :value element))
+
+(defun switch-buffer-popup ()
+  (interactive)
+  (switch-to-buffer (popup-menu* (mapcar 'popupize-buffer (list-visible-buffers))
+				 :scroll-bar t
+				 :isearch t)))
+
 ;; TODO: property list ?
 
 ;;//- plugins
@@ -1051,7 +1066,7 @@ See URL `http://php.net/manual/en/features.commandline.php'."
 							    ("e" (ceh-comment-to-eol))
 							    ("a" (ceh-comment-next-atom)))))
 		       ("f" . (lambda () (boxy-close) (ido-find-file)))
-		       ("g" . (lambda () (boxy-close) (ido-switch-buffer)))
+		       ("g" . (lambda () (boxy-close) (switch-buffer-popup)))
 		       ("j" . (lambda () (boxy-close) (smex)))
 		       ("z" . (lambda () (boxy-close) (undo)))
 		       ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
