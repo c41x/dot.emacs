@@ -23,6 +23,8 @@
     js2-mode
     lua-mode
     helm
+    helm-git-grep
+    helm-ls-git
     smex
     popup
     highlight-symbol
@@ -341,6 +343,21 @@
 ;; scratch buffer text
 (setq initial-scratch-message (concat ";; Emacs .c41x" (make-string 20 ?\n)))
 
+;; buffer switcher via popup.el
+(defun list-visible-buffers ()
+  (remove-if (lambda (e)
+	       (string= " " (substring (buffer-name e) 0 1)))
+	     (buffer-list)))
+
+(defun popupize-buffer (element)
+  (popup-make-item (buffer-name element) :value element))
+
+(defun switch-buffer-popup ()
+  (interactive)
+  (switch-to-buffer (popup-menu* (mapcar 'popupize-buffer (list-visible-buffers))
+				 :scroll-bar t
+				 :isearch t)))
+
 ;; TODO: property list ?
 
 ;;//- plugins
@@ -381,7 +398,15 @@
 (require 'helm-config)
 (set 'helm-idle-delay 0.0)
 (set 'helm-input-idle-delay 0.0)
-(global-set-key (kbd "C-x r b") 'helm-bookmarks)
+(when (eq system-type 'windows-nt)
+  (defun helm-git-submodule-grep-process ()))
+
+;; force helm to use bottom of the screen and to not break window layout
+(add-to-list 'display-buffer-alist
+	     `(,(rx bos "*helm" (* not-newline) "*" eos)
+	       (display-buffer-in-side-window)
+	       (inhibit-same-window . nil)
+	       (window-height . 0.4)))
 
 ;; ace-jump mode for quick jumping around
 (require 'ace-jump-mode)
@@ -946,6 +971,7 @@
 			  " w - [windows ...]"
 			  " i - [insert ...]"
 			  " b - [buffer ...]"
+			  " h - [helm ...]"
 			  " m - > move ..."
 			  " c - > comment ..."
 			  " f - find file"
@@ -1031,12 +1057,18 @@
 							    ("e" (ceh-comment-to-eol))
 							    ("a" (ceh-comment-next-atom)))))
 		       ("f" . (lambda () (boxy-close) (ido-find-file)))
-		       ("g" . (lambda () (boxy-close) (ido-switch-buffer)))
+		       ("g" . (lambda () (boxy-close) (switch-buffer-popup)))
 		       ("j" . (lambda () (boxy-close) (smex)))
 		       ("z" . (lambda () (boxy-close) (undo)))
 		       ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
 		       ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
 		       ("x" . (lambda () (boxy-close) (page-breaks-popup)))
+		       ("h" . (lambda () (boxy-close) (boxy-centered 40 '(" g - Git"
+								     " b - bookmarks"
+								     " f - Grep find in Git")
+								'(("g" . (lambda () (boxy-close) (helm-ls-git-ls)))
+								  ("b" . (lambda () (boxy-close) (helm-bookmarks)))
+								  ("f" . (lambda () (boxy-close) (helm-git-grep)))))))
 		       ("?" . (lambda () (boxy-close) (zeal-at-point))))))
 
   ;; old moded
