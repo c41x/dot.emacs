@@ -44,7 +44,8 @@
     neotree
     omnisharp
     ggtags
-    zeal-at-point))
+    zeal-at-point
+    ac-php))
 
 (defun has-package-to-install ()
   (loop for p in required-packages
@@ -832,6 +833,7 @@
 ;;//- PHP
 (require 'php-mode)
 (require 'web-mode)
+(require 'ac-php)
 (defun setup-php ()
   (web-mode)
   (make-local-variable 'web-mode-code-indent-offset)
@@ -840,27 +842,16 @@
   (setq web-mode-code-indent-offset 4)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-markup-indent-offset 2)
-  (flycheck-select-checker my-php)
-  (flycheck-mode t)
   (setq web-mode-ac-sources-alist
 	'(("css" . (ac-source-words-in-buffer ac-source-css-property))
 	  ("html" . (ac-source-words-in-buffer ac-source-abbrev))
 	  ("php" . (ac-source-words-in-buffer
 		    ac-source-words-in-same-mode-buffers
-		    ac-source-dictionary)))))
+		    ac-source-dictionary
+		    ac-source-php))))
+  (flycheck-mode t)
+  (flycheck-add-mode 'php 'web-mode))
 (add-to-list 'auto-mode-alist '("\\.php$" . setup-php))
-
-;; checker for PHP (copied from flycheck)
-(flycheck-define-checker my-php
-  "A PHP syntax checker using the PHP command line interpreter.
-
-See URL `http://php.net/manual/en/features.commandline.php'."
-  :command ("php" "-l" "-d" "error_reporting=E_ALL" "-d" "display_errors=1"
-            "-d" "log_errors=0" source)
-  :error-patterns
-  ((error line-start (or "Parse" "Fatal" "syntax") " error" (any ":" ",") " "
-          (message) " in " (file-name) " on line " line line-end))
-  :modes (php-mode php+-mode web-mode))
 
 ;;//- Google integration
 ;; google services integration (uses google command line tools - googlecl)
