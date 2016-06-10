@@ -981,11 +981,11 @@ See URL `http://php.net/manual/en/features.commandline.php'."
 			  " i - [insert ...]"
 			  " b - [buffer ...]"
 			  " h - [helm ...]"
+			  " j - [ceh / code manipulation]"
 			  " m - > move ..."
 			  " c - > comment ..."
 			  " f - find file"
 			  " g - switch buffer"
-			  " j - command"
 			  " z - undo"
 			  " s - save"
 			  " o - switch to other buffer"
@@ -1047,6 +1047,8 @@ See URL `http://php.net/manual/en/features.commandline.php'."
 								  ("k" . (lambda () (boxy-close) (windmove-down)))
 								  ("l" . (lambda () (boxy-close) (windmove-right)))
 								  ("i" . (lambda () (boxy-close) (windmove-up)))))))
+		       ("j" . (lambda () (boxy-close) (boxy-centered 40 '(" n - name selection as variable")
+								'(("n" . (lambda () (boxy-close) (name-selection)))))))
 		       ("m" . (lambda () (boxy-close) (moded--rkl "> Move"
 							     "g"
 							     ("l" (smooth-scroll -1 8 0.1))
@@ -1067,7 +1069,6 @@ See URL `http://php.net/manual/en/features.commandline.php'."
 							    ("a" (ceh-comment-next-atom)))))
 		       ("f" . (lambda () (boxy-close) (ido-find-file)))
 		       ("g" . (lambda () (boxy-close) (switch-buffer-popup)))
-		       ("j" . (lambda () (boxy-close) (smex)))
 		       ("z" . (lambda () (boxy-close) (undo)))
 		       ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
 		       ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
