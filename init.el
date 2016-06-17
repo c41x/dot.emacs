@@ -407,6 +407,8 @@
 	       (display-buffer-in-side-window)
 	       (inhibit-same-window . nil)
 	       (window-height . 0.4)))
+(setq helm-split-window-in-side-p t)
+(setq helm-split-window-default-side 'below)
 
 ;; ace-jump mode for quick jumping around
 (require 'ace-jump-mode)
