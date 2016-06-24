@@ -380,6 +380,8 @@
 (setq ido-enable-flex-matching t)
 (smex-initialize)
 (global-set-key (kbd "M-x") 'smex)
+(add-to-list 'ido-ignore-files "\\.meta")  ;; ignore unity .meta files
+(setq ido-ignore-extensions t)
 
 ;; autocomplete
 (require 'auto-complete-config)
