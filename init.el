@@ -856,6 +856,8 @@
   (flycheck-mode t)
   (flycheck-add-mode 'php 'web-mode))
 (add-to-list 'auto-mode-alist '("\\.php$" . setup-php))
+(add-to-list 'auto-mode-alist '("\\.html$" . setup-php))
+(add-to-list 'auto-mode-alist '("\\.css$" . setup-php))
 
 ;;//- Google integration
 ;; google services integration (uses google command line tools - googlecl)
