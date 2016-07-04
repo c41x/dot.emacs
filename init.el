@@ -1153,7 +1153,6 @@
 ;;//- local custom settings
 (load "~/.emacs.d/local-config" t)
 
-;; TODO: moded in VC
 ;; TODO: moded abort bug
 ;; TODO: toggling buffers
 ;; TODO: CMake project - fix searching for executable
