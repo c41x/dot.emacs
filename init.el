@@ -149,6 +149,7 @@
 (font-lock-add-keywords 'csharp-mode operator-rex)
 (font-lock-add-keywords 'maxscript-mode '(("\\([=()#.,+]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
+(font-lock-add-keywords 'lisp-interaction-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'lisp-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'scheme-mode '(("\\([()'.]\\)" . font-lock-operator-face)))
 (font-lock-add-keywords 'xml-mode operator-rex-xml) ;; TODO: make this work
@@ -164,6 +165,7 @@
 (font-lock-add-keywords 'csharp-mode number-rex)
 (font-lock-add-keywords 'maxscript-mode number-rex)
 (font-lock-add-keywords 'emacs-lisp-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
+(font-lock-add-keywords 'lisp-interaction-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'lisp-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'scheme-mode '(("\\<\\(-?[0-9]+\\.?[0-9]*\\)\\>" . font-lock-number-face)))
 (font-lock-add-keywords 'python-mode number-rex)
