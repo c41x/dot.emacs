@@ -280,8 +280,10 @@
 ;; shows current function name in modeline
 ;; (which-function-mode)
 
-;; delete trailing whitespace on save
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
+;; delete trailing whitespace on save, also tabify buffer
+(add-hook 'before-save-hook (lambda ()
+			      (delete-trailing-whitespace)
+			      (tabify (point-min) (point-max))))
 
 ;; automatically reload files when changed
 (global-auto-revert-mode t)
@@ -464,8 +466,8 @@
 ;;   '(add-to-list 'company-backends 'company-irony))
 
 ;; (add-hooks (lambda ()
-;; 	     (irony-mode))
-;; 	   '(c-mode-hook c++-mode-hook))
+;;	     (irony-mode))
+;;	   '(c-mode-hook c++-mode-hook))
 
 ;; ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; ;; irony-mode's buffers by irony-mode's function
@@ -577,9 +579,9 @@
 ;; ;; highlight-symbol advice for ignoring numbers and symbols inside comments
 ;; (defadvice highlight-symbol-get-symbol (after highlight-ignore-symbols activate)
 ;;   (when (or (save-excursion
-;; 	      (skip-chars-backward "0-9.A-Za-z")
-;; 	      (looking-at "[0-9]+\\.?[ulULfF]*"))
-;; 	    (nth 4 (syntax-ppss)))
+;;	      (skip-chars-backward "0-9.A-Za-z")
+;;	      (looking-at "[0-9]+\\.?[ulULfF]*"))
+;;	    (nth 4 (syntax-ppss)))
 ;;     (setq ad-return-value nil)))
 
 ;; recompiling stuff
@@ -760,10 +762,10 @@
   :error-patterns
   ((error line-start
 	  "ERROR: "
-          column ":"
-          line ":"
+	  column ":"
+	  line ":"
 	  (message)
-          line-end)
+	  line-end)
    (warning line-start
 	    "wARNING: "
 	    column ":"
@@ -1157,7 +1159,6 @@
 ;;//- local custom settings
 (load "~/.emacs.d/local-config" t)
 
-;; TODO: moded in VC
 ;; TODO: moded abort bug
 ;; TODO: toggling buffers
 ;; TODO: CMake project - fix searching for executable
