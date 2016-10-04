@@ -922,6 +922,61 @@
 (add-to-list 'load-path "~/.emacs.d/boxy")
 (require 'boxy)
 
+;;//- temporary test code
+
+(defvar recall-capacity 5)
+(defvar recall-distance 300)
+
+(defvar recall--memory '())
+(defvar recall--current-point -1)
+(defvar recall--current-buffer nil)
+
+(defun recall--ignore-this-place (buffer)
+  (string= " " (substring (buffer-name buffer) 0 1)))
+
+(defun recall--need-to-remember ()
+  (or (and (eq recall--current-buffer (current-buffer))
+	   (> (abs (- recall--current-point (point))) recall-distance))
+      (and (not (recall--ignore-this-place (current-buffer)))
+	   (not (eq recall--current-buffer (current-buffer))))))
+
+(defun recall--rembember ()
+  (add-to-list 'recall--memory (cons (point) (current-buffer)))
+  (when (> (length recall--memory) recall-capacity)
+    (nbutlast recall--memory 1))
+  (setq recall--current-point (point))
+  (setq recall--current-buffer (current-buffer)))
+
+(defun recall--recall-name (place)
+  (with-current-buffer (cdr place)
+    (save-excursion
+      (goto-char (car place))
+      (concat
+       (buffer-name (current-buffer))
+       "("
+       (number-to-string (car place))
+       "): "
+       (buffer-substring-no-properties (max (progn (beginning-of-line) (point)) (- (car place) 20))
+				       (min (progn (end-of-line) (point)) (+ (car place) 20)))))))
+
+(defun recall--popupize (place)
+  (popup-make-item (recall--recall-name place) :value place))
+
+(defun recall--recall (place)
+  (switch-to-buffer (cdr place))
+  (goto-char (car place)))
+
+(add-hook 'post-self-insert-hook
+	  (lambda ()
+	    (when (recall--need-to-remember)
+	      (recall--rembember))))
+
+
+(defun recall ()
+  (recall--recall (popup-menu* (mapcar 'recall--popupize recall--memory)
+			       :scroll-bar t
+			       :isearch t)))
+
 ;;//- GUID generator and utilities
 (require 's)
 
@@ -989,6 +1044,7 @@
 			  " g - switch buffer"
 			  " z - undo"
 			  " s - save"
+			  " r - recall"
 			  " o - switch to other buffer"
 			  " x - page breaks navigation"
 			  " ? - Zeal at point")
@@ -1072,6 +1128,7 @@
 		       ("g" . (lambda () (boxy-close) (switch-buffer-popup)))
 		       ("z" . (lambda () (boxy-close) (undo)))
 		       ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
+		       ("r" . (lambda () (boxy-close) (recall)))
 		       ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
 		       ("x" . (lambda () (boxy-close) (page-breaks-popup)))
 		       ("h" . (lambda () (boxy-close) (boxy-centered 40 '(" g - Git"
@@ -1163,3 +1220,4 @@
 ;; TODO: toggling buffers
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: uniform c++ project
+;; TODO: make recall.el package
