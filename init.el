@@ -437,7 +437,9 @@
 (pretty-lambda-for-modes)
 
 ;; neotree
+(require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
+(setq neo-theme 'nerd)
 
 ;; highlight-symbol mode
 (require 'highlight-symbol)
