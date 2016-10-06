@@ -925,7 +925,8 @@
 (require 'boxy)
 
 ;;//- temporary test code
-
+;; (require 'cl)
+;; (require 'popup)
 (defvar recall-capacity 5)
 (defvar recall-distance 300)
 
@@ -942,31 +943,36 @@
       (and (not (recall--ignore-this-place (current-buffer)))
 	   (not (eq recall--current-buffer (current-buffer))))))
 
+(defun recall--cleanup-invalid ()
+  (setq recall--memory (remove-if (lambda (e) (eq nil (marker-buffer e)))
+				  recall--memory)))
+
 (defun recall--rembember ()
-  (add-to-list 'recall--memory (cons (point) (current-buffer)))
+  (add-to-list 'recall--memory (point-marker))
   (when (> (length recall--memory) recall-capacity)
+    (set-marker (car(last recall--memory)) nil nil)
     (nbutlast recall--memory 1))
   (setq recall--current-point (point))
   (setq recall--current-buffer (current-buffer)))
 
 (defun recall--recall-name (place)
-  (with-current-buffer (cdr place)
+  (with-current-buffer (marker-buffer place)
     (save-excursion
-      (goto-char (car place))
+      (goto-char (marker-position place))
       (concat
        (buffer-name (current-buffer))
        "("
-       (number-to-string (car place))
+       (number-to-string (line-number-at-pos (marker-position place)))
        "): "
-       (buffer-substring-no-properties (max (progn (beginning-of-line) (point)) (- (car place) 20))
-				       (min (progn (end-of-line) (point)) (+ (car place) 20)))))))
+       (buffer-substring-no-properties (max (progn (beginning-of-line) (point)) (- (marker-position place) 35))
+				       (min (progn (end-of-line) (point)) (+ (marker-position place) 35)))))))
 
 (defun recall--popupize (place)
   (popup-make-item (recall--recall-name place) :value place))
 
 (defun recall--recall (place)
-  (switch-to-buffer (cdr place))
-  (goto-char (car place)))
+  (switch-to-buffer (marker-buffer place))
+  (goto-char (marker-position place)))
 
 (add-hook 'post-self-insert-hook
 	  (lambda ()
@@ -975,6 +981,7 @@
 
 
 (defun recall ()
+  (recall--cleanup-invalid)
   (recall--recall (popup-menu* (mapcar 'recall--popupize recall--memory)
 			       :scroll-bar t
 			       :isearch t)))
@@ -1222,4 +1229,7 @@
 ;; TODO: toggling buffers
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: uniform c++ project
-;; TODO: make recall.el package
+;; TODO: recall: make recall.el package
+;; TODO: recall: better description string (remove spaces)
+;; TODO: recall: open closed buffers?
+;; TODO: recall: add custom point to history
