@@ -927,7 +927,7 @@
 ;;//- temporary test code
 ;; (require 'cl)
 ;; (require 'popup)
-(defvar recall-capacity 5)
+(defvar recall-capacity 8)
 (defvar recall-distance 300)
 
 (defvar recall--memory '())
@@ -955,6 +955,11 @@
   (setq recall--current-point (point))
   (setq recall--current-buffer (current-buffer)))
 
+(defun recall--trim-string (string)
+  "Remove white spaces in beginning and ending of STRING.
+White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
+(replace-regexp-in-string "\\`[ \t\n]*" "" (replace-regexp-in-string "[ \t\n]*\\'" "" string)))
+
 (defun recall--recall-name (place)
   (with-current-buffer (marker-buffer place)
     (save-excursion
@@ -964,8 +969,9 @@
        "("
        (number-to-string (line-number-at-pos (marker-position place)))
        "): "
-       (buffer-substring-no-properties (max (progn (beginning-of-line) (point)) (- (marker-position place) 35))
-				       (min (progn (end-of-line) (point)) (+ (marker-position place) 35)))))))
+       (recall--trim-string
+	(buffer-substring-no-properties (max (progn (beginning-of-line) (point)) (- (marker-position place) 35))
+					(min (progn (end-of-line) (point)) (+ (marker-position place) 35))))))))
 
 (defun recall--popupize (place)
   (popup-make-item (recall--recall-name place) :value place))
@@ -974,17 +980,21 @@
   (switch-to-buffer (marker-buffer place))
   (goto-char (marker-position place)))
 
-(add-hook 'post-self-insert-hook
-	  (lambda ()
-	    (when (recall--need-to-remember)
-	      (recall--rembember))))
+(defun recall--self-insert-hook ()
+  (when (recall--need-to-remember)
+	      (recall--rembember)))
 
+(add-hook 'post-self-insert-hook 'recall--self-insert-hook)
+;;(remove-hook 'post-self-insert-hook 'recall--self-insert-hook)
 
 (defun recall ()
   (recall--cleanup-invalid)
   (recall--recall (popup-menu* (mapcar 'recall--popupize recall--memory)
 			       :scroll-bar t
 			       :isearch t)))
+
+(defun recall-remember ()
+  (recall--rembember))
 
 ;;//- GUID generator and utilities
 (require 's)
@@ -1230,6 +1240,4 @@
 ;; TODO: CMake project - fix searching for executable
 ;; TODO: uniform c++ project
 ;; TODO: recall: make recall.el package
-;; TODO: recall: better description string (remove spaces)
 ;; TODO: recall: open closed buffers?
-;; TODO: recall: add custom point to history
