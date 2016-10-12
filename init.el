@@ -440,6 +440,9 @@
 (require 'neotree)
 (global-set-key [f8] 'neotree-toggle)
 (setq neo-theme 'nerd)
+(setq neo-dont-be-alone t)
+(setq neo-vc-integration (quote (face char)))
+(setq neo-window-width 35)
 
 ;; highlight-symbol mode
 (require 'highlight-symbol)
