@@ -271,8 +271,8 @@
 (global-set-key [(f11)] 'kmacro-start-macro-or-insert-counter)
 (global-set-key [(f12)] 'kmacro-end-or-call-macro)
 
-;; no shitty spaces
-(setq indent-tabs-mode t)
+;; no shitty spaces ... 13-10-2015 - hell has frozen over
+(setq indent-tabs-mode nil)
 
 ;; auto indenting current line when pressing <enter>
 (electric-indent-mode t)
@@ -283,7 +283,7 @@
 ;; delete trailing whitespace on save, also tabify buffer
 (add-hook 'before-save-hook (lambda ()
 			      (delete-trailing-whitespace)
-			      (tabify (point-min) (point-max))))
+			      (untabify (point-min) (point-max))))
 
 ;; automatically reload files when changed
 (global-auto-revert-mode t)
@@ -692,7 +692,7 @@
 
 (defun my-c-mode-common-hook ()
   (c-set-style "CALX")
-  (setq indent-tabs-mode t)
+  (setq indent-tabs-mode nil)
   (setq tab-width 4))
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
