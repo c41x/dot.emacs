@@ -126,6 +126,8 @@
  '(font-lock-operator-face ((t (:foreground "#99bde6"))))
  '(font-lock-over-80-face ((t (:foreground "#ff2211"))))
  '(highlight-symbol-face ((t (:background "gray25"))))
- '(neo-file-link-face ((t (:foreground "seashell4")))))
+ '(neo-file-link-face ((t (:foreground "seashell4"))))
+ '(neo-vc-default-face ((t (:foreground "#b2af99"))))
+ '(neo-vc-up-to-date-face ((t (:foreground "#b2af99")))))
 
 (provide-theme 'calx)
