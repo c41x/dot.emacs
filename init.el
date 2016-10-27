@@ -6,8 +6,8 @@
 (package-initialize)
 (setq package-archives
       '(("marmalade" . "https://marmalade-repo.org/packages/")
-	("melpa" . "http://melpa.org/packages/")
-	("elpa" . "http://elpa.gnu.org/packages/")))
+        ("melpa" . "http://melpa.org/packages/")
+        ("elpa" . "http://elpa.gnu.org/packages/")))
 
 (defvar required-packages
   '(yasnippet
@@ -49,8 +49,8 @@
 
 (defun has-package-to-install ()
   (loop for p in required-packages
-	when (not (package-installed-p p)) do (return t)
-	finally (return nil)))
+        when (not (package-installed-p p)) do (return t)
+        finally (return nil)))
 
 (when (has-package-to-install)
   (message "get latest versions of packages...")
@@ -65,52 +65,52 @@
 
 (defun buffer-all-visible ()
   (>= (+ 1 (- (line-number-at-pos (window-end))
-	      (line-number-at-pos (window-start))))
+              (line-number-at-pos (window-start))))
       (total-lines)))
 
 (defun buffer-ind-l ()
   (floor (max 0.0 (- (* (/ (float (line-number-at-pos (window-start)))
-			   (float (total-lines)))
-			buffer-pos-indicator-length) 1.0))))
+                           (float (total-lines)))
+                        buffer-pos-indicator-length) 1.0))))
 
 (defun buffer-ind-b ()
   (ceiling (+ 1.0 (* (/ (float (- (line-number-at-pos (window-end))
-				  (line-number-at-pos (window-start))))
-			(float (total-lines)))
-		     buffer-pos-indicator-length))))
+                                  (line-number-at-pos (window-start))))
+                        (float (total-lines)))
+                     buffer-pos-indicator-length))))
 
 (defun buffer-ind-r ()
   (- buffer-pos-indicator-length (+ (buffer-ind-l) (buffer-ind-b))))
 
 (setq-default mode-line-format '("%e"
-				 mode-line-front-space
-				 mode-line-mule-info
-				 mode-line-client
-				 mode-line-modified
-				 mode-line-remote
-				 mode-line-frame-identification
-				 (:eval (if (buffer-modified-p)
-					    (propertize (make-string 1 9632) 'face 'font-lock-number-face)
-					  (propertize (make-string 1 9632) 'face 'mode-line-bg-face)))
-				 " "
-				 (:propertize (:eval mode-line-buffer-identification) face mode-line-separator-face)
-				 (:eval (if (not (buffer-all-visible))
-					    (list
-					     " "
-					     (propertize (make-string (buffer-ind-l) 9632) 'face 'mode-line-bg-face)
-					     (propertize (make-string (buffer-ind-b) 9632) 'face 'mode-line-progress-face)
-					     (propertize (make-string (buffer-ind-r) 9632) 'face 'mode-line-bg-face)
-					     " "
-					     )))
-				 (vc-mode vc-mode)
-				 " "
-				 (:eval (if (boundp 'mode-line-project) (propertize (concat " " mode-line-project " ") 'face 'mode-line-2)))
-				 " "
-				 " "
-				 mode-line-modes
-				 mode-line-misc-info
-				 mode-line-end-spaces
-				 "%-"))
+                                 mode-line-front-space
+                                 mode-line-mule-info
+                                 mode-line-client
+                                 mode-line-modified
+                                 mode-line-remote
+                                 mode-line-frame-identification
+                                 (:eval (if (buffer-modified-p)
+                                            (propertize (make-string 1 9632) 'face 'font-lock-number-face)
+                                          (propertize (make-string 1 9632) 'face 'mode-line-bg-face)))
+                                 " "
+                                 (:propertize (:eval mode-line-buffer-identification) face mode-line-separator-face)
+                                 (:eval (if (not (buffer-all-visible))
+                                            (list
+                                             " "
+                                             (propertize (make-string (buffer-ind-l) 9632) 'face 'mode-line-bg-face)
+                                             (propertize (make-string (buffer-ind-b) 9632) 'face 'mode-line-progress-face)
+                                             (propertize (make-string (buffer-ind-r) 9632) 'face 'mode-line-bg-face)
+                                             " "
+                                             )))
+                                 (vc-mode vc-mode)
+                                 " "
+                                 (:eval (if (boundp 'mode-line-project) (propertize (concat " " mode-line-project " ") 'face 'mode-line-2)))
+                                 " "
+                                 " "
+                                 mode-line-modes
+                                 mode-line-misc-info
+                                 mode-line-end-spaces
+                                 "%-"))
 
 ;;//- visual/UI
 ;; no start screen
@@ -216,14 +216,14 @@
 ;; moving frames around
 (defun move-frame-with-buffer (dir)
   (let* ((c-buff (current-buffer))
-	 (c-win (selected-window))
-	 (o-win (windmove-find-other-window dir)))
+         (c-win (selected-window))
+         (o-win (windmove-find-other-window dir)))
     (when o-win
       (delete-window c-win)
       (select-window o-win)
       (unless (windmove-find-other-window 'up)
-	(split-window-vertically)
-	(windmove-down))
+        (split-window-vertically)
+        (windmove-down))
       (set-window-buffer (selected-window) c-buff))))
 
 (global-set-key (kbd "C-; .") (lambda () (interactive) (move-frame-with-buffer 'right)))
@@ -282,8 +282,8 @@
 
 ;; delete trailing whitespace on save, also tabify buffer
 (add-hook 'before-save-hook (lambda ()
-			      (delete-trailing-whitespace)
-			      (untabify (point-min) (point-max))))
+                              (whitespace-cleanup)
+                              (untabify (point-min) (point-max))))
 
 ;; automatically reload files when changed
 (global-auto-revert-mode t)
@@ -293,18 +293,18 @@
   (dolist (bind binds)
     (define-key org-mode-map (kbd bind) nil)))
 (add-hook 'org-mode-hook
-	  (lambda ()
-	    (nuke-org-keybinds '("M-<right>"
-				 "M-<left>"
-				 "S-<left>"
-				 "S-<right>"
-				 "M-<up>"
-				 "M-<down>"
-				 "S-<down>"
-				 "S-<up>"
-				 "C-S-<down>"
-				 "C-S-<up>"))
-	    (linum-mode -1)))
+          (lambda ()
+            (nuke-org-keybinds '("M-<right>"
+                                 "M-<left>"
+                                 "S-<left>"
+                                 "S-<right>"
+                                 "M-<up>"
+                                 "M-<down>"
+                                 "S-<down>"
+                                 "S-<up>"
+                                 "C-S-<down>"
+                                 "C-S-<up>"))
+            (linum-mode -1)))
 
 (setq query-replace-show-replacement t)
 
@@ -330,10 +330,10 @@
   (interactive)
   (save-excursion
     (let* ((begin (point))
-	   (end (progn
-		  (when (= (skip-chars-backward " \r\n\t") 0)
-		    (forward-char -1))
-		  (point))))
+           (end (progn
+                  (when (= (skip-chars-backward " \r\n\t") 0)
+                    (forward-char -1))
+                  (point))))
       (delete-region begin end))))
 (global-set-key (kbd "S-<backspace>") 'hungry-delete)
 
@@ -350,8 +350,8 @@
 ;; buffer switcher via popup.el
 (defun list-visible-buffers ()
   (remove-if (lambda (e)
-	       (string= " " (substring (buffer-name e) 0 1)))
-	     (buffer-list)))
+               (string= " " (substring (buffer-name e) 0 1)))
+             (buffer-list)))
 
 (defun popupize-buffer (element)
   (popup-make-item (buffer-name element) :value element))
@@ -359,8 +359,8 @@
 (defun switch-buffer-popup ()
   (interactive)
   (switch-to-buffer (popup-menu* (mapcar 'popupize-buffer (list-visible-buffers))
-				 :scroll-bar t
-				 :isearch t)))
+                                 :scroll-bar t
+                                 :isearch t)))
 
 ;; TODO: property list ?
 
@@ -409,10 +409,10 @@
 
 ;; force helm to use bottom of the screen and to not break window layout
 (add-to-list 'display-buffer-alist
-	     `(,(rx bos "*helm" (* not-newline) "*" eos)
-	       (display-buffer-in-side-window)
-	       (inhibit-same-window . nil)
-	       (window-height . 0.4)))
+             `(,(rx bos "*helm" (* not-newline) "*" eos)
+               (display-buffer-in-side-window)
+               (inhibit-same-window . nil)
+               (window-height . 0.4)))
 (setq helm-split-window-in-side-p t)
 (setq helm-split-window-default-side 'below)
 
@@ -447,14 +447,14 @@
 ;; highlight-symbol mode
 (require 'highlight-symbol)
 (add-hooks 'highlight-symbol-mode
-	   '(emacs-lisp-mode-hook
-	     lisp-mode-hook
-	     c-mode-hook
-	     c++-mode-hook
-	     csharp-mode-hook
-	     js-mode-hook
-	     js2-mode-hook
-	     python-mode-hook))
+           '(emacs-lisp-mode-hook
+             lisp-mode-hook
+             c-mode-hook
+             c++-mode-hook
+             csharp-mode-hook
+             js-mode-hook
+             js2-mode-hook
+             python-mode-hook))
 (global-set-key [(control f3)] 'highlight-symbol)
 (global-set-key [f3] 'highlight-symbol-next)
 (global-set-key [(shift f3)] 'highlight-symbol-prev)
@@ -471,8 +471,8 @@
 ;;   '(add-to-list 'company-backends 'company-irony))
 
 ;; (add-hooks (lambda ()
-;;	     (irony-mode))
-;;	   '(c-mode-hook c++-mode-hook))
+;;           (irony-mode))
+;;         '(c-mode-hook c++-mode-hook))
 
 ;; ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; ;; irony-mode's buffers by irony-mode's function
@@ -489,13 +489,13 @@
 (defun popup-doc ()
   (interactive)
   (let* ((position (point))
-	 (string-under-cursor (buffer-substring-no-properties
-			       (progn (skip-syntax-backward "w_") (point))
-			       (progn (skip-syntax-forward "w_") (point)))))
+         (string-under-cursor (buffer-substring-no-properties
+                               (progn (skip-syntax-backward "w_") (point))
+                               (progn (skip-syntax-forward "w_") (point)))))
     (if (ac-symbol-documentation (intern string-under-cursor))
-	(progn
-	  (goto-char position)
-	  (popup-tip (ac-symbol-documentation (intern string-under-cursor))))
+        (progn
+          (goto-char position)
+          (popup-tip (ac-symbol-documentation (intern string-under-cursor))))
       (message (format "symbol documentation not found: \"%s\"" (intern string-under-cursor))))))
 
 (global-set-key (kbd "C-?") 'popup-doc)
@@ -503,20 +503,20 @@
 ;; control + space = autocomplete (and enable AC mode if not enabled)
 (global-unset-key (kbd "C-SPC"))
 (global-set-key (kbd "C-SPC")
-		'(lambda ()
-		   (interactive)
-		   (unless auto-complete-mode
-		     (message "enabling auto-complete-mode")
-		     (auto-complete-mode t))
-		   (auto-complete)))
+                '(lambda ()
+                   (interactive)
+                   (unless auto-complete-mode
+                     (message "enabling auto-complete-mode")
+                     (auto-complete-mode t))
+                   (auto-complete)))
 
 ;; simple smooth scrolling (sit-for is some kind of Sleep)
 ;; time is not accurate because lag may occur while scrolling... so tweak it experimenally
 (defun smooth-scroll (lines number-of-iterations time)
   (let ((sit-for-time (/ (float time) (float number-of-iterations))))
     (loop for i from 1 to number-of-iterations do (progn
-						    (scroll-up lines)
-						    (sit-for sit-for-time)))))
+                                                    (scroll-up lines)
+                                                    (sit-for sit-for-time)))))
 
 (global-set-key (kbd "C-M-<up>") '(lambda () (interactive) (smooth-scroll -3 7 0.1)))
 (global-set-key (kbd "C-M-<down>") '(lambda () (interactive) (smooth-scroll 3 7 0.1)))
@@ -531,8 +531,8 @@
   (interactive)
   (if (re-search-backward "[0-9]+" -200 t 1) ; no forward searching
       (progn
-	(message "changing: %s->%d" (match-string 0) (+ increase-by (string-to-number (match-string 0))))
-	(replace-match (number-to-string (+ increase-by (string-to-number (match-string 0))))))
+        (message "changing: %s->%d" (match-string 0) (+ increase-by (string-to-number (match-string 0))))
+        (replace-match (number-to-string (+ increase-by (string-to-number (match-string 0))))))
     (error "No number found at this point")))
 
 (global-set-key (kbd "C-c +") (lambda () (interactive) (change-closest-number 1)))
@@ -544,9 +544,9 @@
   (interactive)
   (unless (one-window-p)
     (let* ((this (selected-window))
-	   (that (next-window))
-	   (this-buffer (window-buffer this))
-	   (that-buffer (window-buffer that)))
+           (that (next-window))
+           (this-buffer (window-buffer this))
+           (that-buffer (window-buffer that)))
       (set-window-buffer this that-buffer)
       (set-window-buffer that this-buffer)
       (other-window 1))))
@@ -556,9 +556,9 @@
   (interactive)
   (unless (one-window-p)
     (let* ((that (next-window))
-	   (this (selected-window))
-	   (this-buffer (window-buffer this))
-	   (prv-buffer (other-buffer)))
+           (this (selected-window))
+           (this-buffer (window-buffer this))
+           (prv-buffer (other-buffer)))
       (set-window-buffer this prv-buffer)
       (set-window-buffer that this-buffer)
       (other-window 1))))
@@ -584,9 +584,9 @@
 ;; ;; highlight-symbol advice for ignoring numbers and symbols inside comments
 ;; (defadvice highlight-symbol-get-symbol (after highlight-ignore-symbols activate)
 ;;   (when (or (save-excursion
-;;	      (skip-chars-backward "0-9.A-Za-z")
-;;	      (looking-at "[0-9]+\\.?[ulULfF]*"))
-;;	    (nth 4 (syntax-ppss)))
+;;            (skip-chars-backward "0-9.A-Za-z")
+;;            (looking-at "[0-9]+\\.?[ulULfF]*"))
+;;          (nth 4 (syntax-ppss)))
 ;;     (setq ad-return-value nil)))
 
 ;; recompiling stuff
@@ -603,12 +603,12 @@
     (setq toggle-buffer-list (buffer-list))
     (setq toggle-buffer-i 0))
   (while (progn
-	   (if next
-	       (setq toggle-buffer-i (min (+ 1 toggle-buffer-i) (length toggle-buffer-list)))
-	     (setq toggle-buffer-i (max 0 (- toggle-buffer-i 1))))
-	   (message (buffer-name (nth toggle-buffer-i toggle-buffer-list)))
-	   (= (aref (buffer-name (nth toggle-buffer-i toggle-buffer-list)) 0)
-	      ?\s))) ;; buffers with space as first char are special buffers
+           (if next
+               (setq toggle-buffer-i (min (+ 1 toggle-buffer-i) (length toggle-buffer-list)))
+             (setq toggle-buffer-i (max 0 (- toggle-buffer-i 1))))
+           (message (buffer-name (nth toggle-buffer-i toggle-buffer-list)))
+           (= (aref (buffer-name (nth toggle-buffer-i toggle-buffer-list)) 0)
+              ?\s))) ;; buffers with space as first char are special buffers
   (switch-to-buffer (nth toggle-buffer-i toggle-buffer-list)))
 
 (defun toggle-buffer-next ()
@@ -641,12 +641,12 @@
 ;; C/C++ autocomplete hooks
 (defun ac-ccc-mode-setup ()
   (setq ac-sources '(;ac-source-dictionary ; standard dictionary words
-		     ac-source-filename ; just press / and directory completion appears
-		     ac-source-files-in-current-dir ; from files in current directory
-		     ;;ac-source-semantic ; symantic autocomplete for C/C++
-		     ac-source-words-in-all-buffer ; all stuff from buffers
-		     ;;ac-source-yasnippet
-		     )))
+                     ac-source-filename ; just press / and directory completion appears
+                     ac-source-files-in-current-dir ; from files in current directory
+                     ;;ac-source-semantic ; symantic autocomplete for C/C++
+                     ac-source-words-in-all-buffer ; all stuff from buffers
+                     ;;ac-source-yasnippet
+                     )))
 
 (add-hook 'c-mode-hook 'ac-ccc-mode-setup)
 (add-hook 'c++-mode-hook 'ac-ccc-mode-setup)
@@ -666,25 +666,25 @@
   '((c-tab-always-indent . t)
     (c-comment-only-line-offset . 4)
     (c-hanging-braces-alist . ((substatement-open after)
-			       (brace-list-open)))
+                               (brace-list-open)))
     (c-hanging-colons-alist . ((member-init-intro before)
-			       (inher-intro)
-			       (case-label after)
-			       (label after)
-			       (access-label after)))
+                               (inher-intro)
+                               (case-label after)
+                               (label after)
+                               (access-label after)))
     (c-cleanup-list . (scope-operator
-		       empty-defun-braces
-		       defun-close-semi))
+                       empty-defun-braces
+                       defun-close-semi))
     (c-offsets-alist . ((arglist-close . c-lineup-arglist)
-			(substatement-open . 0)
-			(member-init-intro . ++)
-			(case-label . 4)
-			(block-open . 0)
-			(inclass . 4)
-			(innamespace . 0)
-			(comment-intro . 0)
-			(cpp-macro . 0)
-			(knr-argdecl-intro . -)))
+                        (substatement-open . 0)
+                        (member-init-intro . ++)
+                        (case-label . 4)
+                        (block-open . 0)
+                        (inclass . 4)
+                        (innamespace . 0)
+                        (comment-intro . 0)
+                        (cpp-macro . 0)
+                        (knr-argdecl-intro . -)))
     (c-echo-syntactic-information-p . t))
   "calx programming style")
 
@@ -702,7 +702,7 @@
 (require 'cmake-mode)
 (setq auto-mode-alist
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
-		("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
+                ("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
 
 ;;//- JavaScript
 ;; js2 mode for .js files
@@ -717,7 +717,7 @@
 ;; Racket (run-racket)
 (require 'ac-geiser)
 (add-hooks 'ac-geiser-setup '(geiser-mode-hook
-			      geiser-repl-mode-hook))
+                              geiser-repl-mode-hook))
 (eval-after-load "auto-complete"
   '(add-to-list 'ac-modes 'geiser-repl-mode))
 
@@ -725,12 +725,12 @@
 ;; csharp-mode inserts {} braces automatically (this totally breaks autopair)
 (add-hook 'csharp-mode-hook (lambda () (local-set-key (kbd "{") 'c-electric-brace)))
 (add-hook 'csharp-mode-hook (lambda ()
-			      (local-set-key (kbd "C-SPC")
-					      '(lambda ()
-						 (interactive)
-						 (omnisharp-auto-complete)))
-			      (auto-complete-mode t)
-			      (omnisharp-mode)))
+                              (local-set-key (kbd "C-SPC")
+                                              '(lambda ()
+                                                 (interactive)
+                                                 (omnisharp-auto-complete)))
+                              (auto-complete-mode t)
+                              (omnisharp-mode)))
 (add-hook 'csharp-mode-hook 'flycheck-mode)
 (setq omnisharp-server-executable-path "c:/apps/OmniSharp/OmniSharp.exe")
 
@@ -766,54 +766,54 @@
   :command ("glslangValidator" source)
   :error-patterns
   ((error line-start
-	  "ERROR: "
-	  column ":"
-	  line ":"
-	  (message)
-	  line-end)
+          "ERROR: "
+          column ":"
+          line ":"
+          (message)
+          line-end)
    (warning line-start
-	    "wARNING: "
-	    column ":"
-	    line ":"
-	    (message)
-	    line-end)
+            "wARNING: "
+            column ":"
+            line ":"
+            (message)
+            line-end)
    (info line-start
-	 "NOTE: "
-	 column ":"
-	 line ":"
-	 (message)
-	 line-end))
+         "NOTE: "
+         column ":"
+         line ":"
+         (message)
+         line-end))
   :modes (glsl-mode))
 
 ;; add checker hook
 (add-hook 'glsl-mode-hook (lambda ()
-			    (flycheck-mode)
-			    (flycheck-select-checker 'glsl-checker)))
+                            (flycheck-mode)
+                            (flycheck-select-checker 'glsl-checker)))
 
 ;; shaderlab indenting
 (defconst my-shaderlab-style
   '((c-tab-always-indent . t)
     (c-comment-only-line-offset . 4)
     (c-hanging-braces-alist . ((substatement-open after)
-			       (brace-list-open)))
+                               (brace-list-open)))
     (c-hanging-colons-alist . ((member-init-intro before)
-			       (inher-intro)
-			       (case-label after)
-			       (label after)
-			       (access-label after)))
+                               (inher-intro)
+                               (case-label after)
+                               (label after)
+                               (access-label after)))
     (c-cleanup-list . (scope-operator
-		       empty-defun-braces
-		       defun-close-semi))
+                       empty-defun-braces
+                       defun-close-semi))
     (c-offsets-alist . ((arglist-close . c-lineup-arglist)
-			(substatement-open . 0)
-			(case-label . 4)
-			(block-open . 0)
-			(inclass . 4)
-			(innamespace . 0)
-			(comment-intro . 0)
-			(cpp-macro . 0)
-			(statement-cont . 0)
-			(knr-argdecl-intro . -)))
+                        (substatement-open . 0)
+                        (case-label . 4)
+                        (block-open . 0)
+                        (inclass . 4)
+                        (innamespace . 0)
+                        (comment-intro . 0)
+                        (cpp-macro . 0)
+                        (statement-cont . 0)
+                        (knr-argdecl-intro . -)))
     (c-echo-syntactic-information-p . t))
   "calx Unity ShaderLab style")
 
@@ -856,12 +856,12 @@
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-ac-sources-alist
-	'(("css" . (ac-source-words-in-buffer ac-source-css-property))
-	  ("html" . (ac-source-words-in-buffer ac-source-abbrev))
-	  ("php" . (ac-source-words-in-buffer
-		    ac-source-words-in-same-mode-buffers
-		    ac-source-dictionary
-		    ac-source-php))))
+        '(("css" . (ac-source-words-in-buffer ac-source-css-property))
+          ("html" . (ac-source-words-in-buffer ac-source-abbrev))
+          ("php" . (ac-source-words-in-buffer
+                    ac-source-words-in-same-mode-buffers
+                    ac-source-dictionary
+                    ac-source-php))))
   (flycheck-mode t)
   (flycheck-add-mode 'php 'web-mode))
 (add-to-list 'auto-mode-alist '("\\.php$" . setup-php))
@@ -893,10 +893,10 @@
 ;; page breaks / tags utility
 (require 'tags)
 (add-hooks (lambda ()
-	     (highlight-page-breaks)
-	     (highlight-todos))
-	   '(cg-mode-hook c-mode-hook c++-mode-hook js-mode-hook js2-mode-hook csharp-mode-hook
-			  emacs-lisp-mode-hook lisp-mode-hook))
+             (highlight-page-breaks)
+             (highlight-todos))
+           '(cg-mode-hook c-mode-hook c++-mode-hook js-mode-hook js2-mode-hook csharp-mode-hook
+                          emacs-lisp-mode-hook lisp-mode-hook))
 (global-set-key (kbd "M-]") 'next-page-break)
 (global-set-key (kbd "M-[") 'prev-page-break)
 (global-set-key (kbd "C-; x") 'page-breaks-popup)
@@ -908,13 +908,13 @@
 (add-to-list 'load-path "~/.emacs.d/ceh")
 (require 'ceh)
 (add-hooks 'ceh-mode
-	   '(cg-mode-hook
-	     c-mode-hook
-	     c++-mode-hook
-	     js-mode-hook
-	     js2-mode-hook
-	     csharp-mode-hook
-	     web-mode-hook))
+           '(cg-mode-hook
+             c-mode-hook
+             c++-mode-hook
+             js-mode-hook
+             js2-mode-hook
+             csharp-mode-hook
+             web-mode-hook))
 
 ;; API
 (require 'calx-api)
@@ -942,13 +942,13 @@
 
 (defun recall--need-to-remember ()
   (or (and (eq recall--current-buffer (current-buffer))
-	   (> (abs (- recall--current-point (point))) recall-distance))
+           (> (abs (- recall--current-point (point))) recall-distance))
       (and (not (recall--ignore-this-place (current-buffer)))
-	   (not (eq recall--current-buffer (current-buffer))))))
+           (not (eq recall--current-buffer (current-buffer))))))
 
 (defun recall--cleanup-invalid ()
   (setq recall--memory (remove-if (lambda (e) (eq nil (marker-buffer e)))
-				  recall--memory)))
+                                  recall--memory)))
 
 (defun recall--rembember ()
   (add-to-list 'recall--memory (point-marker))
@@ -973,8 +973,8 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
        (number-to-string (line-number-at-pos (marker-position place)))
        "): "
        (recall--trim-string
-	(buffer-substring-no-properties (max (progn (beginning-of-line) (point)) (- (marker-position place) 35))
-					(min (progn (end-of-line) (point)) (+ (marker-position place) 35))))))))
+        (buffer-substring-no-properties (max (progn (beginning-of-line) (point)) (- (marker-position place) 35))
+                                        (min (progn (end-of-line) (point)) (+ (marker-position place) 35))))))))
 
 (defun recall--popupize (place)
   (popup-make-item (recall--recall-name place) :value place))
@@ -985,7 +985,7 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
 
 (defun recall--self-insert-hook ()
   (when (recall--need-to-remember)
-	      (recall--rembember)))
+              (recall--rembember)))
 
 (add-hook 'post-self-insert-hook 'recall--self-insert-hook)
 ;;(remove-hook 'post-self-insert-hook 'recall--self-insert-hook)
@@ -993,8 +993,8 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
 (defun recall ()
   (recall--cleanup-invalid)
   (recall--recall (popup-menu* (mapcar 'recall--popupize recall--memory)
-			       :scroll-bar t
-			       :isearch t)))
+                               :scroll-bar t
+                               :isearch t)))
 
 (defun recall-remember ()
   (recall--rembember))
@@ -1018,10 +1018,10 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
   (interactive)
   (while
       (let* ((new-guid (generate-guid))
-	     (searching (re-search-forward "{[A-Za-z0-9]\\{8\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{12\\}}" nil t)))
-	(when (and searching (y-or-n-p "Replace with new GUID?"))
-	  (replace-match (concat "{" new-guid "}")))
-	searching)))
+             (searching (re-search-forward "{[A-Za-z0-9]\\{8\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{4\\}-[A-Za-z0-9]\\{12\\}}" nil t)))
+        (when (and searching (y-or-n-p "Replace with new GUID?"))
+          (replace-match (concat "{" new-guid "}")))
+        searching)))
 
 ;;//- modal edit prototype
 (defmacro moded--rk (desc &rest keylists)
@@ -1030,9 +1030,9 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
 
 (defmacro moded--rkl (desc delim &rest keylists)
   `(while (not (string= ,delim
-			(let ((rkey (key-description (vector (read-key ,desc)))))
-			  (pcase rkey .,keylists)
-			  rkey)))))
+                        (let ((rkey (key-description (vector (read-key ,desc)))))
+                          (pcase rkey .,keylists)
+                          rkey)))))
 
 (defmacro moded--rklk (desc key &rest expr)
   `(while (string= ,key (key-description (vector (read-key ,desc))))
@@ -1042,7 +1042,7 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
   (save-excursion
     (backward-word)
     (when (or (looking-at "jf")
-	      (looking-at "fj"))
+              (looking-at "fj"))
       (undo))))
 
 (defvar moded-boxy t)
@@ -1052,114 +1052,114 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
       (interactive)
       (moded--error-correct)
       (boxy-centered 40 '(" p - [project ...]"
-			  " v - [version control ...]"
-			  " k - [kill ...]"
-			  " d - [compile ...]"
-			  " w - [windows ...]"
-			  " i - [insert ...]"
-			  " b - [buffer ...]"
-			  " h - [helm ...]"
-			  " j - [ceh / code manipulation]"
-			  " m - > move ..."
-			  " c - > comment ..."
-			  " f - find file"
-			  " g - switch buffer"
-			  " z - undo"
-			  " s - save"
-			  " r - recall"
-			  " o - switch to other buffer"
-			  " x - page breaks navigation"
-			  " ? - Zeal at point")
-		     '(("p" . (lambda () (boxy-close) (boxy-centered 40 '(" i - initialize"
-								     " t - switch target"
-								     " c - configuration (Debug/Release)"
-								     " u - unload project"
-								     " l - install project (CMake only)"
-								     " g - generate CMake project"
-								     " r - regenerate CMake project")
-								'(("i" . (lambda () (boxy-close) (or (switch-target) (vs-init) (vs-search))))
-								  ("t" . (lambda () (boxy-close) (switch-target)))
-								  ("c" . (lambda () (boxy-close) (if (vs-active) (vs-switch-configuration) (switch-configuration))))
-								  ("u" . (lambda () (boxy-close) (unload-project)))
-								  ("l" . (lambda () (boxy-close) (cmake-install)))
-								  ("g" . (lambda () (boxy-close) (generate-project)))
-								  ("r" . (lambda () (boxy-close) (cm-regenerate)))))))
-		       ("v" . (lambda () (boxy-close) (boxy-centered 40 '(" r - [root ...]"
-								     " d - directory status"
-								     " c - diff current file (=)"
-								     " v - commit current file"
-								     " u - revert current file"
-								     " l - print log")
-								'(("r" . (lambda () (boxy-close) (boxy-centered 40 '(" l - log")
-													   '(("l" . (lambda () (boxy-close) (vc-print-root-log)))))))
-								  ("d" . (lambda () (boxy-close) (call-interactively 'vc-dir)))
-								  ("=" . (lambda () (boxy-close) (vc-diff)))
-								  ("c" . (lambda () (boxy-close) (vc-diff)))
-								  ("v" . (lambda () (boxy-close) (call-interactively 'vc-next-action)))
-								  ("u" . (lambda () (boxy-close) (call-interactively 'vc-revert)))
-								  ("l" . (lambda () (boxy-close) (call-interactively 'vc-print-log)))))))
-		       ("k" . (lambda () (boxy-close) (boxy-centered 40 '(" k - kill current buffer"
-								     " w - kill buffer and window"
-								     " c - kill compilation process")
-								'(("k" . (lambda () (boxy-close) (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer))))
-								  ("w" . (lambda () (boxy-close) (kill-buffer-and-window)))
-								  ("c" . (lambda () (boxy-close) (kill-compilation)))))))
-		       ("d" . (lambda () (boxy-close) (boxy-centered 40 '(" d - compile (debug)"
-								     " r - compile (release)"
-								     " s - run (debug)")
-								'(("d" . (lambda () (boxy-close) (cm-compile-debug)))
-								  ("r" . (lambda () (boxy-close) (cm-compile-release)))
-								  ("s" . (lambda () (boxy-close) (cm-run-debug)))))))
-		       ("w" . (lambda () (boxy-close) (boxy-centered 40 '(" w - delete window"
-								     " j - split horizontally"
-								     " f - split vertically")
-								'(("w" . (lambda () (boxy-close) (delete-window)))
-								  ("j" . (lambda () (boxy-close) (split-window-horizontally)))
-								  ("f" . (lambda () (boxy-close) (split-window-vertically)))))))
-		       ("i" . (lambda () (boxy-close) (boxy-centered 40 '(" g - insert GUID")
-								'(("g" . (lambda () (boxy-close) (insert-guid)))))))
-		       ("b" . (lambda () (boxy-close) (boxy-centered 40 '(" j - windmove left"
-								     " k - windmove down"
-								     " l - windmove right"
-								     " i - windmove up")
-								'(("j" . (lambda () (boxy-close) (windmove-left)))
-								  ("k" . (lambda () (boxy-close) (windmove-down)))
-								  ("l" . (lambda () (boxy-close) (windmove-right)))
-								  ("i" . (lambda () (boxy-close) (windmove-up)))))))
-		       ("j" . (lambda () (boxy-close) (boxy-centered 40 '(" n - name selection as variable")
-								'(("n" . (lambda () (boxy-close) (name-selection)))))))
-		       ("m" . (lambda () (boxy-close) (moded--rkl "> Move"
-							     "g"
-							     ("l" (smooth-scroll -1 8 0.1))
-							     ("m" (smooth-scroll 1 8 0.1))
-							     ("j" (backward-word))
-							     ("k" (forward-word))
-							     ("d" (forward-line -1))
-							     ("f" (forward-line 1))
-							     ("e" (backward-paragraph))
-							     ("i" (forward-paragraph)))))
-		       ("c" . (lambda () (boxy-close) (moded--rk "> Comment"
-							    ("c" (comment-or-uncomment-region (region-beginning) (region-end)))
-							    ("n" (moded--rk "> Comment > Next >"
-									    ("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
-									    ("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
-							    ("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
-							    ("e" (ceh-comment-to-eol))
-							    ("a" (ceh-comment-next-atom)))))
-		       ("f" . (lambda () (boxy-close) (ido-find-file)))
-		       ("g" . (lambda () (boxy-close) (switch-buffer-popup)))
-		       ("z" . (lambda () (boxy-close) (undo)))
-		       ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
-		       ("r" . (lambda () (boxy-close) (recall)))
-		       ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
-		       ("x" . (lambda () (boxy-close) (page-breaks-popup)))
-		       ("h" . (lambda () (boxy-close) (boxy-centered 40 '(" g - Git"
-								     " b - bookmarks"
-								     " f - Grep find in Git")
-								'(("g" . (lambda () (boxy-close) (helm-ls-git-ls)))
-								  ("b" . (lambda () (boxy-close) (helm-bookmarks)))
-								  ("f" . (lambda () (boxy-close) (helm-git-grep)))))))
-		       ("?" . (lambda () (boxy-close) (zeal-at-point))))))
+                          " v - [version control ...]"
+                          " k - [kill ...]"
+                          " d - [compile ...]"
+                          " w - [windows ...]"
+                          " i - [insert ...]"
+                          " b - [buffer ...]"
+                          " h - [helm ...]"
+                          " j - [ceh / code manipulation]"
+                          " m - > move ..."
+                          " c - > comment ..."
+                          " f - find file"
+                          " g - switch buffer"
+                          " z - undo"
+                          " s - save"
+                          " r - recall"
+                          " o - switch to other buffer"
+                          " x - page breaks navigation"
+                          " ? - Zeal at point")
+                     '(("p" . (lambda () (boxy-close) (boxy-centered 40 '(" i - initialize"
+                                                                     " t - switch target"
+                                                                     " c - configuration (Debug/Release)"
+                                                                     " u - unload project"
+                                                                     " l - install project (CMake only)"
+                                                                     " g - generate CMake project"
+                                                                     " r - regenerate CMake project")
+                                                                '(("i" . (lambda () (boxy-close) (or (switch-target) (vs-init) (vs-search))))
+                                                                  ("t" . (lambda () (boxy-close) (switch-target)))
+                                                                  ("c" . (lambda () (boxy-close) (if (vs-active) (vs-switch-configuration) (switch-configuration))))
+                                                                  ("u" . (lambda () (boxy-close) (unload-project)))
+                                                                  ("l" . (lambda () (boxy-close) (cmake-install)))
+                                                                  ("g" . (lambda () (boxy-close) (generate-project)))
+                                                                  ("r" . (lambda () (boxy-close) (cm-regenerate)))))))
+                       ("v" . (lambda () (boxy-close) (boxy-centered 40 '(" r - [root ...]"
+                                                                     " d - directory status"
+                                                                     " c - diff current file (=)"
+                                                                     " v - commit current file"
+                                                                     " u - revert current file"
+                                                                     " l - print log")
+                                                                '(("r" . (lambda () (boxy-close) (boxy-centered 40 '(" l - log")
+                                                                                                           '(("l" . (lambda () (boxy-close) (vc-print-root-log)))))))
+                                                                  ("d" . (lambda () (boxy-close) (call-interactively 'vc-dir)))
+                                                                  ("=" . (lambda () (boxy-close) (vc-diff)))
+                                                                  ("c" . (lambda () (boxy-close) (vc-diff)))
+                                                                  ("v" . (lambda () (boxy-close) (call-interactively 'vc-next-action)))
+                                                                  ("u" . (lambda () (boxy-close) (call-interactively 'vc-revert)))
+                                                                  ("l" . (lambda () (boxy-close) (call-interactively 'vc-print-log)))))))
+                       ("k" . (lambda () (boxy-close) (boxy-centered 40 '(" k - kill current buffer"
+                                                                     " w - kill buffer and window"
+                                                                     " c - kill compilation process")
+                                                                '(("k" . (lambda () (boxy-close) (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer))))
+                                                                  ("w" . (lambda () (boxy-close) (kill-buffer-and-window)))
+                                                                  ("c" . (lambda () (boxy-close) (kill-compilation)))))))
+                       ("d" . (lambda () (boxy-close) (boxy-centered 40 '(" d - compile (debug)"
+                                                                     " r - compile (release)"
+                                                                     " s - run (debug)")
+                                                                '(("d" . (lambda () (boxy-close) (cm-compile-debug)))
+                                                                  ("r" . (lambda () (boxy-close) (cm-compile-release)))
+                                                                  ("s" . (lambda () (boxy-close) (cm-run-debug)))))))
+                       ("w" . (lambda () (boxy-close) (boxy-centered 40 '(" w - delete window"
+                                                                     " j - split horizontally"
+                                                                     " f - split vertically")
+                                                                '(("w" . (lambda () (boxy-close) (delete-window)))
+                                                                  ("j" . (lambda () (boxy-close) (split-window-horizontally)))
+                                                                  ("f" . (lambda () (boxy-close) (split-window-vertically)))))))
+                       ("i" . (lambda () (boxy-close) (boxy-centered 40 '(" g - insert GUID")
+                                                                '(("g" . (lambda () (boxy-close) (insert-guid)))))))
+                       ("b" . (lambda () (boxy-close) (boxy-centered 40 '(" j - windmove left"
+                                                                     " k - windmove down"
+                                                                     " l - windmove right"
+                                                                     " i - windmove up")
+                                                                '(("j" . (lambda () (boxy-close) (windmove-left)))
+                                                                  ("k" . (lambda () (boxy-close) (windmove-down)))
+                                                                  ("l" . (lambda () (boxy-close) (windmove-right)))
+                                                                  ("i" . (lambda () (boxy-close) (windmove-up)))))))
+                       ("j" . (lambda () (boxy-close) (boxy-centered 40 '(" n - name selection as variable")
+                                                                '(("n" . (lambda () (boxy-close) (name-selection)))))))
+                       ("m" . (lambda () (boxy-close) (moded--rkl "> Move"
+                                                             "g"
+                                                             ("l" (smooth-scroll -1 8 0.1))
+                                                             ("m" (smooth-scroll 1 8 0.1))
+                                                             ("j" (backward-word))
+                                                             ("k" (forward-word))
+                                                             ("d" (forward-line -1))
+                                                             ("f" (forward-line 1))
+                                                             ("e" (backward-paragraph))
+                                                             ("i" (forward-paragraph)))))
+                       ("c" . (lambda () (boxy-close) (moded--rk "> Comment"
+                                                            ("c" (comment-or-uncomment-region (region-beginning) (region-end)))
+                                                            ("n" (moded--rk "> Comment > Next >"
+                                                                            ("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
+                                                                            ("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
+                                                            ("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
+                                                            ("e" (ceh-comment-to-eol))
+                                                            ("a" (ceh-comment-next-atom)))))
+                       ("f" . (lambda () (boxy-close) (ido-find-file)))
+                       ("g" . (lambda () (boxy-close) (switch-buffer-popup)))
+                       ("z" . (lambda () (boxy-close) (undo)))
+                       ("s" . (lambda () (boxy-close) (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer))))
+                       ("r" . (lambda () (boxy-close) (recall)))
+                       ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
+                       ("x" . (lambda () (boxy-close) (page-breaks-popup)))
+                       ("h" . (lambda () (boxy-close) (boxy-centered 40 '(" g - Git"
+                                                                     " b - bookmarks"
+                                                                     " f - Grep find in Git")
+                                                                '(("g" . (lambda () (boxy-close) (helm-ls-git-ls)))
+                                                                  ("b" . (lambda () (boxy-close) (helm-bookmarks)))
+                                                                  ("f" . (lambda () (boxy-close) (helm-git-grep)))))))
+                       ("?" . (lambda () (boxy-close) (zeal-at-point))))))
 
   ;; old moded
   (defun moded-do ()
@@ -1167,68 +1167,68 @@ White space here is any of: space, tab, emacs newline (line feed, ASCII 10)."
     (moded--error-correct)
     (set-face-attribute 'mode-line nil :background "firebrick")
     (moded--rk ">"
-	       ("f" (ido-find-file))
-	       ("g" (ido-switch-buffer))
-	       ("j" (smex))
-	       ("z" (undo))
-	       ("s" (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer)))
-	       ("x" (page-breaks-popup))
-	       ("o" (switch-to-buffer (other-buffer)))
-	       ("m" (moded--rkl "> Move"
-				"g"
-				("l" (smooth-scroll -1 8 0.1))
-				("m" (smooth-scroll 1 8 0.1))
-				("j" (backward-word))
-				("k" (forward-word))
-				("d" (forward-line -1))
-				("f" (forward-line 1))
-				("e" (backward-paragraph))
-				("i" (forward-paragraph))))
-	       ("c" (moded--rk "> Comment"
-			       ("c" (comment-or-uncomment-region (region-beginning) (region-end)))
-			       ("n" (moded--rk "> Comment > Next >"
-					       ("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
-					       ("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
-			       ("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
-			       ("e" (ceh-comment-to-eol))
-			       ("a" (ceh-comment-next-atom))))
-	       ("v" (moded--rk "> Version Control"
-			       ("d" (call-interactively 'vc-dir))
-			       ("=" (vc-diff))
-			       ("c" (vc-diff))
-			       ("v" (call-interactively 'vc-next-action))
-			       ("u" (call-interactively 'vc-revert))
-			       ("l" (vc-print-log))
-			       ("r" (moded--rk "> Version Control > Root"
-					       ("l" (vc-print-root-log))))))
-	       ("k" (moded--rk "> Kill"
-			       ("k" (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer)))
-			       ("w" (kill-buffer-and-window))
-			       ("c" (kill-compilation))))
-	       ("d" (moded--rk "> Compile"
-			       ("d" (cm-compile-debug))
-			       ("r" (cm-compile-release))
-			       ("s" (cm-run-debug))))
-	       ("w" (moded--rk "> Windows"
-			       ("w" (delete-window))
-			       ("j" (split-window-horizontally))
-			       ("f" (split-window-vertically))))
-	       ("i" (moded--rk "> Insert"
-			       ("g" (insert-guid))))
-	       ("b" (moded--rkl "> Buffer" "b"
-				("j" (windmove-left))
-				("k" (windmove-down))
-				("l" (windmove-right))
-				("i" (windmove-up))))
-	       ("l" (toggle-buffer-finish) (toggle-buffer-next)
-		(moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next)))
-	       ("p" (moded--rk "> Project"
-			       ("i" (or (switch-target) (vs-init) (vs-search)))
-			       ("t" (switch-target))
-			       ("c" (if (vs-active) (vs-switch-configuration) (switch-configuration)))
-			       ("u" (unload-project))
-			       ("l" (cmake-install))
-			       ("g" (generate-project)))))
+               ("f" (ido-find-file))
+               ("g" (ido-switch-buffer))
+               ("j" (smex))
+               ("z" (undo))
+               ("s" (if moded-save-hook (run-hooks 'moded-save-hook) (save-buffer)))
+               ("x" (page-breaks-popup))
+               ("o" (switch-to-buffer (other-buffer)))
+               ("m" (moded--rkl "> Move"
+                                "g"
+                                ("l" (smooth-scroll -1 8 0.1))
+                                ("m" (smooth-scroll 1 8 0.1))
+                                ("j" (backward-word))
+                                ("k" (forward-word))
+                                ("d" (forward-line -1))
+                                ("f" (forward-line 1))
+                                ("e" (backward-paragraph))
+                                ("i" (forward-paragraph))))
+               ("c" (moded--rk "> Comment"
+                               ("c" (comment-or-uncomment-region (region-beginning) (region-end)))
+                               ("n" (moded--rk "> Comment > Next >"
+                                               ("l" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-line) (point))))
+                                               ("b" (comment-or-uncomment-region (region-beginning) (save-excursion (forward-paragraph) (point))))))
+                               ("b" (comment-or-uncomment-region (save-excursion (backward-paragraph) (point)) (save-excursion (forward-paragraph) (point))))
+                               ("e" (ceh-comment-to-eol))
+                               ("a" (ceh-comment-next-atom))))
+               ("v" (moded--rk "> Version Control"
+                               ("d" (call-interactively 'vc-dir))
+                               ("=" (vc-diff))
+                               ("c" (vc-diff))
+                               ("v" (call-interactively 'vc-next-action))
+                               ("u" (call-interactively 'vc-revert))
+                               ("l" (vc-print-log))
+                               ("r" (moded--rk "> Version Control > Root"
+                                               ("l" (vc-print-root-log))))))
+               ("k" (moded--rk "> Kill"
+                               ("k" (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer)))
+                               ("w" (kill-buffer-and-window))
+                               ("c" (kill-compilation))))
+               ("d" (moded--rk "> Compile"
+                               ("d" (cm-compile-debug))
+                               ("r" (cm-compile-release))
+                               ("s" (cm-run-debug))))
+               ("w" (moded--rk "> Windows"
+                               ("w" (delete-window))
+                               ("j" (split-window-horizontally))
+                               ("f" (split-window-vertically))))
+               ("i" (moded--rk "> Insert"
+                               ("g" (insert-guid))))
+               ("b" (moded--rkl "> Buffer" "b"
+                                ("j" (windmove-left))
+                                ("k" (windmove-down))
+                                ("l" (windmove-right))
+                                ("i" (windmove-up))))
+               ("l" (toggle-buffer-finish) (toggle-buffer-next)
+                (moded--rklk "> Cycle Buffers" "l" (toggle-buffer-next)))
+               ("p" (moded--rk "> Project"
+                               ("i" (or (switch-target) (vs-init) (vs-search)))
+                               ("t" (switch-target))
+                               ("c" (if (vs-active) (vs-switch-configuration) (switch-configuration)))
+                               ("u" (unload-project))
+                               ("l" (cmake-install))
+                               ("g" (generate-project)))))
     (set-face-attribute 'mode-line nil :background "#225599")))
 
 (key-chord-define-global "jf" 'moded-do)
