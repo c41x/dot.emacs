@@ -404,9 +404,10 @@
 (require 'helm-config)
 (set 'helm-idle-delay 0.0)
 (set 'helm-input-idle-delay 0.0)
+(require 'helm-git-grep)
 (when (eq system-type 'windows-nt)
   (defun helm-git-submodule-grep-process ()))
-(setq helm-git-grep-sources '(helm-git-grep-sources)) ;; only search in git, not in submodules
+(setq helm-git-grep-sources '(helm-source-git-grep)) ;; only search in git, not in submodules
 
 ;; force helm to use bottom of the screen and to not break window layout
 (add-to-list 'display-buffer-alist
