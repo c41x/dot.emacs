@@ -19,7 +19,7 @@ case $doit in
     *) echo aborting ;;
 esac
 
-mv dot.emacs .emacs.d
+mv dot.emacs/* .emacs.d
 mv ceh.el .emacs.d/ceh
 mv hnr.el .emacs.d/hnr
 mv boxy.el .emacs.d/boxy
