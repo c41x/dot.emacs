@@ -391,8 +391,8 @@
 (require 'auto-complete-config)
 (add-to-list 'ac-dictionary-directories "~/.emacs.d/autocomplete-dict")
 (ac-config-default)
-(setq-default auto-complete-mode t)
-(global-auto-complete-mode t)
+(setq-default auto-complete-mode nil)
+(global-auto-complete-mode nil)
 (delq 'ac-source-yasnippet ac-sources)
 (setq ac-ignore-case t)
 (setq ac-use-fuzzy t)
@@ -468,23 +468,11 @@
 ;; flycheck
 (require 'flycheck)
 
-;; ;; irony
-;; (eval-after-load 'company
-;;   '(add-to-list 'company-backends 'company-irony))
-
-;; (add-hooks (lambda ()
-;;           (irony-mode))
-;;         '(c-mode-hook c++-mode-hook))
-
-;; ;; replace the `completion-at-point' and `complete-symbol' bindings in
-;; ;; irony-mode's buffers by irony-mode's function
-;; (defun my-irony-mode-hook ()
-;;   (define-key irony-mode-map [remap completion-at-point]
-;;     'irony-completion-at-point-async)
-;;   (define-key irony-mode-map [remap complete-symbol]
-;;     'irony-completion-at-point-async))
-;; (add-hook 'irony-mode-hook 'my-irony-mode-hook)
-;; (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+;; company
+(require 'company)
+(setq company-idle-delay 0.0)
+(define-key company-active-map [tab] 'company-complete-selection)
+(define-key company-active-map (kbd "TAB") 'company-complete-selection)
 
 ;;//- general tweaks
 ;; documentation tip
@@ -502,15 +490,16 @@
 
 (global-set-key (kbd "C-?") 'popup-doc)
 
-;; control + space = autocomplete (and enable AC mode if not enabled)
+;; control + space = company (and enable company mode if not enabled)
 (global-unset-key (kbd "C-SPC"))
 (global-set-key (kbd "C-SPC")
                 '(lambda ()
                    (interactive)
-                   (unless auto-complete-mode
-                     (message "enabling auto-complete-mode")
-                     (auto-complete-mode t))
-                   (auto-complete)))
+                   (unless company-mode
+                     (message "enabling company-mode")
+                     (setq company-backends '((company-dabbrev)))
+                     (company-mode t))
+                   (company-complete)))
 
 ;; simple smooth scrolling (sit-for is some kind of Sleep)
 ;; time is not accurate because lag may occur while scrolling... so tweak it experimenally
@@ -699,6 +688,25 @@
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
+;; irony
+(eval-after-load 'company
+  '(add-to-list 'company-backends 'company-irony))
+
+(add-hooks (lambda ()
+             (setq company-backends '((company-irony :separate company-dabbrev)))
+             (irony-mode))
+           '(c-mode-hook c++-mode-hook))
+
+;; replace the `completion-at-point' and `complete-symbol' bindings in
+;; irony-mode's buffers by irony-mode's function
+(defun my-irony-mode-hook ()
+  (define-key irony-mode-map [remap completion-at-point]
+    'irony-completion-at-point-async)
+  (define-key irony-mode-map [remap complete-symbol]
+    'irony-completion-at-point-async))
+(add-hook 'irony-mode-hook 'my-irony-mode-hook)
+(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
 ;;//- CMake
 ;; cmake-mode
 (require 'cmake-mode)
@@ -727,11 +735,8 @@
 ;; csharp-mode inserts {} braces automatically (this totally breaks autopair)
 (add-hook 'csharp-mode-hook (lambda () (local-set-key (kbd "{") 'c-electric-brace)))
 (add-hook 'csharp-mode-hook (lambda ()
-                              (local-set-key (kbd "C-SPC")
-                                              '(lambda ()
-                                                 (interactive)
-                                                 (omnisharp-auto-complete)))
-                              (auto-complete-mode t)
+                              (setq company-backends '((company-omnisharp :separate company-dabbrev)))
+                              (company-mode t)
                               (omnisharp-mode)))
 (add-hook 'csharp-mode-hook 'flycheck-mode)
 (setq omnisharp-server-executable-path "c:/apps/OmniSharp/OmniSharp.exe")
