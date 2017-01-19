@@ -388,16 +388,10 @@
 (setq ido-ignore-extensions t)
 
 ;; autocomplete
-(require 'auto-complete-config)
-(add-to-list 'ac-dictionary-directories "~/.emacs.d/autocomplete-dict")
-(ac-config-default)
 (setq-default auto-complete-mode nil)
-(global-auto-complete-mode nil)
-(delq 'ac-source-yasnippet ac-sources)
 (setq ac-ignore-case t)
 (setq ac-use-fuzzy t)
 (setq popup-isearch-cursor-color "orange")
-(ac-flyspell-workaround) ; lag hack
 (flyspell-mode 0) ;; speedup AC
 
 ;; helm
@@ -473,6 +467,8 @@
 (setq company-idle-delay 0.0)
 (define-key company-active-map [tab] 'company-complete-selection)
 (define-key company-active-map (kbd "TAB") 'company-complete-selection)
+(setq company-dabbrev-downcase nil)
+(setq company-dabbrev-ignore-case (quote keep-prefix))
 
 ;;//- general tweaks
 ;; documentation tip
@@ -497,7 +493,7 @@
                    (interactive)
                    (unless company-mode
                      (message "enabling company-mode")
-                     (setq company-backends '((company-dabbrev)))
+                     (setq-local company-backends '((company-dabbrev)))
                      (company-mode t))
                    (company-complete)))
 
@@ -693,7 +689,7 @@
   '(add-to-list 'company-backends 'company-irony))
 
 (add-hooks (lambda ()
-             (setq company-backends '((company-irony :separate company-dabbrev)))
+             (setq-local company-backends '((company-irony :separate company-dabbrev)))
              (irony-mode))
            '(c-mode-hook c++-mode-hook))
 
@@ -741,7 +737,7 @@
 ;; csharp-mode inserts {} braces automatically (this totally breaks autopair)
 (add-hook 'csharp-mode-hook (lambda () (local-set-key (kbd "{") 'c-electric-brace)))
 (add-hook 'csharp-mode-hook (lambda ()
-                              (setq company-backends '((company-omnisharp :separate company-dabbrev)))
+                              (setq-local company-backends '((company-omnisharp :separate company-dabbrev)))
                               (company-mode t)
                               (omnisharp-mode)))
 (add-hook 'csharp-mode-hook 'flycheck-mode)
@@ -848,8 +844,15 @@
 (setq jedi:complete-on-dot t)
 
 ;;//- Emacs Lisp
-;; flycheck in LISP
-(add-hook 'emacs-lisp-mode-hook 'flycheck-mode)
+(defun my-elisp-mode-hook ()
+  ;; flycheck in LISP
+  (flycheck-mode)
+
+  ;; autocomplate
+  (setq-local ac-sources '(ac-source-symbols ac-source-words-in-same-mode-buffers))
+  (auto-complete-mode t))
+
+(add-hook 'emacs-lisp-mode-hook 'my-elisp-mode-hook)
 (setq-default flycheck-disabled-checkers '(emacs-lisp-checkdoc))
 
 ;;//- MaxScript
