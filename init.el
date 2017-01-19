@@ -714,6 +714,12 @@
       (append '(("CMakeLists\\.txt\\'" . cmake-mode)
                 ("\\.cmake\\'" . cmake-mode)) auto-mode-alist))
 
+(defun my-cmake-mode-hook ()
+  (setq-local company-backends '((company-cmake :separate company-dabbrev)))
+  (company-mode t))
+
+(add-hook 'cmake-mode-hook 'my-cmake-mode-hook)
+
 ;;//- JavaScript
 ;; js2 mode for .js files
 (add-to-list 'auto-mode-alist '("\\.js\\'" . js2-mode))
