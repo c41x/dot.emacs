@@ -42,20 +42,20 @@
 
 (make-face 'mode-line-separator-face)
 (set-face-attribute 'mode-line-separator-face nil
-		    :foreground "antique white"
-		    :weight 'bold)
+                    :foreground "antique white"
+                    :weight 'bold)
 
 (make-face 'mode-line-progress-face)
 (set-face-attribute 'mode-line-progress-face nil
-		    :foreground "antique white")
+                    :foreground "antique white")
 
 (make-face 'mode-line-bg-face)
 (set-face-attribute 'mode-line-bg-face nil
-		    :foreground "black")
+                    :foreground "black")
 
 ;;(set-face-attribute 'log-view-message-face nil
-;;		    :foreground "#aa7733"
-;;		    :weight 'bold)
+;;                  :foreground "#aa7733"
+;;                  :weight 'bold)
 
 (custom-theme-set-faces
  'calx
@@ -128,6 +128,15 @@
  '(highlight-symbol-face ((t (:background "gray25"))))
  '(neo-file-link-face ((t (:foreground "seashell4"))))
  '(neo-vc-default-face ((t (:foreground "#b2af99"))))
- '(neo-vc-up-to-date-face ((t (:foreground "#b2af99")))))
+ '(neo-vc-up-to-date-face ((t (:foreground "#b2af99"))))
+ '(company-preview ((t (:background "gray20" :foreground "wheat"))))
+ '(company-preview-common ((t (:inherit company-preview :foreground "OliveDrab3"))))
+ '(company-preview-search ((t (:inherit company-preview :background "dodger blue"))))
+ '(company-scrollbar-bg ((t (:background "gray15"))))
+ '(company-scrollbar-fg ((t (:background "orange3"))))
+ '(company-tooltip ((t (:background "gray15" :foreground "orange1"))))
+ '(company-tooltip-annotation ((t (:foreground "DarkOliveGreen3"))))
+ '(company-tooltip-common ((t (:foreground "orange2"))))
+ '(company-tooltip-selection ((t (:background "gray30")))))
 
 (provide-theme 'calx)
