@@ -17,16 +17,16 @@
   (when (and dir (file-exists-p dir))
     (let ((res nil))
       (dolist (file (directory-files dir))
-	(when (string= name file)
-	  (setq res (cons (file-name-as-directory dir) res)))
-	(when (and
-	       (file-directory-p (concat (file-name-as-directory dir) file))
-	       (not (or
-		     (string= file ".")
-		     (string= file ".."))))
-	  (let ((subdir-result (dirs-contains-file name (concat (file-name-as-directory dir) file))))
-	    (when subdir-result
-	      (setq res (append subdir-result res))))))
+        (when (string= name file)
+          (setq res (cons (file-name-as-directory dir) res)))
+        (when (and
+               (file-directory-p (concat (file-name-as-directory dir) file))
+               (not (or
+                     (string= file ".")
+                     (string= file ".."))))
+          (let ((subdir-result (dirs-contains-file name (concat (file-name-as-directory dir) file))))
+            (when subdir-result
+              (setq res (append subdir-result res))))))
       res)))
 
 (defun search-file (name dir)
@@ -36,16 +36,16 @@
 (defun upward-check-file (filename startdir)
   "Moves up in directory structure and checks if desired file is there, returns last found"
   (let ((dirname (expand-file-name startdir))
-	(top nil)
-	(max-level 10)
-	(prv-dirname nil)
-	(last-found nil))
+        (top nil)
+        (max-level 10)
+        (prv-dirname nil)
+        (last-found nil))
     (while (not (or top (= max-level 0)))
       (setq max-level (- max-level 1))
       (if (string= (expand-file-name dirname) "/")
-	  (setq top t))
+          (setq top t))
       (if (file-exists-p (expand-file-name filename dirname))
-	  (setq last-found dirname))
+          (setq last-found dirname))
       (setq prv-dirname dirname)
       (setq dirname (expand-file-name ".." dirname)))
     last-found))
@@ -61,18 +61,18 @@
 (defmacro find-in-file-regex (file-name regex)
   "in-file search builder"
   `(let ((i 0)
-	 (matches '())
-	 (file-buffer (get-string-from-file ,file-name)))
+         (matches '())
+         (file-buffer (get-string-from-file ,file-name)))
      (save-match-data
        (while (string-match ,regex file-buffer i)
-	 (setq i (match-end 1))
-	 (add-to-list 'matches (match-string-no-properties 1 file-buffer))))
+         (setq i (match-end 1))
+         (add-to-list 'matches (match-string-no-properties 1 file-buffer))))
      matches))
 
 (defun extract-targets-from-file (file-name)
   "searches for CMake targets in specified file"
   (append (find-in-file-regex file-name "add_executable(\\([A-Za-z_]*\\)")
-	  (find-in-file-regex file-name "add_library(\\([A-Za-z_]*\\)")))
+          (find-in-file-regex file-name "add_library(\\([A-Za-z_]*\\)")))
 
 (defun find-all-targets ()
   "returns lists with all targets available in current CMake project"
@@ -90,8 +90,8 @@
     (when (> (length all-targets) 0)
       (setq selected-target (popup-menu* all-targets :scroll-bar t :isearch t))
       (if (< (length all-targets) 2)
-	  (cons selected-target t)
-	(cons selected-target nil)))))
+          (cons selected-target t)
+        (cons selected-target nil)))))
 
 (defun find-project-directory-debug ()
   (find-project-directory-base "project/debug"))
@@ -115,7 +115,7 @@
 
 (defun refresh-mode-line ()
   (setq mode-line-project (concat "CMake:" current-target-name " / "
-				  (if current-target-release "Release" "Debug")))
+                                  (if current-target-release "Release" "Debug")))
   (setq frame-title-format mode-line-project)
   (setq icon-title-format mode-line-project))
 
@@ -131,14 +131,14 @@
   (setq current-dir-debug (find-project-directory-debug)))
 (defun refresh-executable-debug ()
   (setq current-executable-debug
-	(search-file
-	 (exec-name current-target-name)
-	 current-dir-debug)))
+        (search-file
+         (exec-name current-target-name)
+         current-dir-debug)))
 (defun refresh-executable-release ()
   (setq current-executable-release
-	(search-file
-	 (exec-name current-target-name)
-	 current-dir-release)))
+        (search-file
+         (exec-name current-target-name)
+         current-dir-release)))
 
 (defmacro refresh-unset (flag refresh-function)
   `(unless ,flag
@@ -150,12 +150,12 @@
   (refresh-unset current-dir-release refresh-dir-release)
   (save-some-buffers t)
   (compile (format "cmake --build \"%s\" --config %s %s %s"
-		   (if release current-dir-release current-dir-debug)
-		   (if release "Release" "Debug")
-		   (if current-target-all
-		       ""
-		     (concat "--target " current-target-name))
-		   (if clean "--clean-first" ""))))
+                   (if release current-dir-release current-dir-debug)
+                   (if release "Release" "Debug")
+                   (if current-target-all
+                       ""
+                     (concat "--target " current-target-name))
+                   (if clean "--clean-first" ""))))
 
 (defun cmake-regenerate (release)
   (save-some-buffers t)
@@ -171,19 +171,33 @@
   (refresh-unset current-executable-release refresh-executable-release)
   (save-some-buffers t)
   (compile (concat (if release
-		       current-executable-release
-		     current-executable-debug)
-		   (exec-name current-target-name)) t))
+                       current-executable-release
+                     current-executable-debug)
+                   (exec-name current-target-name)) t))
 
 (defun run-debug ()
   (refresh-unset current-executable-debug refresh-executable-debug)
   (gdb (format "gdb -i=mi %s" (concat current-executable-debug
-				      (exec-name current-target-name)))))
+                                      (exec-name current-target-name)))))
 
 (defun enable-visual-line-mode ()
   (select-window (get-buffer-window "*compilation*"))
   (end-of-buffer)
   (visual-line-mode t))
+
+(defun setup-irony-flycheck-for-cmake ()
+  (when (is-cmake-project)
+    (irony-mode nil)
+    (company-mode nil)
+    (flycheck-mode nil)
+    (irony-cdb-json-add-compile-commands-path
+     (find-project-directory)
+     (concat (if current-target-release current-dir-release current-dir-debug)
+             "/compile_commands.json"))
+    (setq-local company-backends '((company-irony :separate company-dabbrev)))
+    (irony-mode t)
+    (company-mode t)
+    (flycheck-mode t)))
 
 (defun switch-target ()
   (interactive)
@@ -192,6 +206,7 @@
   (refresh-dir-release)
   (setq current-executable-debug nil)
   (setq current-executable-release nil)
+  (setup-irony-flycheck-for-cmake)
   current-target-name)
 
 (defun switch-configuration ()
@@ -199,6 +214,7 @@
   (if (string= "debug" (popup-menu* '("debug" "release") :scroll-bar t :isearch t))
       (setq current-target-release nil)
     (setq current-target-release t))
+  (setup-irony-flycheck-for-cmake)
   (refresh-mode-line))
 
 (defun unload-project ()
@@ -221,8 +237,8 @@
 ;;//- Visual Studio project support
 (defun find-file-upwards (match)
   (let ((i 0)
-	(ret nil)
-	(dir "."))
+        (ret nil)
+        (dir "."))
     (while (and (< i 5) (not ret))
       (setq ret (directory-files dir nil match))
       (unless ret (setq dir (expand-file-name ".." dir)))
@@ -248,23 +264,23 @@
   (interactive)
   (let ((f (or path-to-sln (find-file-upwards ".sln"))))
     (if f
-	(progn
-	  (setq vs-solution (concat (car f) "/" (cdr f)))
-	  (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
-	  (setq vs-binary-debug (concat (car f) "/bin/" (file-name-base (cdr f)) "_debug.exe"))
-	  (setq vs-solution-name (cdr f))
-	  (global-set-key (kbd "<f7>") 'vs-compile)
-	  ;;(global-set-key (kbd "S-<f7>") 'vs-compile-release)
-	  (global-set-key (kbd "<f6>") 'vs-run)
-	  ;;(global-set-key (kbd "S-<f6>") 'vs-run-release)
-	  (vs--refresh-mode-line))
+        (progn
+          (setq vs-solution (concat (car f) "/" (cdr f)))
+          (setq vs-binary-release (concat (car f) "/bin/" (file-name-base (cdr f)) ".exe"))
+          (setq vs-binary-debug (concat (car f) "/bin/" (file-name-base (cdr f)) "_debug.exe"))
+          (setq vs-solution-name (cdr f))
+          (global-set-key (kbd "<f7>") 'vs-compile)
+          ;;(global-set-key (kbd "S-<f7>") 'vs-compile-release)
+          (global-set-key (kbd "<f6>") 'vs-run)
+          ;;(global-set-key (kbd "S-<f6>") 'vs-run-release)
+          (vs--refresh-mode-line))
       ;; load project file
       (let ((prj (find-file-upwards ".ep")))
-	(when prj
-	  (load (concat (car prj) "/" (cdr prj)))
-	  (vs--refresh-mode-line)
-	  (global-set-key (kbd "<f7>") 'vs-compile)
-	  (global-set-key (kbd "<f6>") 'vs-run))))))
+        (when prj
+          (load (concat (car prj) "/" (cdr prj)))
+          (vs--refresh-mode-line)
+          (global-set-key (kbd "<f7>") 'vs-compile)
+          (global-set-key (kbd "<f6>") 'vs-run))))))
 
 (defun vs--compile (configuration)
   (if (string= "" vs-solution)
@@ -407,16 +423,16 @@
   (let ((i 0) (matches '()) (file-buffer (get-string-from-file file-name)))
     (save-match-data
       (while (string-match "include_directories(\"\\([^\"]*\\)\")" file-buffer i)
-	(setq i (match-end 1))
-	(add-to-list 'matches
-		     (replace-regexp-in-string
-		      "//" "/"
-		      (replace-regexp-in-string
-		       "${project_source_dir}"
-		       project-source-dir
-		       (match-string-no-properties 1 file-buffer)
-		       1)
-		      1))))
+        (setq i (match-end 1))
+        (add-to-list 'matches
+                     (replace-regexp-in-string
+                      "//" "/"
+                      (replace-regexp-in-string
+                       "${project_source_dir}"
+                       project-source-dir
+                       (match-string-no-properties 1 file-buffer)
+                       1)
+                      1))))
     matches))
 
 (defun extract-options-from-file (file-name)
@@ -424,68 +440,68 @@
   (let ((i 0) (matches '()) (file-buffer (get-string-from-file file-name)))
     (save-match-data
       (while (string-match "option(\\([^ ]*\\) " file-buffer i)
-	(setq i (match-end 1))
-	(add-to-list 'matches (match-string-no-properties 1 file-buffer))))
+        (setq i (match-end 1))
+        (add-to-list 'matches (match-string-no-properties 1 file-buffer))))
     matches))
 
 (defun get-current-project-include-list ()
   (let ((proj-dir (find-project-directory)))
     (if proj-dir
-	(extract-includes-from-file (concat proj-dir "CMakeLists.txt") proj-dir)
+        (extract-includes-from-file (concat proj-dir "CMakeLists.txt") proj-dir)
       nil)))
 
 ;; (when (not (string= system-type "windows-nt"))
 ;;   (add-hook 'c++-mode-hook
-;; 	    (lambda ()
-;; 	      (when (is-cmake-project)
-;; 		(setq flycheck-c/c++-gcc-executable (if (string= system-type "windows-nt") "mingw32-gcc" "gcc"))
-;; 		(setq flycheck-gcc-include-path (get-current-project-include-list))
-;; 		(setq flycheck-idle-change-delay 5.0)
-;; 		(setq flycheck-gcc-args '("-std=c++1y" "-msse" "-msse2" "-msse3"))
-;; 		(flycheck-mode)
-;; 		(flycheck-select-checker 'c/c++-gcc)))))
+;;          (lambda ()
+;;            (when (is-cmake-project)
+;;              (setq flycheck-c/c++-gcc-executable (if (string= system-type "windows-nt") "mingw32-gcc" "gcc"))
+;;              (setq flycheck-gcc-include-path (get-current-project-include-list))
+;;              (setq flycheck-idle-change-delay 5.0)
+;;              (setq flycheck-gcc-args '("-std=c++1y" "-msse" "-msse2" "-msse3"))
+;;              (flycheck-mode)
+;;              (flycheck-select-checker 'c/c++-gcc)))))
 
 ;;//- CMake project generator
 (defun generate-project ()
   (interactive)
   (if (is-cmake-project)
       (let* ((root (find-project-directory))
-	     (configuration (if root
-				(popup-menu* '("Debug"
-					       "Release"
-					       "RelWithDebInfo"
-					       "MinSizeRel") :scroll-bar t :isearch t) nil))
-	     (generator (if configuration
-			    (popup-menu* '("MinGW Makefiles"
-					   "Unix Makefiles"
-					   "MSYS Makefiles"
-					   "NMake Makefiles"
-					   "Ninja"
-					   "Visual Studio 10 2010"
-					   "Visual Studio 11 2012"
-					   "Visual Studio 12 2013"
-					   "Visual Studio 14 2015 Win64"
-					   "CodeBlocks - MinGW Makefiles"
-					   "Eclipse CDT4 - MinGW Makefiles"
-					   "KDevelop3") :scroll-bar t :isearch t) nil))
-	     (project-dir (if generator
-			      (cond
-			       ((string= configuration "Debug")
-				(concat root "project/debug"))
-			       ((string= configuration "Release")
-				(concat root "project/release"))
-			       ((string= configuration "RelWithDebInfo")
-				(concat root "project/relWithDebInfo"))
-			       ((string= configuration "MinSizeRel")
-				(concat root "project/minSizeRel"))
-			       (t nil)) nil))
-	     (already-generated (and project-dir (file-exists-p project-dir))))
-	;;(if already-generated
-	;; (message "CMake project with choosen configuration already exists")
-	(message (format "Generating project for: %s | %s | %s" project-dir generator configuration))
-	(mkdir project-dir t)
-	(compile (format "cd \"%s\" && cmake -DCMAKE_BUILD_TYPE=%s -G\"%s\" ../.."
-			 project-dir configuration generator)))
+             (configuration (if root
+                                (popup-menu* '("Debug"
+                                               "Release"
+                                               "RelWithDebInfo"
+                                               "MinSizeRel") :scroll-bar t :isearch t) nil))
+             (generator (if configuration
+                            (popup-menu* '("MinGW Makefiles"
+                                           "Unix Makefiles"
+                                           "MSYS Makefiles"
+                                           "NMake Makefiles"
+                                           "Ninja"
+                                           "Visual Studio 10 2010"
+                                           "Visual Studio 11 2012"
+                                           "Visual Studio 12 2013"
+                                           "Visual Studio 14 2015 Win64"
+                                           "CodeBlocks - MinGW Makefiles"
+                                           "Eclipse CDT4 - MinGW Makefiles"
+                                           "KDevelop3") :scroll-bar t :isearch t) nil))
+             (project-dir (if generator
+                              (cond
+                               ((string= configuration "Debug")
+                                (concat root "project/debug"))
+                               ((string= configuration "Release")
+                                (concat root "project/release"))
+                               ((string= configuration "RelWithDebInfo")
+                                (concat root "project/relWithDebInfo"))
+                               ((string= configuration "MinSizeRel")
+                                (concat root "project/minSizeRel"))
+                               (t nil)) nil))
+             (already-generated (and project-dir (file-exists-p project-dir))))
+        ;;(if already-generated
+        ;; (message "CMake project with choosen configuration already exists")
+        (message (format "Generating project for: %s | %s | %s" project-dir generator configuration))
+        (mkdir project-dir t)
+        (compile (format "cd \"%s\" && cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=%s -G\"%s\" ../.."
+                         project-dir configuration generator)))
     (message "Not a CMake project")))
 
 ;; example Visual Studio project file:

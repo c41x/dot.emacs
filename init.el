@@ -41,6 +41,7 @@
     company
     company-irony
     irony
+    flycheck-irony
     neotree
     omnisharp
     ggtags
@@ -687,10 +688,14 @@
 ;; irony
 (eval-after-load 'company
   '(add-to-list 'company-backends 'company-irony))
+(eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
 
 (add-hooks (lambda ()
              (setq-local company-backends '((company-irony :separate company-dabbrev)))
-             (irony-mode))
+             (irony-mode t)
+             (company-mode t)
+             (flycheck-mode t))
            '(c-mode-hook c++-mode-hook))
 
 ;; replace the `completion-at-point' and `complete-symbol' bindings in
@@ -860,7 +865,7 @@
 (add-to-list 'auto-mode-alist '("\\.ms$" . maxscript-mode))
 
 ;;//- PHP
-(require 'php-mode)
+;;(require 'php-mode)
 (require 'web-mode)
 (require 'ac-php)
 (defun setup-php ()
