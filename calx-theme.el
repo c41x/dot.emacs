@@ -57,9 +57,13 @@
 ;;                  :foreground "#aa7733"
 ;;                  :weight 'bold)
 
+(defvar font-default '(default ((t (:inherit nil :background "#000000" :foreground "#b2af99" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 110 :width normal :foundry "outline" :family "Liberation Mono")))))
+(when (string= system-type "windows-nt")
+  (setq font-default '(default ((t (:inherit nil :background "#000000" :foreground "#b2af99" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "outline" :family "Liberation Mono"))))))
+
 (custom-theme-set-faces
  'calx
- '(default ((t (:inherit nil :background "#000000" :foreground "#b2af99" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 98 :width normal :foundry "outline" :family "Liberation Mono"))))
+ font-default
  '(cursor ((t (:background "white"))))
  '(fixed-pitch ((t (:family "Monospace"))))
  '(variable-pitch ((t (:family "Sans Serif"))))
