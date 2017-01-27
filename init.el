@@ -1021,6 +1021,7 @@
                           " z - undo"
                           " s - save"
                           " r - recall"
+                          " u - paste"
                           " o - switch to other buffer"
                           " x - page breaks navigation"
                           " ? - Zeal at point")
@@ -1107,6 +1108,7 @@
                        ("r" . (lambda () (boxy-close) (recall)))
                        ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
                        ("x" . (lambda () (boxy-close) (page-breaks-popup)))
+                       ("u" . (lambda () (boxy-close) (call-interactively 'cua-paste)))
                        ("h" . (lambda () (boxy-close) (boxy-centered 40 '(" g - Git"
                                                                      " b - bookmarks"
                                                                      " f - Grep find in Git")
