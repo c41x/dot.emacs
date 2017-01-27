@@ -470,6 +470,7 @@
 (define-key company-active-map (kbd "TAB") 'company-complete-selection)
 (setq company-dabbrev-downcase nil)
 (setq company-dabbrev-ignore-case (quote keep-prefix))
+(setq company-irony-ignore-case t)
 
 ;;//- general tweaks
 ;; documentation tip
