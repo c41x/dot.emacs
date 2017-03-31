@@ -427,6 +427,7 @@
 ;; expand region
 (require 'expand-region)
 (global-unset-key (kbd "C-w"))
+(global-set-key (kbd "C-' x") 'kill-region)
 (global-set-key (kbd "C-w") 'er/expand-region)
 
 ;; pretty lambda
@@ -687,17 +688,16 @@
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
 ;; irony
-(eval-after-load 'company
-  '(add-to-list 'company-backends 'company-irony))
-(eval-after-load 'flycheck
-  '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
-
 (add-hooks (lambda ()
              (setq-local company-backends '((company-irony :separate company-dabbrev)))
              (irony-mode t)
              (company-mode t)
-             (flycheck-mode t))
-           '(c-mode-hook c++-mode-hook))
+             (flycheck-mode t)
+             (flycheck-irony-setup))
+           '(c++-mode-hook))
+
+(setq-default company-irony-ignore-case t)
+(setq-default irony-supported-major-modes nil)
 
 ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; irony-mode's buffers by irony-mode's function
