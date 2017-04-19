@@ -954,6 +954,9 @@
 (require 'recall)
 (add-hook 'change-major-mode-hook 'recall-mode)
 
+;; PlayFab
+(require 'playfab)
+
 ;;//- GUID generator and utilities
 (require 's)
 
@@ -1015,6 +1018,7 @@
                           " b - [buffer ...]"
                           " h - [helm ...]"
                           " j - [ceh / code manipulation]"
+                          " = - [online]"
                           " m - > move ..."
                           " c - > comment ..."
                           " f - find file"
@@ -1060,6 +1064,10 @@
                                                                 '(("k" . (lambda () (boxy-close) (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer))))
                                                                   ("w" . (lambda () (boxy-close) (kill-buffer-and-window)))
                                                                   ("c" . (lambda () (boxy-close) (kill-compilation)))))))
+                       ("=" . (lambda () (boxy-close) (boxy-centered 40 '(" v - PlayFab: get current version"
+                                                                     " u - PlayFab: upload file to playfab")
+                                                                '(("v" . (lambda () (boxy-close) (playfab-get-revision)))
+                                                                  ("u" . (lambda () (boxy-close) (playfab-update-cloudscript)))))))
                        ("d" . (lambda () (boxy-close) (boxy-centered 40 '(" d - compile (debug)"
                                                                      " r - compile (release)"
                                                                      " s - run (debug)")
