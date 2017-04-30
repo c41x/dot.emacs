@@ -511,6 +511,18 @@
 ;; (setq vs-binary-release "c:/repo/pro/vc2013/x64/Release/pro.exe")
 ;; (setq vs-release nil)
 
+;; quick testfield for C++
+(defun cpp-testfield-init ()
+  (interactive)
+  (switch-to-buffer (get-buffer-create "C++Tesftield.cpp"))
+  (write-file "/tmp/C++Testfield.cpp")
+  (local-set-key (kbd "<f6>") 'cpp-testfield-compile-run))
+
+(defun cpp-testfield-compile-run ()
+  (interactive)
+  (save-some-buffers t)
+  (compile "g++ -std=c++1z -o /tmp/C++Testfield /tmp/C++Testfield.cpp && /tmp/C++Testfield" t))
+
 ;;// TODO: CMake OPTION support
 ;;// TODO: Project generation:
 ;; - scan for project type, if not found -> manual config (like above), finish
