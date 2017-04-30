@@ -427,6 +427,7 @@
 ;; expand region
 (require 'expand-region)
 (global-unset-key (kbd "C-w"))
+(global-set-key (kbd "C-' x") 'kill-region)
 (global-set-key (kbd "C-w") 'er/expand-region)
 
 ;; pretty lambda
@@ -687,17 +688,16 @@
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
 ;; irony
-(eval-after-load 'company
-  '(add-to-list 'company-backends 'company-irony))
-(eval-after-load 'flycheck
-  '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
-
 (add-hooks (lambda ()
              (setq-local company-backends '((company-irony :separate company-dabbrev)))
              (irony-mode t)
              (company-mode t)
-             (flycheck-mode t))
-           '(c-mode-hook c++-mode-hook))
+             (flycheck-mode t)
+             (flycheck-irony-setup))
+           '(c++-mode-hook))
+
+(setq-default company-irony-ignore-case t)
+(setq-default irony-supported-major-modes nil)
 
 ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; irony-mode's buffers by irony-mode's function
@@ -747,7 +747,7 @@
                               (company-mode t)
                               (omnisharp-mode)))
 (add-hook 'csharp-mode-hook 'flycheck-mode)
-(setq omnisharp-server-executable-path "c:/apps/OmniSharp/OmniSharp.exe")
+(setq omnisharp-server-executable-path "e:/repo/omnisharp-roslyn/artifacts/publish/OmniSharp/default/net46/OmniSharp.exe")
 
 ;;//- Cg/HLSL/GLSL/ShaderLab
 ;; CG/HLSL mode
@@ -954,6 +954,9 @@
 (require 'recall)
 (add-hook 'change-major-mode-hook 'recall-mode)
 
+;; PlayFab
+(require 'playfab)
+
 ;;//- GUID generator and utilities
 (require 's)
 
@@ -1015,6 +1018,7 @@
                           " b - [buffer ...]"
                           " h - [helm ...]"
                           " j - [ceh / code manipulation]"
+                          " = - [online]"
                           " m - > move ..."
                           " c - > comment ..."
                           " f - find file"
@@ -1022,6 +1026,7 @@
                           " z - undo"
                           " s - save"
                           " r - recall"
+                          " u - paste"
                           " o - switch to other buffer"
                           " x - page breaks navigation"
                           " ? - Zeal at point")
@@ -1059,6 +1064,10 @@
                                                                 '(("k" . (lambda () (boxy-close) (if moded-kill-hook (run-hooks 'moded-kill-hook) (kill-buffer))))
                                                                   ("w" . (lambda () (boxy-close) (kill-buffer-and-window)))
                                                                   ("c" . (lambda () (boxy-close) (kill-compilation)))))))
+                       ("=" . (lambda () (boxy-close) (boxy-centered 40 '(" v - PlayFab: get current version"
+                                                                     " u - PlayFab: upload file to playfab")
+                                                                '(("v" . (lambda () (boxy-close) (playfab-get-revision)))
+                                                                  ("u" . (lambda () (boxy-close) (playfab-update-cloudscript)))))))
                        ("d" . (lambda () (boxy-close) (boxy-centered 40 '(" d - compile (debug)"
                                                                      " r - compile (release)"
                                                                      " s - run (debug)")
@@ -1108,6 +1117,7 @@
                        ("r" . (lambda () (boxy-close) (recall)))
                        ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
                        ("x" . (lambda () (boxy-close) (page-breaks-popup)))
+                       ("u" . (lambda () (boxy-close) (call-interactively 'cua-paste)))
                        ("h" . (lambda () (boxy-close) (boxy-centered 40 '(" g - Git"
                                                                      " b - bookmarks"
                                                                      " f - Grep find in Git")
