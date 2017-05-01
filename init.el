@@ -1036,14 +1036,16 @@
                                                                      " u - unload project"
                                                                      " l - install project (CMake only)"
                                                                      " g - generate CMake project"
-                                                                     " r - regenerate CMake project")
+                                                                     " r - regenerate CMake project"
+                                                                     " q - quick C++ test program")
                                                                 '(("i" . (lambda () (boxy-close) (or (switch-target) (vs-init) (vs-search))))
                                                                   ("t" . (lambda () (boxy-close) (switch-target)))
                                                                   ("c" . (lambda () (boxy-close) (if (vs-active) (vs-switch-configuration) (switch-configuration))))
                                                                   ("u" . (lambda () (boxy-close) (unload-project)))
                                                                   ("l" . (lambda () (boxy-close) (cmake-install)))
                                                                   ("g" . (lambda () (boxy-close) (generate-project)))
-                                                                  ("r" . (lambda () (boxy-close) (cm-regenerate)))))))
+                                                                  ("r" . (lambda () (boxy-close) (cm-regenerate)))
+                                                                  ("q" . (lambda () (boxy-close) (cpp-testfield-init)))))))
                        ("v" . (lambda () (boxy-close) (boxy-centered 40 '(" r - [root ...]"
                                                                      " d - directory status"
                                                                      " c - diff current file (=)"
