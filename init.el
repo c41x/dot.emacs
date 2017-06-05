@@ -697,7 +697,8 @@
            '(c++-mode-hook))
 
 (setq-default company-irony-ignore-case t)
-(setq-default irony-supported-major-modes nil)
+(setq-default irony-supported-major-modes '(c++-mode))
+(setq-default w32-pipe-read-delay 0)
 
 ;; replace the `completion-at-point' and `complete-symbol' bindings in
 ;; irony-mode's buffers by irony-mode's function
