@@ -142,6 +142,6 @@
  '(company-tooltip-annotation ((t (:foreground "DarkOliveGreen3"))))
  '(company-tooltip-common ((t (:foreground "orange2"))))
  '(company-tooltip-selection ((t (:background "gray30"))))
- '(vertical-border ((t (:foreground "black")))))
+ '(vertical-border ((t (:foreground "#222222")))))
 
 (provide-theme 'calx)
