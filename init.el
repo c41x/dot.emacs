@@ -1068,9 +1068,11 @@
                                                                   ("w" . (lambda () (boxy-close) (kill-buffer-and-window)))
                                                                   ("c" . (lambda () (boxy-close) (kill-compilation)))))))
                        ("=" . (lambda () (boxy-close) (boxy-centered 40 '(" v - PlayFab: get current version"
-                                                                     " u - PlayFab: upload file to playfab")
+                                                                     " u - PlayFab: upload file to playfab"
+                                                                     " d - PlayFab: download latest version")
                                                                 '(("v" . (lambda () (boxy-close) (playfab-get-revision)))
-                                                                  ("u" . (lambda () (boxy-close) (playfab-update-cloudscript)))))))
+                                                                  ("u" . (lambda () (boxy-close) (playfab-update-cloudscript)))
+                                                                  ("d" . (lambda () (boxy-close) (playfab-download-latest)))))))
                        ("d" . (lambda () (boxy-close) (boxy-centered 40 '(" d - compile (debug)"
                                                                      " r - compile (release)"
                                                                      " s - run (debug)")
