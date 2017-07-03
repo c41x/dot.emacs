@@ -749,6 +749,7 @@
                               (omnisharp-mode)))
 (add-hook 'csharp-mode-hook 'flycheck-mode)
 (setq omnisharp-server-executable-path "e:/repo/omnisharp-roslyn/artifacts/publish/OmniSharp/default/net46/OmniSharp.exe")
+(global-set-key (kbd "C-<f12>") 'omnisharp-go-to-definition)
 
 ;;//- Cg/HLSL/GLSL/ShaderLab
 ;; CG/HLSL mode
