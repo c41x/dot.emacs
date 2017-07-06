@@ -275,6 +275,9 @@
 ;; no shitty spaces ... 13-10-2015 - hell has frozen over
 (setq indent-tabs-mode nil)
 
+;; tabs should be always interpreted as 4 spaces
+(setq-default tab-width 4)
+
 ;; auto indenting current line when pressing <enter>
 (electric-indent-mode t)
 
@@ -282,9 +285,11 @@
 ;; (which-function-mode)
 
 ;; delete trailing whitespace on save, also tabify buffer
-(add-hook 'before-save-hook (lambda ()
-                              (whitespace-cleanup)
-                              (untabify (point-min) (point-max))))
+(defun cleanup-before-save ()
+  (whitespace-cleanup)
+  (untabify (point-min) (point-max)))
+
+(add-hook 'before-save-hook 'cleanup-before-save)
 
 ;; automatically reload files when changed
 (global-auto-revert-mode t)
