@@ -273,7 +273,7 @@
 (global-set-key [(f12)] 'kmacro-end-or-call-macro)
 
 ;; no shitty spaces ... 13-10-2015 - hell has frozen over
-(setq indent-tabs-mode nil)
+(setq-default indent-tabs-mode nil)
 
 ;; tabs should be always interpreted as 4 spaces
 (setq-default tab-width 4)
