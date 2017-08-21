@@ -69,20 +69,21 @@
               (line-number-at-pos (window-start))))
       (total-lines)))
 
-(defun buffer-ind-l ()
-  (floor (max 0.0 (- (* (/ (float (line-number-at-pos (window-start)))
-                           (float (total-lines)))
-                        buffer-pos-indicator-length) 1.0))))
+(defun modeline-bar (index)
+  (let ((line (* (/ (float index)
+                    (float buffer-pos-indicator-length))
+                 (float (total-lines))))
+        (start (line-number-at-pos (window-start)))
+        (end (line-number-at-pos (window-end))))
+    (if (or (< line start)
+            (> line end))
+        'mode-line-bg-face
+      'mode-line-progress-face)))
 
-(defun buffer-ind-b ()
-  (ceiling (+ 1.0 (* (/ (float (- (line-number-at-pos (window-end))
-                                  (line-number-at-pos (window-start))))
-                        (float (total-lines)))
-                     buffer-pos-indicator-length))))
-
-(defun buffer-ind-r ()
-  (- buffer-pos-indicator-length (+ (buffer-ind-l) (buffer-ind-b))))
-
+;; TODO: show flycheck errors as red dots in modeline
+;;(setq errors flycheck-current-errors)
+;;(elt (elt errors 0) 7)
+;;(elt (elt errors 0) 4)
 (setq-default mode-line-format '("%e"
                                  mode-line-front-space
                                  mode-line-mule-info
@@ -95,14 +96,13 @@
                                           (propertize (make-string 1 9632) 'face 'mode-line-bg-face)))
                                  " "
                                  (:propertize (:eval mode-line-buffer-identification) face mode-line-separator-face)
+                                 " "
                                  (:eval (if (not (buffer-all-visible))
-                                            (list
-                                             " "
-                                             (propertize (make-string (buffer-ind-l) 9632) 'face 'mode-line-bg-face)
-                                             (propertize (make-string (buffer-ind-b) 9632) 'face 'mode-line-progress-face)
-                                             (propertize (make-string (buffer-ind-r) 9632) 'face 'mode-line-bg-face)
-                                             " "
-                                             )))
+                                            (cl-loop for i from 1 to buffer-pos-indicator-length collect
+                                                     (propertize (make-string 1 9632)
+                                                                 'face
+                                                                 (modeline-bar i)))))
+                                 " "
                                  (vc-mode vc-mode)
                                  " "
                                  (:eval (if (boundp 'mode-line-project) (propertize (concat " " mode-line-project " ") 'face 'mode-line-2)))
