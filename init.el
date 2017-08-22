@@ -2,6 +2,7 @@
 (require 'cl-lib)
 (require 'cl)
 (require 'package)
+(require 'cl-seq)
 
 (package-initialize)
 (setq package-archives
@@ -69,21 +70,33 @@
               (line-number-at-pos (window-start))))
       (total-lines)))
 
+(defun flycheck-error-in-line (line range)
+  (catch 'ret
+    (dolist (e flycheck-current-errors)
+      (let ((l (- line range))
+            (r (+ line range))
+            (error-line (elt e 4))
+            (error-type (elt e 7)))
+        (when (and (eq error-type 'error)
+                   (> error-line l)
+                   (< error-line r))
+          (throw 'ret t))))
+    nil))
+
 (defun modeline-bar (index)
   (let ((line (* (/ (float index)
                     (float buffer-pos-indicator-length))
                  (float (total-lines))))
         (start (line-number-at-pos (window-start)))
-        (end (line-number-at-pos (window-end))))
-    (if (or (< line start)
-            (> line end))
-        'mode-line-bg-face
-      'mode-line-progress-face)))
+        (end (line-number-at-pos (window-end)))
+        (lines-in-cell (/ (float (total-lines))
+                          (float buffer-pos-indicator-length))))
+    (let ((err (flycheck-error-in-line line (/ lines-in-cell 2.0))))
+      (if (or (< line start)
+              (> line end))
+          (if err 'mode-line-error-face-bg 'mode-line-bg-face)
+        (if err 'mode-line-error-face 'mode-line-progress-face)))))
 
-;; TODO: show flycheck errors as red dots in modeline
-;;(setq errors flycheck-current-errors)
-;;(elt (elt errors 0) 7)
-;;(elt (elt errors 0) 4)
 (setq-default mode-line-format '("%e"
                                  mode-line-front-space
                                  mode-line-mule-info
