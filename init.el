@@ -77,7 +77,7 @@
             (r (+ line range))
             (error-line (elt e 4))
             (error-type (elt e 7)))
-        (when (and (eq error-type 'error)
+        (when (and (equal error-type 'error)
                    (> error-line l)
                    (< error-line r))
           (throw 'ret t))))
@@ -375,11 +375,34 @@
 (defun popupize-buffer (element)
   (popup-make-item (buffer-name element) :value element))
 
+(defvar last-file-isearch "")
+
+(defun custom-isearch-filter (pattern list)
+  (setq last-file-isearch pattern)
+  (let ((filter (popup-isearch-filter-list pattern list)))
+    (append (if (equal 'git-search (cdr (nth 4 (last filter))))
+                (butlast filter)
+              filter)
+            (last list))))
+
+(defun helm-inject-filter (args)
+  (if (plist-member args :sources)
+      (plist-put args :input last-file-isearch)
+    args))
+
 (defun switch-buffer-popup ()
   (interactive)
-  (switch-to-buffer (popup-menu* (mapcar 'popupize-buffer (list-visible-buffers))
-                                 :scroll-bar t
-                                 :isearch t)))
+  (let ((popup (popup-menu*
+                (append (mapcar 'popupize-buffer (list-visible-buffers))
+                        (list (popup-make-item "Search in repository..." :value 'git-search)))
+                :scroll-bar t
+                :isearch t
+                :isearch-filter 'custom-isearch-filter)))
+    (if (equal popup 'git-search)
+        (progn (advice-add 'helm :filter-args 'helm-inject-filter)
+               (helm-ls-git-ls)
+               (advice-remove 'helm 'helm-inject-filter))
+      (switch-to-buffer popup))))
 
 ;; TODO: property list ?
 
