@@ -300,7 +300,8 @@
 ;; delete trailing whitespace on save, also tabify buffer
 (defun cleanup-before-save ()
   (whitespace-cleanup)
-  (untabify (point-min) (point-max)))
+  (untabify (point-min) (point-max))
+  (indent-for-tab-command))
 
 (add-hook 'before-save-hook 'cleanup-before-save)
 
