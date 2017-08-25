@@ -30,6 +30,28 @@
                                                                                          (buffer-substring-no-properties (point) (point-max))))))
                     (kill-buffer)))))
 
+(defun playfab--get-contents (response)
+  (cdr (assoc 'FileContents (elt (cdr (assoc 'Files (cdr (assoc 'data (json-read-from-string response))))) 0))))
+
+(defun playfab-download-latest ()
+  (interactive)
+  (let ((url-request-method "POST")
+        (url-request-extra-headers `(("Content-Type" . "application/json")
+                                     ("X-SecretKey" . ,playfab-secret-key)))
+        (url-request-data "{}"))
+    (url-retrieve (playfab-get-cloudscript-revision-url)
+                  (lambda (status)
+                    (switch-to-buffer (current-buffer))
+                    (goto-char (point-min))
+                    (search-forward "\n\n")
+                    (let ((contents (playfab--get-contents
+                                     (buffer-substring-no-properties (point) (point-max)))))
+                      (kill-buffer)
+                      (erase-buffer)
+                      (insert (replace-regexp-in-string "\r" "" contents))
+                      (goto-char (point-min))
+                      (save-buffer))))))
+
 (defun playfab--get-update-state (response)
   (cdr (assoc 'status (json-read-from-string response))))
 

@@ -49,6 +49,14 @@
 (set-face-attribute 'mode-line-progress-face nil
                     :foreground "antique white")
 
+(make-face 'mode-line-error-face-bg)
+(set-face-attribute 'mode-line-error-face-bg nil
+                    :foreground "#881100")
+
+(make-face 'mode-line-error-face)
+(set-face-attribute 'mode-line-error-face nil
+                    :foreground "#ff2200")
+
 (make-face 'mode-line-bg-face)
 (set-face-attribute 'mode-line-bg-face nil
                     :foreground "black")

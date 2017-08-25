@@ -6,3 +6,7 @@
 
 ;(require 'simple-httpd)
 ;(setq httpd-root "d:/repo/minigame2")
+
+;; remove cleanup before save - helpful if repository I'm working on is total shit ignoring
+;; basic coding conventions
+;(remove-hook 'before-save-hook 'cleanup-before-save)

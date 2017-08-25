@@ -2,6 +2,7 @@
 (require 'cl-lib)
 (require 'cl)
 (require 'package)
+(require 'cl-seq)
 
 (package-initialize)
 (setq package-archives
@@ -69,19 +70,32 @@
               (line-number-at-pos (window-start))))
       (total-lines)))
 
-(defun buffer-ind-l ()
-  (floor (max 0.0 (- (* (/ (float (line-number-at-pos (window-start)))
-                           (float (total-lines)))
-                        buffer-pos-indicator-length) 1.0))))
+(defun flycheck-error-in-line (line range)
+  (catch 'ret
+    (dolist (e flycheck-current-errors)
+      (let ((l (- line range))
+            (r (+ line range))
+            (error-line (elt e 4))
+            (error-type (elt e 7)))
+        (when (and (equal error-type 'error)
+                   (> error-line l)
+                   (< error-line r))
+          (throw 'ret t))))
+    nil))
 
-(defun buffer-ind-b ()
-  (ceiling (+ 1.0 (* (/ (float (- (line-number-at-pos (window-end))
-                                  (line-number-at-pos (window-start))))
-                        (float (total-lines)))
-                     buffer-pos-indicator-length))))
-
-(defun buffer-ind-r ()
-  (- buffer-pos-indicator-length (+ (buffer-ind-l) (buffer-ind-b))))
+(defun modeline-bar (index)
+  (let ((line (* (/ (float index)
+                    (float buffer-pos-indicator-length))
+                 (float (total-lines))))
+        (start (line-number-at-pos (window-start)))
+        (end (line-number-at-pos (window-end)))
+        (lines-in-cell (/ (float (total-lines))
+                          (float buffer-pos-indicator-length))))
+    (let ((err (flycheck-error-in-line line (/ lines-in-cell 2.0))))
+      (if (or (< line start)
+              (> line end))
+          (if err 'mode-line-error-face-bg 'mode-line-bg-face)
+        (if err 'mode-line-error-face 'mode-line-progress-face)))))
 
 (setq-default mode-line-format '("%e"
                                  mode-line-front-space
@@ -95,14 +109,13 @@
                                           (propertize (make-string 1 9632) 'face 'mode-line-bg-face)))
                                  " "
                                  (:propertize (:eval mode-line-buffer-identification) face mode-line-separator-face)
+                                 " "
                                  (:eval (if (not (buffer-all-visible))
-                                            (list
-                                             " "
-                                             (propertize (make-string (buffer-ind-l) 9632) 'face 'mode-line-bg-face)
-                                             (propertize (make-string (buffer-ind-b) 9632) 'face 'mode-line-progress-face)
-                                             (propertize (make-string (buffer-ind-r) 9632) 'face 'mode-line-bg-face)
-                                             " "
-                                             )))
+                                            (cl-loop for i from 1 to buffer-pos-indicator-length collect
+                                                     (propertize (make-string 1 9632)
+                                                                 'face
+                                                                 (modeline-bar i)))))
+                                 " "
                                  (vc-mode vc-mode)
                                  " "
                                  (:eval (if (boundp 'mode-line-project) (propertize (concat " " mode-line-project " ") 'face 'mode-line-2)))
@@ -277,7 +290,10 @@
 (global-set-key [(f12)] 'kmacro-end-or-call-macro)
 
 ;; no shitty spaces ... 13-10-2015 - hell has frozen over
-(setq indent-tabs-mode nil)
+(setq-default indent-tabs-mode nil)
+
+;; tabs should be always interpreted as 4 spaces
+(setq-default tab-width 4)
 
 ;; auto indenting current line when pressing <enter>
 (electric-indent-mode t)
@@ -286,9 +302,12 @@
 ;; (which-function-mode)
 
 ;; delete trailing whitespace on save, also tabify buffer
-(add-hook 'before-save-hook (lambda ()
-                              (whitespace-cleanup)
-                              (untabify (point-min) (point-max))))
+(defun cleanup-before-save ()
+  (whitespace-cleanup)
+  (untabify (point-min) (point-max))
+  (indent-for-tab-command))
+
+(add-hook 'before-save-hook 'cleanup-before-save)
 
 ;; automatically reload files when changed
 (global-auto-revert-mode t)
@@ -361,11 +380,34 @@
 (defun popupize-buffer (element)
   (popup-make-item (buffer-name element) :value element))
 
+(defvar last-file-isearch "")
+
+(defun custom-isearch-filter (pattern list)
+  (setq last-file-isearch pattern)
+  (let ((filter (popup-isearch-filter-list pattern list)))
+    (append (if (equal 'git-search (cdr (nth 4 (last filter))))
+                (butlast filter)
+              filter)
+            (last list))))
+
+(defun helm-inject-filter (args)
+  (if (plist-member args :sources)
+      (plist-put args :input last-file-isearch)
+    args))
+
 (defun switch-buffer-popup ()
   (interactive)
-  (switch-to-buffer (popup-menu* (mapcar 'popupize-buffer (list-visible-buffers))
-                                 :scroll-bar t
-                                 :isearch t)))
+  (let ((popup (popup-menu*
+                (append (mapcar 'popupize-buffer (list-visible-buffers))
+                        (list (popup-make-item "Search in repository..." :value 'git-search)))
+                :scroll-bar t
+                :isearch t
+                :isearch-filter 'custom-isearch-filter)))
+    (if (equal popup 'git-search)
+        (progn (advice-add 'helm :filter-args 'helm-inject-filter)
+               (helm-ls-git-ls)
+               (advice-remove 'helm 'helm-inject-filter))
+      (switch-to-buffer popup))))
 
 ;; TODO: property list ?
 
@@ -753,6 +795,7 @@
                               (omnisharp-mode)))
 (add-hook 'csharp-mode-hook 'flycheck-mode)
 (setq omnisharp-server-executable-path "e:/repo/omnisharp-roslyn/artifacts/publish/OmniSharp/default/net46/OmniSharp.exe")
+(global-set-key (kbd "C-<f12>") 'omnisharp-go-to-definition)
 
 ;;//- Cg/HLSL/GLSL/ShaderLab
 ;; CG/HLSL mode
@@ -1072,9 +1115,11 @@
                                                                   ("w" . (lambda () (boxy-close) (kill-buffer-and-window)))
                                                                   ("c" . (lambda () (boxy-close) (kill-compilation)))))))
                        ("=" . (lambda () (boxy-close) (boxy-centered 40 '(" v - PlayFab: get current version"
-                                                                     " u - PlayFab: upload file to playfab")
+                                                                     " u - PlayFab: upload file to playfab"
+                                                                     " d - PlayFab: download latest version")
                                                                 '(("v" . (lambda () (boxy-close) (playfab-get-revision)))
-                                                                  ("u" . (lambda () (boxy-close) (playfab-update-cloudscript)))))))
+                                                                  ("u" . (lambda () (boxy-close) (playfab-update-cloudscript)))
+                                                                  ("d" . (lambda () (boxy-close) (playfab-download-latest)))))))
                        ("d" . (lambda () (boxy-close) (boxy-centered 40 '(" d - compile (debug)"
                                                                      " r - compile (release)"
                                                                      " s - run (debug)")
