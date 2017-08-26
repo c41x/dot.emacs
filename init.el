@@ -2,7 +2,6 @@
 (require 'cl-lib)
 (require 'cl)
 (require 'package)
-(require 'cl-seq)
 
 (package-initialize)
 (setq package-archives
