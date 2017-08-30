@@ -457,7 +457,7 @@
 
 ;; ace-jump mode for quick jumping around
 (require 'ace-jump-mode)
-(define-key global-map (kbd "C-.") 'ace-jump-mode)
+(define-key global-map (kbd "C-\\") 'ace-jump-mode)
 
 ;; multiple cursors
 (require 'multiple-cursors)
