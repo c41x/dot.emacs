@@ -2,7 +2,6 @@
 (require 'cl-lib)
 (require 'cl)
 (require 'package)
-(require 'cl-seq)
 
 (package-initialize)
 (setq package-archives
@@ -271,6 +270,10 @@
 (defun cfg ()
   (interactive)
   (find-file "~/.emacs.d/init.el"))
+
+(defun cfg-theme ()
+  (interactive)
+  (find-file "~/.emacs.d/calx-theme.el"))
 
 ;; fix to conflict between cua rectangle mode and autopair (autopair overrides enter key (cua-rotate-rectangle))
 ;; just bind cua-rotate-rectangle to other keybind
