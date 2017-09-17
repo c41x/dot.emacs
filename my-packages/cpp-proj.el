@@ -516,13 +516,18 @@
 (defun cpp-testfield-init ()
   (interactive)
   (switch-to-buffer (get-buffer-create "C++Tesftield.cpp"))
-  (write-file "/tmp/C++Testfield.cpp")
+  (write-file (if (string-equal system-type "windows-nt")
+                  "C:/tmp/C++Testfield.cpp"
+                "/tmp/C++Testfield.cpp"))
   (local-set-key (kbd "<f6>") 'cpp-testfield-compile-run))
 
 (defun cpp-testfield-compile-run ()
   (interactive)
   (save-some-buffers t)
-  (compile "g++ -std=c++1z -o /tmp/C++Testfield /tmp/C++Testfield.cpp && /tmp/C++Testfield" t))
+  (compile (if (string-equal system-type "windows-nt")
+               "g++ -std=c++1z -o C:/tmp/C++Testfield C:/tmp/C++Testfield.cpp && C:/tmp/C++Testfield"
+             "g++ -std=c++1z -o /tmp/C++Testfield /tmp/C++Testfield.cpp && /tmp/C++Testfield")
+           t))
 
 ;;// TODO: CMake OPTION support
 ;;// TODO: Project generation:
