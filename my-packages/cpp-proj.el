@@ -190,6 +190,7 @@
     (irony-mode nil)
     (company-mode nil)
     (flycheck-mode nil)
+    (setq irony-additional-clang-options '("-std=c++1z"))
     (irony-cdb-json-add-compile-commands-path
      (find-project-directory)
      (concat (if current-target-release current-dir-release current-dir-debug)
