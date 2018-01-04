@@ -304,7 +304,11 @@
 (defun cleanup-before-save ()
   (whitespace-cleanup)
   (untabify (point-min) (point-max))
-  (indent-for-tab-command))
+  (when (or (equal major-mode 'c++-mode)
+            (equal major-mode 'c-mode)
+            (equal major-mode 'csharp-mode)
+            (equal major-mode 'js2-mode))
+      (indent-for-tab-command)))
 
 (add-hook 'before-save-hook 'cleanup-before-save)
 
