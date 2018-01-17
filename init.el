@@ -242,7 +242,33 @@
 (global-set-key (kbd "C-; .") (lambda () (interactive) (move-frame-with-buffer 'right)))
 (global-set-key (kbd "C-; ,") (lambda () (interactive) (move-frame-with-buffer 'left)))
 
-;; comment/uncomment
+;; smart comment/uncomment
+(defmacro smart-comment (key-bind)
+  `(lambda ()
+     (local-set-key (kbd ,key-bind)
+                    (lambda ()
+                      (interactive)
+                      (if (use-region-p)
+                          (comment-or-uncomment-region
+                           (region-beginning)
+                           (region-end))
+                        (insert ,key-bind))))))
+
+(add-hooks (smart-comment ";")
+           '(emacs-lisp-mode-hook
+            lisp-mode-hook))
+
+(add-hooks (smart-comment "/")
+           '(c-mode-hook
+             c++-mode-hook
+             csharp-mode-hook
+             js-mode-hook
+             js2-mode-hook))
+
+(add-hooks (smart-comment "#")
+           '(python-mode-hook))
+
+;; default comment key binding
 (global-set-key (kbd "C-; c") 'comment-or-uncomment-region)
 
 (cua-mode 1) ; cua-mode (Ctrl+C,V,X,Z)
