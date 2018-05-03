@@ -133,7 +133,7 @@
 (load-theme 'calx t)
 
 ;; set frame size
-(add-hook 'after-init-hook (lambda () (set-frame-size (selected-frame) 120 68)))
+(add-hook 'after-init-hook (lambda () (set-frame-size (selected-frame) 100 60)))
 
 ;; show line numbers
 (global-linum-mode t)
@@ -1290,3 +1290,17 @@
 ;; TODO: uniform c++ project
 ;; TODO: recall: make recall.el package
 ;; TODO: recall: open closed buffers?
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (ac-php zeal-at-point ggtags omnisharp neotree flycheck-irony company-irony company s web-mode php-mode ac-geiser geiser fuzzy skewer-mode key-chord flycheck jedi highlight-symbol smex helm-ls-git helm-git-grep helm lua-mode js2-mode csharp-mode autopair pretty-lambdada cmake-mode glsl-mode ace-jump-mode multiple-cursors expand-region auto-complete yasnippet))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
