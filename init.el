@@ -130,7 +130,11 @@
 (setq inhibit-startup-screen 1)
 
 ;; theme
+(define-key special-event-map [config-changed-event] #'ignore) ;; ignore gconf settings - prevents some weird bug
 (load-theme 'calx t)
+(if (string= system-type "windows-nt")
+    (set-face-attribute 'default nil :height 98 :family "Liberation Mono")
+  (set-face-attribute 'default nil :height 115 :family "Liberation Mono"))
 
 ;; set frame size
 (add-hook 'after-init-hook (lambda () (set-frame-size (selected-frame) 100 60)))
@@ -1298,9 +1302,3 @@
  '(package-selected-packages
    (quote
     (ac-php zeal-at-point ggtags omnisharp neotree flycheck-irony company-irony company s web-mode php-mode ac-geiser geiser fuzzy skewer-mode key-chord flycheck jedi highlight-symbol smex helm-ls-git helm-git-grep helm lua-mode js2-mode csharp-mode autopair pretty-lambdada cmake-mode glsl-mode ace-jump-mode multiple-cursors expand-region auto-complete yasnippet))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
