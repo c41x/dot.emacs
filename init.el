@@ -543,6 +543,10 @@
 ;; flycheck
 (require 'flycheck)
 
+;; dont show errors from other files
+(with-eval-after-load 'flycheck
+  (advice-add 'flycheck-relevant-error-other-file-p :override (lambda (&rest args) nil)))
+
 ;; company
 (require 'company)
 (setq company-idle-delay 0.0)
