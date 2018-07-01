@@ -451,7 +451,7 @@
 
 ;; yasnippet
 (require 'yasnippet)
-(setq yas-snippet-dirs "~/.emacs.d/yasnippet-snippets")
+(setq yas-snippet-dirs '("~/.emacs.d/yasnippet-snippets"))
 (setq-default yas/trigger-key (kbd "C-S-M-;")) ;; impossibru shortcut
 (yas-global-mode t)
 (define-key yas-minor-mode-map (kbd "<tab>") nil) ;; disable tab (trigger YAS only with AC)
