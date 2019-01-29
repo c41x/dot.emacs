@@ -438,6 +438,9 @@
                (advice-remove 'helm 'helm-inject-filter))
       (switch-to-buffer popup))))
 
+;; some unicode fonts are slowing navigating
+(setq inhibit-compacting-font-caches t)
+
 ;; TODO: property list ?
 
 ;;//- plugins
@@ -834,6 +837,7 @@
 (add-to-list 'auto-mode-alist '("\\.shader\\'" . cg-mode))
 (add-to-list 'auto-mode-alist '("\\.compute\\'" . cg-mode))
 (add-to-list 'auto-mode-alist '("\\.cginc\\'" . cg-mode))
+(add-to-list 'auto-mode-alist '("\\.cgh\\'" . cg-mode))
 (font-lock-add-keywords 'cg-mode operator-rex) ; highlight operators
 (font-lock-add-keywords 'cg-mode number-rex) ; highlight numbers
 (defvar preprocessor-rex '(("\\#[A-Za-z]+" . font-lock-preprocessor-face)))
