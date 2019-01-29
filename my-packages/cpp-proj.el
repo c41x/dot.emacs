@@ -401,14 +401,22 @@
   (setq gdb-many-windows nil)
   (jump-to-register 1))
 
+(defun gdbgui-debug ()
+  (interactive)
+  (refresh-unset current-executable-debug refresh-executable-debug)
+  (compile (format "gdbgui \"%s\""
+                   (concat current-executable-debug
+                           (exec-name current-target-name)))))
+
 (global-set-key (kbd "<f7>") 'cm-compile)
 ;;(global-set-key (kbd "S-<f7>") 'cm-compile-release)
 (global-set-key (kbd "C-<f7>") 'cm-compile-clean)
 ;;(global-set-key (kbd "C-S-<f7>") 'cm-compile-release-clean)
 (global-set-key (kbd "<f6>") 'cm-run)
 ;;(global-set-key (kbd "S-<f6>") 'cm-run-release)
-(global-set-key (kbd "<f5>") 'cm-debug)
-(global-set-key (kbd "S-<f5>") 'cm-restore-debug)
+;;(global-set-key (kbd "<f5>") 'cm-debug)
+;;(global-set-key (kbd "S-<f5>") 'cm-restore-debug)
+(global-set-key (kbd "<f5>") 'gdbgui-debug)
 (global-set-key (kbd "<f9>") 'gud-break) ; toggle breakpoint
 (global-set-key (kbd "<left-margin> <mouse-1>") 'gud-break)
 (global-set-key (kbd "<f10>") 'gud-next) ; next statement
@@ -525,8 +533,8 @@
   (interactive)
   (save-some-buffers t)
   (compile (if (string-equal system-type "windows-nt")
-               "g++ -std=c++1z -o C:/tmp/C++Testfield C:/tmp/C++Testfield.cpp && C:/tmp/C++Testfield"
-             "g++ -std=c++1z -o /tmp/C++Testfield /tmp/C++Testfield.cpp && /tmp/C++Testfield")
+               "g++ -std=c++1z -g -O3 -o C:/tmp/C++Testfield C:/tmp/C++Testfield.cpp && C:/tmp/C++Testfield"
+             "g++ -std=c++1z -g -O3 -o /tmp/C++Testfield /tmp/C++Testfield.cpp && /tmp/C++Testfield")
            t))
 
 ;;// TODO: CMake OPTION support
