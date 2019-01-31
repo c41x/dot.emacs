@@ -448,8 +448,8 @@
 ;; recode file from windows-1250 to utf-8
 (defun recode-pl-to-utf ()
   (interactive)
-  (revert-buffer-with-coding-system "windows-1250")
-  (set-buffer-file-coding-system "utf-8"))
+  (revert-buffer-with-coding-system 'windows-1250)
+  (set-buffer-file-coding-system 'utf-8))
 
 ;; TODO: property list ?
 
