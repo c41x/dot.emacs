@@ -1052,6 +1052,9 @@
 ;; PlayFab
 (require 'playfab)
 
+;; OOM IO
+(require 'oom-io)
+
 ;;//- GUID generator and utilities
 (require 's)
 
