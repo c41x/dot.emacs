@@ -5,8 +5,7 @@
 
 (package-initialize)
 (setq package-archives
-      '(("marmalade" . "https://marmalade-repo.org/packages/")
-        ("melpa" . "http://melpa.org/packages/")
+      '(("melpa" . "http://melpa.org/packages/")
         ("elpa" . "http://elpa.gnu.org/packages/")))
 
 (defvar required-packages
@@ -17,8 +16,6 @@
     ace-jump-mode
     glsl-mode
     cmake-mode
-    pretty-lambdada
-    autopair
     csharp-mode
     js2-mode
     lua-mode
@@ -305,10 +302,6 @@
   (interactive)
   (find-file "~/.emacs.d/calx-theme.el"))
 
-;; fix to conflict between cua rectangle mode and autopair (autopair overrides enter key (cua-rotate-rectangle))
-;; just bind cua-rotate-rectangle to other keybind
-(global-set-key (kbd "C-M-r") 'cua-rotate-rectangle)
-
 ;; file name in title bar
 (defvar default-frame-title-format "emacs | %b")
 (setq frame-title-format default-frame-title-format)
@@ -455,8 +448,7 @@
 
 ;;//- plugins
 ;; automatic brackets {}()[]""'' pairing
-(require 'autopair)
-(autopair-global-mode)
+(electric-pair-mode 1)
 
 ;; yasnippet
 (require 'yasnippet)
@@ -484,6 +476,7 @@
 (flyspell-mode 0) ;; speedup AC
 
 ;; helm
+(require 'compile)
 (require 'helm-config)
 (set 'helm-idle-delay 0.0)
 (set 'helm-input-idle-delay 0.0)
@@ -518,9 +511,8 @@
 (global-set-key (kbd "C-' x") 'kill-region)
 (global-set-key (kbd "C-w") 'er/expand-region)
 
-;; pretty lambda
-(require 'pretty-lambdada)
-(pretty-lambda-for-modes)
+;; was pretty lambda, but 24.4 introduced prettify symbols
+(global-prettify-symbols-mode 1)
 
 ;; neotree
 (require 'neotree)
@@ -834,7 +826,6 @@
 
 ;;//- C#
 ;; csharp-mode inserts {} braces automatically (this totally breaks autopair)
-(add-hook 'csharp-mode-hook (lambda () (local-set-key (kbd "{") 'c-electric-brace)))
 (add-hook 'csharp-mode-hook (lambda ()
                               (setq-local company-backends '((company-omnisharp :separate company-dabbrev)))
                               (company-mode t)
@@ -1311,11 +1302,3 @@
 ;; TODO: uniform c++ project
 ;; TODO: recall: make recall.el package
 ;; TODO: recall: open closed buffers?
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    (ac-php zeal-at-point ggtags omnisharp neotree flycheck-irony company-irony company s web-mode php-mode ac-geiser geiser fuzzy skewer-mode key-chord flycheck jedi highlight-symbol smex helm-ls-git helm-git-grep helm lua-mode js2-mode csharp-mode autopair pretty-lambdada cmake-mode glsl-mode ace-jump-mode multiple-cursors expand-region auto-complete yasnippet))))
