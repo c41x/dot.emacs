@@ -185,20 +185,67 @@
   (end-of-buffer)
   (visual-line-mode t))
 
-(defun setup-irony-flycheck-for-cmake ()
+(defun newest-file (path)
+  (car
+   (seq-find
+    '(lambda (x) (not (nth 1 x))) ; non-directory
+    (sort
+     (directory-files-and-attributes path 'full nil t)
+     '(lambda (x y) (time-less-p (nth 5 y) (nth 5 x)))))))
+
+(defun load-latest-dump-kdbg ()
+  (interactive)
+  ; refresh debug directories if not up to date
+  (refresh-unset current-executable-debug refresh-executable-debug)
+  (refresh-unset current-executable-release refresh-executable-release)
+  ; uncompress latest file from dump directory
+  (shell-command (concat
+                  "unzstd -f "
+                  (newest-file "/var/lib/systemd/coredump")
+                  " -o "
+                  (if current-target-release current-dir-release current-dir-debug)
+                  "/dump"))
+  ;; load it into kdbg
+  (shell-command (concat
+                  "kdbg "
+                  (concat (if current-target-release
+                              current-executable-release
+                            current-executable-debug)
+                          (exec-name current-target-name))
+                  " "
+                  (if current-target-release current-dir-release current-dir-debug)
+                  "/dump"
+                  )))
+
+(defvar compile-commands-path "")
+
+(defun eglot-clangd-command ()
+  (let ((dir (file-name-directory compile-commands-path)))
+    `("clangd" ,(concat "--compile-commands-dir=" dir))))
+
+(with-eval-after-load 'eglot
+  (when (not (string-equal compile-commands-path ""))
+    (setq eglot-server-programs
+          `(((c-mode c++-mode) . eglot-clangd-command)))))
+
+(defun setup-cmake-project ()
   (when (is-cmake-project)
-    (irony-mode nil)
+    ;; disable stuff for now, will reinitialize later
     (company-mode nil)
     (flycheck-mode nil)
-    (setq irony-additional-clang-options '("-std=c++20"))
-    (irony-cdb-json-add-compile-commands-path
-     (find-project-directory)
-     (concat (if current-target-release current-dir-release current-dir-debug)
-             "/compile_commands.json"))
-    (setq-local company-backends '((company-irony :separate company-dabbrev)))
-    (irony-mode t)
+    (eglot-shutdown (eglot-current-server))
+
+    ;; find compile_commands.json
+    (setq compile-commands-path
+          (progn
+            (find-project-directory)
+            (concat (if current-target-release current-dir-release current-dir-debug)
+                    "/compile_commands.json")))
+
+    ;; reenable eglot, company and flycheck
     (company-mode t)
-    (flycheck-mode t)))
+    (flycheck-mode t)
+    (eglot-ensure)))
 
 (defun switch-target ()
   (interactive)
@@ -207,7 +254,7 @@
   (refresh-dir-release)
   (setq current-executable-debug nil)
   (setq current-executable-release nil)
-  (setup-irony-flycheck-for-cmake)
+  (setup-cmake-project)
   current-target-name)
 
 (defun switch-configuration ()
@@ -215,7 +262,7 @@
   (if (string= "debug" (popup-menu* '("debug" "release") :scroll-bar t :isearch t))
       (setq current-target-release nil)
     (setq current-target-release t))
-  (setup-irony-flycheck-for-cmake)
+  (setup-cmake-project)
   (refresh-mode-line))
 
 (defun unload-project ()
