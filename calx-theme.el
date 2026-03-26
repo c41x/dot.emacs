@@ -110,6 +110,12 @@
  '(compilation-warning ((t (:foreground "green yellow" :underline nil))))
  '(diff-added ((t (:background "dark green"))))
  '(diff-removed ((t (:background "firebrick4"))))
+
+ ;;'(diff-added ((t (:extend t :background "#113300"))))
+ '(diff-refine-added ((t (:inherit diff-refine-changed :background "#114400"))))
+ '(diff-refine-removed ((t (:inherit diff-refine-changed :background "#551100"))))
+ ;;'(diff-removed ((t (:extend t :background "#441100"))))
+
  '(dired-directory ((t (:foreground "#eeaa11"))))
  '(fringe ((t (:background "black" :foreground "#39ae1c"))))
  '(linum ((t (:background "black" :foreground "#343434"))))
