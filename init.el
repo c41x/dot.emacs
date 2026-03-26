@@ -1,6 +1,5 @@
 ;;//- package management
 (require 'cl-lib)
-(require 'cl)
 (require 'package)
 
 (package-initialize)
@@ -19,9 +18,6 @@
     csharp-mode
     js2-mode
     lua-mode
-    helm
-    helm-git-grep
-    helm-ls-git
     smex
     popup
     highlight-symbol
@@ -36,26 +32,24 @@
     web-mode
     s
     company
-    company-irony
-    irony
-    flycheck-irony
     neotree
+    nlinum
     omnisharp
-    ggtags
+    pkg-info
     zeal-at-point
-    ac-php))
+    ac-php
+    markdown-mode
+    helm
+    helm-git-grep
+    helm-ls-git))
 
-(defun has-package-to-install ()
-  (loop for p in required-packages
-        when (not (package-installed-p p)) do (return t)
-        finally (return nil)))
-
-(when (has-package-to-install)
-  (message "get latest versions of packages...")
-  (package-refresh-contents)
-  (message "done.")
+;; install all packages
+(let ((refresh-packages nil))
   (dolist (p required-packages)
     (when (not (package-installed-p p))
+      (when (not refresh-packages)
+        (setq refresh-packages t)
+        (package-refresh-contents))
       (package-install p))))
 
 ;;//- mode-line
@@ -93,6 +87,21 @@
           (if err 'mode-line-error-face-bg 'mode-line-bg-face)
         (if err 'mode-line-error-face 'mode-line-progress-face)))))
 
+(defun buffer-ind-l ()
+  (floor (max 0.0 (- (* (/ (float (line-number-at-pos (window-start)))
+                           (float (total-lines)))
+                        buffer-pos-indicator-length) 1.0))))
+
+(defun buffer-ind-b ()
+  (ceiling (+ 1.0 (* (/ (float (- (line-number-at-pos (window-end))
+                                  (line-number-at-pos (window-start))))
+                        (float (total-lines)))
+                     buffer-pos-indicator-length))))
+
+(defun buffer-ind-r ()
+  (- buffer-pos-indicator-length (+ (buffer-ind-l) (buffer-ind-b))))
+
+
 (setq-default mode-line-format '("%e"
                                  mode-line-front-space
                                  mode-line-mule-info
@@ -107,10 +116,14 @@
                                  (:propertize (:eval mode-line-buffer-identification) face mode-line-separator-face)
                                  " "
                                  (:eval (if (not (buffer-all-visible))
-                                            (cl-loop for i from 1 to buffer-pos-indicator-length collect
-                                                     (propertize (make-string 1 9632)
-                                                                 'face
-                                                                 (modeline-bar i)))))
+                                            (list
+                                             " "
+                                             (propertize (make-string (buffer-ind-l) 9632) 'face 'mode-line-bg-face)
+                                             (propertize (make-string (buffer-ind-b) 9632) 'face 'mode-line-progress-face)
+                                             (propertize (make-string (buffer-ind-r) 9632) 'face 'mode-line-bg-face)
+                                             " "
+                                             )
+                                          ))
                                  " "
                                  (vc-mode vc-mode)
                                  " "
@@ -131,12 +144,13 @@
 (load-theme 'calx t)
 (if (string= system-type "windows-nt")
     (set-face-attribute 'default nil :height 98 :family "Liberation Mono")
-  (set-face-attribute 'default nil :height 115 :family "Liberation Mono"))
+  (set-face-attribute 'default nil :height 125 :family "Liberation Mono"))
 
 ;; set frame size
-(add-hook 'after-init-hook (lambda () (set-frame-size (selected-frame) 100 60)))
+(add-hook 'after-init-hook (lambda () (set-frame-size (selected-frame) 100 30)))
 
 ;; show line numbers
+(require 'linum)
 (global-linum-mode t)
 
 ;; (unless (string= system-type "windows-nt")
@@ -325,13 +339,14 @@
 
 ;; delete trailing whitespace on save, also tabify buffer
 (defun cleanup-before-save ()
-  (whitespace-cleanup)
-  (untabify (point-min) (point-max))
-  (when (or (equal major-mode 'c++-mode)
-            (equal major-mode 'c-mode)
-            (equal major-mode 'csharp-mode)
-            (equal major-mode 'js2-mode))
-      (indent-for-tab-command)))
+  (when (not (equal major-mode 'makefile-gmake-mode))
+    (whitespace-cleanup)
+    (untabify (point-min) (point-max))
+    (when (or (equal major-mode 'c++-mode)
+              (equal major-mode 'c-mode)
+              (equal major-mode 'csharp-mode)
+              (equal major-mode 'js2-mode))
+      (indent-for-tab-command))))
 
 (add-hook 'before-save-hook 'cleanup-before-save)
 
@@ -477,13 +492,13 @@
 
 ;; helm
 (require 'compile)
-(require 'helm-config)
 (set 'helm-idle-delay 0.0)
 (set 'helm-input-idle-delay 0.0)
 (require 'helm-git-grep)
 (when (eq system-type 'windows-nt)
   (defun helm-git-submodule-grep-process ()))
 (setq helm-git-grep-sources '(helm-source-git-grep)) ;; only search in git, not in submodules
+(setq helm-allow-mouse nil) ; workaroud for helm-git-grep https://github.com/yasuyk/helm-git-grep/issues/52
 
 ;; force helm to use bottom of the screen and to not break window layout
 (add-to-list 'display-buffer-alist
@@ -553,9 +568,11 @@
 (setq company-idle-delay 0.0)
 (define-key company-active-map [tab] 'company-complete-selection)
 (define-key company-active-map (kbd "TAB") 'company-complete-selection)
-(setq company-dabbrev-downcase nil)
-(setq company-dabbrev-ignore-case (quote keep-prefix))
-(setq company-irony-ignore-case t)
+(setq company-dabbrev-downcase t)
+(setq company-dabbrev-ignore-case t)
+(setq company-dabbrev-code-ignore-case t)
+(setq company-dabbrev-other-buffers t)
+(company-mode 1)
 
 ;;//- general tweaks
 ;; documentation tip
@@ -580,7 +597,6 @@
                    (interactive)
                    (unless company-mode
                      (message "enabling company-mode")
-                     (setq-local company-backends '((company-dabbrev)))
                      (company-mode t))
                    (company-complete)))
 
@@ -588,7 +604,7 @@
 ;; time is not accurate because lag may occur while scrolling... so tweak it experimenally
 (defun smooth-scroll (lines number-of-iterations time)
   (let ((sit-for-time (/ (float time) (float number-of-iterations))))
-    (loop for i from 1 to number-of-iterations do (progn
+    (cl-loop for i from 1 to number-of-iterations do (progn
                                                     (scroll-up lines)
                                                     (sit-for sit-for-time)))))
 
@@ -648,6 +664,9 @@
   (delete-window))
 
 (global-set-key (kbd "C-x C-k") 'kill-close-window)
+
+;; disable annoying sounds
+(setq ring-bell-function 'ignore)
 
 ;; highlight 80+ lines
 (defun highlight-80+ ()
@@ -725,15 +744,15 @@
 (add-hook 'c-mode-hook 'ac-ccc-mode-setup)
 (add-hook 'c++-mode-hook 'ac-ccc-mode-setup)
 
-;; GNU global tags
-;; 1) install global (sudo apt-get install global)
-;; 2) run gtags in project root
-(require 'ggtags)
-(defun ggtags-enable ()
-  (ggtags-mode 1))
-(add-hook 'c-mode-hook 'ggtags-enable)
-(add-hook 'c++-mode-hook 'ggtags-enable)
-(define-key ggtags-mode-map (kbd "M-]") nil) ;; unbind keybing conflict
+;; eglot (this replaces ggtags and irony)
+(defun eglot-company-fix-backends ()
+  (setq-local company-backends
+              '((company-capf company-dabbrev-code company-keywords))))
+
+(add-hook 'c-mode-hook 'eglot-ensure)
+(add-hook 'c++-mode-hook 'eglot-ensure)
+(add-hook 'eglot-managed-mode-hook #'eglot-company-fix-backends)
+(setq completion-ignore-case t)
 
 ;; C++ coding style (indenting)
 (defconst my-c-style
@@ -771,28 +790,13 @@
 
 (add-hook 'c-mode-common-hook 'my-c-mode-common-hook)
 
-;; irony
+;; flycheck mode and company enabled by default for c++
 (add-hooks (lambda ()
-             (setq-local company-backends '((company-irony :separate company-dabbrev)))
-             (irony-mode t)
              (company-mode t)
-             (flycheck-mode t)
-             (flycheck-irony-setup))
-           '(c++-mode-hook))
+             (flycheck-mode t))
+           '(c++-mode-hook c-mode-hook))
 
-(setq-default company-irony-ignore-case t)
-(setq-default irony-supported-major-modes '(c++-mode))
 (setq-default w32-pipe-read-delay 0)
-
-;; replace the `completion-at-point' and `complete-symbol' bindings in
-;; irony-mode's buffers by irony-mode's function
-(defun my-irony-mode-hook ()
-  (define-key irony-mode-map [remap completion-at-point]
-    'irony-completion-at-point-async)
-  (define-key irony-mode-map [remap complete-symbol]
-    'irony-completion-at-point-async))
-(add-hook 'irony-mode-hook 'my-irony-mode-hook)
-(add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
 
 ;;//- CMake
 ;; cmake-mode
@@ -833,6 +837,11 @@
 (add-hook 'csharp-mode-hook 'flycheck-mode)
 (setq omnisharp-server-executable-path "e:/repo/omnisharp-roslyn/artifacts/publish/OmniSharp/default/net46/OmniSharp.exe")
 (global-set-key (kbd "C-<f12>") 'omnisharp-go-to-definition)
+
+;;//- markdown mode
+(add-hook 'markdown-mode-hook (lambda ()
+                                (visual-line-mode t)
+                                (markdown-toggle-inline-images)))
 
 ;;//- Cg/HLSL/GLSL/ShaderLab
 ;; CG/HLSL mode
@@ -1126,7 +1135,8 @@
                                                                      " l - install project (CMake only)"
                                                                      " g - generate CMake project"
                                                                      " r - regenerate CMake project"
-                                                                     " q - quick C++ test program")
+                                                                     " q - quick C++ test program"
+                                                                     " d - open latest dump in KDbg")
                                                                 '(("i" . (lambda () (boxy-close) (or (switch-target) (vs-init) (vs-search))))
                                                                   ("t" . (lambda () (boxy-close) (switch-target)))
                                                                   ("c" . (lambda () (boxy-close) (if (vs-active) (vs-switch-configuration) (switch-configuration))))
@@ -1134,7 +1144,8 @@
                                                                   ("l" . (lambda () (boxy-close) (cmake-install)))
                                                                   ("g" . (lambda () (boxy-close) (generate-project)))
                                                                   ("r" . (lambda () (boxy-close) (cm-regenerate)))
-                                                                  ("q" . (lambda () (boxy-close) (cpp-testfield-init)))))))
+                                                                  ("q" . (lambda () (boxy-close) (cpp-testfield-init)))
+                                                                  ("d" . (lambda () (boxy-close) (load-latest-dump-kdbg)))))))
                        ("v" . (lambda () (boxy-close) (boxy-centered 40 '(" r - [root ...]"
                                                                      " d - directory status"
                                                                      " c - diff current file (=)"
@@ -1211,10 +1222,10 @@
                        ("o" . (lambda () (boxy-close) (switch-to-buffer (other-buffer))))
                        ("x" . (lambda () (boxy-close) (page-breaks-popup)))
                        ("u" . (lambda () (boxy-close) (call-interactively 'cua-paste)))
-                       ("h" . (lambda () (boxy-close) (boxy-centered 40 '(" g - Git"
+                       ("h" . (lambda () (boxy-close) (boxy-centered 40 '(" g - git find file"
                                                                      " b - bookmarks"
-                                                                     " f - Grep find in Git")
-                                                                '(("g" . (lambda () (boxy-close) (helm-ls-git-ls)))
+                                                                     " f - grep find in git")
+                                                                '(("g" . (lambda () (boxy-close) (helm-ls-git)))
                                                                   ("b" . (lambda () (boxy-close) (helm-bookmarks)))
                                                                   ("f" . (lambda () (boxy-close) (helm-git-grep)))))))
                        ("?" . (lambda () (boxy-close) (zeal-at-point))))))
@@ -1289,9 +1300,11 @@
                                ("g" (generate-project)))))
     (set-face-attribute 'mode-line nil :background "#225599")))
 
+;; key chord mode
 (key-chord-define-global "jf" 'moded-do)
 (key-chord-define-global "fj" 'moded-do)
 (key-chord-mode t)
+(setq key-chord-two-keys-delay 0.2)
 
 ;;//- local custom settings
 (load "~/.emacs.d/local-config" t)
@@ -1302,3 +1315,35 @@
 ;; TODO: uniform c++ project
 ;; TODO: recall: make recall.el package
 ;; TODO: recall: open closed buffers?
+;; TODO: focus change for ergodox, it requires pressing 4 keys, bad
+
+;; ; my debugger breakpoint test
+;; (setq breakpoints (list))
+
+;; (defun is-breakpoint-set ()
+;;   (member (line-number-at-pos) breakpoints))
+
+;; (defun set-breakpoint ()
+;;   (setq breakpoints (cons (line-number-at-pos) breakpoints)))
+
+;; (defun set-breakpoint-icon ()
+;;   (overlay-put
+;;    (make-overlay (point) (point))
+;;    'before-string (propertize
+;;                    "x" 'display
+;;                    `(left-fringe right-triangle warning))))
+
+;; (defun toggle-breakpoint-offline ()
+;;   (interactive)
+;;   (if (is-breakpoint-set)
+;;       (progn)
+;;     (set-breakpoint)
+;;     (set-breakpoint-icon)))
+
+;; (global-set-key (kbd "<f9>") 'toggle-breakpoint-offline)
+
+
+;; ergodox keybinds and macros:
+;; layer1 + arrows on right thumb = previous next mark
+;; right alt tap = interactive command
+;; right layer1 = C+g
