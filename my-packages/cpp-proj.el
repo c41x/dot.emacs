@@ -219,14 +219,13 @@
 
 (defvar compile-commands-path "")
 
-(defun eglot-clangd-command ()
+(defun eglot-clangd-command (&rest _) ;; eglot is calling this function with some arguments, ignore them using &rest
   (let ((dir (file-name-directory compile-commands-path)))
     `("clangd" ,(concat "--compile-commands-dir=" dir))))
 
 (with-eval-after-load 'eglot
-  (when (not (string-equal compile-commands-path ""))
-    (setq eglot-server-programs
-          `(((c-mode c++-mode) . eglot-clangd-command)))))
+  (setq eglot-server-programs
+        `(((c-mode c++-mode) . eglot-clangd-command))))
 
 (defun setup-cmake-project ()
   (when (is-cmake-project)
